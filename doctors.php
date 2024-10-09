@@ -441,13 +441,7 @@ var promotionID =$(this).attr("id");
       if(this.checked){
         count++;
       }
-      
-
-
     });
-
-
-
 
     if($('#docid').val() == "" || count<1)  
     {  

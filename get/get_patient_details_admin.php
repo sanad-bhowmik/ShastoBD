@@ -26,9 +26,6 @@ if(isset($_POST['p_id'])){
   Mobile: '.$pDetails['Mobile'].'
   </div>
   <div class="col-md-3">
-  Address: '.$pDetails['Address'].'
-  </div>
-  <div class="col-md-3">
   Email: '.$pDetails['Email'].'
   </div>
   </div>

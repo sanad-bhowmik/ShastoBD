@@ -20,10 +20,6 @@ if(isset($_POST['aid'])){
 
   $user_remarks = $_POST['user_remarks'];
 
-
-
-
- 
 //=============================
       
 
@@ -161,10 +157,6 @@ if(isset($_POST['aid'])){
       fclose($file);
 
      }
-
-
-
-
    }
 
      $ai= 'applications/icon/'.$ai;

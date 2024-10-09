@@ -5,11 +5,7 @@ require_once("../include/dasfunctions.php");
 
 if(isset($_POST['pid'])){
 
-
-
   $pid = trim($_POST['pid']);
-
- 
 
   $sql  = "update tbl_otherprofessional set Active=1 where OID ='$pid' limit 1 ";
 

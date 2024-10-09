@@ -71,19 +71,7 @@ include_once("include/header.php");
 
 
     });
-
-
-
-
-
-
-
-
-
-
    });
-
-
 
 
     $("#Saturday").click(function(){

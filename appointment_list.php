@@ -1,62 +1,41 @@
 <?php
 include_once("include/header.php");
-
-
-
-
-if(isset($_POST['submit'])){
+if (isset($_POST['submit'])) {
 
   $param = array();
-  
-  if(isset($_POST['doc_id']) &&  $_POST['doc_id'] !="" &&  !empty($_POST['doc_id'])){
-    
+
+  if (isset($_POST['doc_id']) &&  $_POST['doc_id'] != "" &&  !empty($_POST['doc_id'])) {
+
     $docID = $_POST['doc_id'];
-    $condition = "DOCID =".$docID;
-    array_push($param,$condition);
-
+    $condition = "DOCID =" . $docID;
+    array_push($param, $condition);
   }
-
-  if(isset($_POST['status'])){
-    
-     
-    if($_POST['status'] !="all"){
-      $condition = " Status = '".$_POST['status']."' ";
-      array_push($param,$condition);
+  if (isset($_POST['status'])) {
+    if ($_POST['status'] != "all") {
+      $condition = " Status = '" . $_POST['status'] . "' ";
+      array_push($param, $condition);
     }
-   
+  }
+  if (isset($_POST['fdate']) && isset($_POST['todate'])) {
 
+
+    $condition = " AppointmentDate between '" . $_POST['fdate'] . "' and '" . $_POST['todate'] . "' ";
+    array_push($param, $condition);
   }
 
 
-  if(isset($_POST['fdate']) && isset($_POST['todate']) ){
-    
-  
-    $condition = " AppointmentDate between '".$_POST['fdate']."' and '".$_POST['todate']."' ";
-    array_push($param,$condition);
-
-  }
-
-  
-  $condition = implode(" and ",$param);
+  $condition = implode(" and ", $param);
 
 
-  
-  
-  $sql_get_data = "select * from appointmentview  where  ".$condition."  order by AppointmentDate desc" ;
+  $sql_get_data = "select * from appointmentview  where  " . $condition . "  order by AppointmentDate desc";
   //var_dump($sql_get_data);
   //die;
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
-
-
-
-
-}// end if submit
-else{
-
+} // end if submit
+else {
   $sql_get_data = "select * from appointmentview  where 1=1 order by AppointmentDate desc ";
 
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
-
 }
 
 
@@ -71,77 +50,77 @@ else{
 <div class="app-main__inner">
 
 
-<form id="search"  action="<?php echo $_SERVER['PHP_SELF'];?>" method="post" >
-  <div class="row">
-    <div class="col-md-12">
-      <div class="main-card mb-3 card">
-        <div class="card-header">Search Appointment</div>
-        <div class="card-body">
+  <form id="search" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="main-card mb-3 card">
+          <div class="card-header">Search Appointment</div>
+          <div class="card-body">
 
 
 
 
 
-        
 
-          <div class="position-relative row form-group">
-            
-          <div class="col-sm-3">
-              <input type="text" hidden="true"  name="doc_id" class="form-control" id="doc_id">
-              <p class="text">Type Doctor Name :</p> <input autocomplete="off" type="text"  name="doc_name" class="form-control" id="doc_name" placeholder="Type Doctor Name">
-              <div class="list-group" id="show-list">
+
+            <div class="position-relative row form-group">
+
+              <div class="col-sm-3">
+                <input type="text" hidden="true" name="doc_id" class="form-control" id="doc_id">
+                <p class="text">Type Doctor Name :</p> <input autocomplete="off" type="text" name="doc_name" class="form-control" id="doc_name" placeholder="Type Doctor Name">
+                <div class="list-group" id="show-list">
+                </div>
               </div>
+              <div class="col-sm-3">
+
+                <p class="text">From Date :</p>
+                <input class="form-control" required value="<?php if (isset($_POST['fdate'])) echo $_POST['fdate']; ?>" type="date" name="fdate" id="fdate">
+              </div>
+              <div class="col-sm-3">
+
+                <p class="text">To Date :</p>
+                <input class="form-control" required type="date" value="<?php if (isset($_POST['todate'])) echo $_POST['todate']; ?>" name="todate" id="todate">
+              </div>
+
+              <div class="col-sm-3">
+
+                <p class="text">Status</p>
+
+                <select name="status" id="status" class="form-control">
+                  <option value="all">All
+                  </option>
+                  <option value="Completed">Completed
+                  </option>
+                  <option value="pending">Pending
+                  </option>
+                  <option value="overdue">Over Due
+                  </option>
+                </select>
+
+              </div>
+
+            </div>
+
+
+
+            <div class="position-relative row form-group p-t-10 ">
+              <div class="col-sm-4 ">
+
+                <input type="submit" id="search" value="Search" name="submit" class="btn btn-secondary">
+
+
+              </div>
+            </div>
+
+
+
+
           </div>
-          <div class="col-sm-3">
-              
-              <p class="text">From Date :</p> 
-              <input class="form-control" required value="<?php if(isset($_POST['fdate'])) echo $_POST['fdate']; ?>" type="date" name="fdate" id="fdate">
-          </div>
-          <div class="col-sm-3">
-            
-              <p class="text">To Date :</p> 
-              <input class="form-control" required type="date"  value="<?php if(isset($_POST['todate'])) echo $_POST['todate']; ?>" name="todate" id="todate">
-          </div>
-
-          <div class="col-sm-3">
-            
-            <p class="text">Status</p> 
-
-            <select name="status" id="status" class="form-control" >
-              <option value="all">All
-              </option>
-              <option value="Completed">Completed
-              </option>
-              <option value="pending">Pending
-              </option>
-              <option value="overdue">Over Due
-              </option>
-            </select>
-
-        </div>
-          
-          </div>
-
-
-
-<div class="position-relative row form-group p-t-10 ">
-<div class="col-sm-4 ">
-
-<input type="submit"  id="search" value="Search"  name="submit" class="btn btn-secondary">
-
-
-</div>
-</div>
-
-       
-
-
         </div>
       </div>
     </div>
-  </div>
 
-</form>
+  </form>
 
   <div class="row">
     <div class="col-md-12">
@@ -181,16 +160,16 @@ else{
                       <?php echo $rs['MobileNum']; ?>
                     </td>
                     <td class="text-center">
-                    <?php echo $rs['Appointment_Time']; ?>
+                      <?php echo $rs['Appointment_Time']; ?>
                     </td>
                     <td class="text-center">
                       <?php echo $rs['AppointmentDate']; ?>
                     </td>
                     <td class="text-center">
-                    <?php 
-                    
-                    echo  "<a href='#' id='".$rs['PatientID']."' class='patientDetails'>".$rs['PatientName']."</a><br>".$rs['PatientMobile']."";
-                       
+                      <?php
+
+                      echo  "<a href='#' id='" . $rs['PatientID'] . "' class='patientDetails'>" . $rs['PatientName'] . "</a><br>" . $rs['PatientMobile'] . "";
+
                       ?>
                     </td>
                     <td class="text-center">
@@ -201,9 +180,9 @@ else{
 
                     <td class="text-center">
                       N/A
-                     <!--  <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary doctorDetails">Details</button> -->
+                      <!--  <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary doctorDetails">Details</button> -->
 
-                    <!--   <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-danger docDelete">Remove</button> -->
+                      <!--   <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-danger docDelete">Remove</button> -->
 
                     </td>
 
@@ -230,53 +209,56 @@ include_once("include/footer.php");
 <!-- Large modal -->
 
 <div id="pModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle"><div id="pdt">Details</div></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-             <form id="UpdateDoctor"  method="post" enctype="multipart/form-data">
-                <div class="modal-body" id="patient-details">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">
+          <div id="pdt">Details</div>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="UpdateDoctor" method="post" enctype="multipart/form-data">
+        <div class="modal-body" id="patient-details">
 
-                </div>
-                <div class="modal-footer">
-                 
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <!-- <button id="saveChanges" type="submit" class="btn btn-primary">Save changes</button> -->
-                </div>
-            </form>
         </div>
+        <div class="modal-footer">
+
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <!-- <button id="saveChanges" type="submit" class="btn btn-primary">Save changes</button> -->
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 
 
 <script type="text/javascript">
   $(document).ready(function() {
 
-    
+
     //===============================details
-    $(document).on('click', '.patientDetails', function(){
+    $(document).on('click', '.patientDetails', function() {
 
-var p_id = $(this).attr("id");
-//  console.log(product_id);
+      var p_id = $(this).attr("id");
+      //  console.log(product_id);
 
-$.ajax({
-   url:"get/get_patient_details_admin.php",
-   method:"POST",
-   data:{p_id:p_id},
-   success:function(data)
-   {   
-      // console.log(data);
-       $("#patient-details").html(data);
-       $(".bd-example-modal-lg").modal('show');
-   }
-});
-});
+      $.ajax({
+        url: "get/get_patient_details_admin.php",
+        method: "POST",
+        data: {
+          p_id: p_id
+        },
+        success: function(data) {
+          // console.log(data);
+          $("#patient-details").html(data);
+          $(".bd-example-modal-lg").modal('show');
+        }
+      });
+    });
 
-//=======================end
+    //=======================end
 
 
 
@@ -290,7 +272,7 @@ $.ajax({
 
 
     $('#doc_name').keyup(function() {
-      
+
 
       console.log("11");
 

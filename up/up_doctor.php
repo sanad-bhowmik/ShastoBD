@@ -259,12 +259,7 @@ $status=1;
 $general_payment=0;
 
 $json_day_time = json_encode($allDaysWithTime);
-
-
-
-     
-
-      
+ 
       $date = date("Y-m-d H:i:s");
 
       if(isset($_POST['docHospital'])){

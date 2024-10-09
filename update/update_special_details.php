@@ -4,11 +4,6 @@ require_once("../include/dasfunctions.php");
 
 
 if(isset($_POST['oid'])){
-
-
-
-  
- 
   if(isset($_POST['simg']) && $_POST['simg'] != ""){
     $img =  $_POST['simg'];
   }

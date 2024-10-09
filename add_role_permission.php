@@ -13,11 +13,6 @@ include_once("include/header.php");
                 <div class="card-body">
                     <div class="card-title"> Add Role Permissions</div>
                     <hr>
-		
-
-
-		
-                
         <div class="row">
                     	<div class="col-md-4">
 
@@ -29,32 +24,18 @@ include_once("include/header.php");
                     
                      $output .='<option value="'.$value["id"].'">'.$value["role_name"].'</option>';
                   }
-
-
                   echo $output;
                   ?>
-                    
-                  
-
                   </select>
                     	</div>	
-
              </div>
-             
-         
           </div>
-
       </div>
   </div>
 </div>
 
 <div id="menu-list">
-
-
-
-
 </div>
-
 
 <button id="saveChanges" type="submit" class="btn btn-primary">Save changes</button>
 
@@ -180,16 +161,7 @@ include_once("include/footer.php");
     }
 
 });
-
-
-
      });
-
-
-
-
-
- 
 
 
 </script>

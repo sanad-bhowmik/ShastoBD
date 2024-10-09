@@ -18,14 +18,8 @@ include_once("include/header.php");
 <script>
 $(document).ready(function() { 
   $('#uploadForm').submit(function(e) { 
-
-
             e.preventDefault();
-
-
             $('#loader-icon').show();
-
-
             $(this).ajaxSubmit({ 
                 target:   '#targetLayer', 
                 beforeSubmit: function() {
@@ -44,10 +38,6 @@ $(document).ready(function() {
                 resetForm: true 
             }); 
             return false; 
-       
-       
-
-
     }); // end upload form
 });// end document
 </script>

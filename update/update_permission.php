@@ -51,22 +51,11 @@ if(isset($_POST['role_id'])){
           $result = mysqli_query($GLOBALS['con'],$sql);
           //echo $sql;
 
-          
-       
-
         }
 
         echo "success";
 
       }
-
-
-
-
-
-
-
-
 
   //echo "string";
 

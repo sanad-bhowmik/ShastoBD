@@ -9,7 +9,6 @@ $appointment = get_count_by_sql("select count(*) from appointmentview where Appo
 
 <!--  Start content-->
                     <div class="app-main__inner">
-                        
                         <div class="row">
                             <div class="col-md-6 col-xl-4">
                                 <div class="card mb-3 widget-content bg-midnight-bloom">

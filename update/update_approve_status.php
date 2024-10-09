@@ -11,11 +11,6 @@ if(isset($_POST['app_id'])){
   $home_cat =0;
   $remarks="";
 
-
-
-
-
-
   $app_id = mysqli_real_escape_string($GLOBALS['con'],$_POST['app_id']);
   $command = mysqli_real_escape_string($GLOBALS['con'],$_POST['command']);
 
@@ -70,10 +65,6 @@ if(isset($_POST['app_id'])){
     $sql  = "update applications set app_status='$app_status',approve_status='$status' , admin_remarks='$remarks',home_cat_id='$home_cat', approve_date='$date',approve_by='$user',approve_id='$user_id'  where id='$app_id' limit 1";
 
   }
-
-
-
-
 
   $result = mysqli_query($GLOBALS['con'],$sql);
 

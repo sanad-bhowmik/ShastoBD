@@ -367,11 +367,6 @@ $sql .= "HospitalID='$docHospital' , SpecialArea = '$speciality' ,MobileNum = '$
 $sql .= "Password='$docPass' , Remarks = '$remarks',Payment = '$docPayment',general_payment = '$docPayment',
         report_showing_payment='$report_showing_payment',followup_payment ='$followup_payment',counseling_payment='$counseling_payment', ";
 
-
-
-
-
-
 if($gm1 !=""){
   $sql .= "DocImage='$filepath1' ,fileName ='$fileName1' , ";
 } 
@@ -385,11 +380,6 @@ $sql .= "Gen_Prac='$gen_prac' , OtherPfID = '$op' ,DayOfPractice = '$dayOfPracti
 
 
 $sql .= "Gender = '$gender',DOB = '$dob',Email = '$email', ";
-
-
-
-
-
 
 $sql .= "updated_at='$udate' , updated_by ='$user' where DOCID='$docId'  limit 1";
 

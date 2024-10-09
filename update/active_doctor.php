@@ -4,12 +4,7 @@ require_once("../include/dasfunctions.php");
 
 
 if(isset($_POST['pid'])){
-
-
-
   $pid = trim($_POST['pid']);
-
- 
 
   $sql  = "update tbl_doctor set Active=1 where DOCID ='$pid' limit 1 ";
 
@@ -24,16 +19,6 @@ if(isset($_POST['pid'])){
   echo  "Somthing went wrong !!";
 
 }
-
-
-
-
-
 }
-
-
-
-
-
 
 ?>
