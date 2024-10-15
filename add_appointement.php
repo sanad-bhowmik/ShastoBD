@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 $doctorQuery = "SELECT DOCID, DocName FROM tbl_doctor WHERE Active = 1";
 $doctorResult = $conn->query($doctorQuery);
 
-$patientQuery = "SELECT OID, Name FROM tbl_patient WHERE Active = 1";
+$patientQuery = "SELECT OID, Name, Mobile, Gender FROM tbl_patient WHERE Active = 1";
 $patientResult = $conn->query($patientQuery);
 ?>
 
@@ -23,7 +23,7 @@ $patientResult = $conn->query($patientQuery);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <!-- Include Toastr CSS and JS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <div class="form-container">
@@ -44,21 +44,25 @@ $patientResult = $conn->query($patientQuery);
                     ?>
                 </select>
             </label>
-            <label for="patientid">Patient Name:
-                <select name="patientid" id="patientid" required disabled>
-                    <option value="">Select Patient</option>
-                    <?php
-                    if ($patientResult->num_rows > 0) {
-                        while ($row = $patientResult->fetch_assoc()) {
-                            echo "<option value='" . $row['OID'] . "'>" . $row['Name'] . "</option>";
-                        }
-                    } else {
-                        echo "<option value=''>No Patients Available</option>";
-                    }
-                    ?>
+            <label for="patientName" style="margin-top: -8px;">Patient Name:
+                <input type="text" name="patientName" id="patientName" required placeholder="Enter Patient Name" style="height: 34px;">
+            </label>
+        </div>
+
+        <div class="form-row">
+            <label for="PatientMobile">Patient Mobile:
+                <input type="text" name="PatientMobile" id="PatientMobile" required placeholder="Enter Patient Mobile" >
+            </label>
+            <label for="gender">Gender:
+                <select name="gender" id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                 </select>
             </label>
         </div>
+
         <div class="form-row">
             <label for="AppointmentTime">Appointment Time:
                 <input type="time" name="AppointmentTime" required>
@@ -67,19 +71,7 @@ $patientResult = $conn->query($patientQuery);
                 <input type="date" name="AppointmentDate" required>
             </label>
         </div>
-        <div class="form-row">
-            <label for="PatientMobile">Patient Mobile:
-                <input type="text" name="PatientMobile" id="PatientMobile" readonly required>
-            </label>
-            <label for="gender">Gender:
-                <select name="gender" id="gender" readonly required>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </label>
-        </div>
+
         <input type="submit" value="Book Appointment">
     </form>
 </div>
@@ -90,53 +82,21 @@ $patientResult = $conn->query($patientQuery);
             placeholder: "Select Doctor",
             allowClear: true
         });
-        $('#patientid').select2({
-            placeholder: "Select Patient",
-            allowClear: true
-        });
 
+        // Handle the change event for the doctor selection
         $('#doctorid').on('change', function() {
             var doctorSelected = $(this).val();
             if (doctorSelected) {
-                $('#patientid').prop('disabled', false);
+                // Here you can enable the patient name input if needed
+                $('#patientName').prop('disabled', false);
             } else {
-                $('#patientid').prop('disabled', true);
+                $('#patientName').val(''); // Clear the input if no doctor is selected
                 $('#PatientMobile').val('');
-                $('#gender').val('').trigger('change');
+                $('#gender').val('').trigger('change'); // Reset gender dropdown
             }
         });
 
-        $('#patientid').on('change', function() {
-            var patientId = $(this).val();
-            if (patientId) {
-                $.ajax({
-                    url: 'get_patient_details.php',
-                    type: 'GET',
-                    data: {
-                        id: patientId
-                    },
-                    dataType: 'json',
-                    success: function(data) {
-                        if (data) {
-                            $('#PatientMobile').val(data.Mobile);
-                            $('#gender').val(data.Gender).trigger('change');
-                        } else {
-                            $('#PatientMobile').val('');
-                            $('#gender').val('').trigger('change');
-                        }
-
-                        $('#PatientMobile').prop('readonly', true);
-                        $('#gender').prop('disabled', true);
-                    },
-                    error: function() {
-                        alert('Error retrieving patient details.');
-                    }
-                });
-            } else {
-                $('#PatientMobile').val('');
-                $('#gender').val('').trigger('change');
-            }
-        });
+        // If you have a way to get patient details based on the name input, you can handle that here
 
         <?php if (isset($_SESSION['success_message'])): ?>
             toastr.success("<?php echo $_SESSION['success_message']; ?>");
@@ -144,7 +104,6 @@ $patientResult = $conn->query($patientQuery);
         <?php endif; ?>
     });
 </script>
-
 
 <style>
     body {

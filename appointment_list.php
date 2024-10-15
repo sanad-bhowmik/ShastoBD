@@ -140,7 +140,7 @@ else {
                   <th class="text-center">Appointment Time</th>
                   <th class="text-center">Appointment Date</th>
                   <th class="text-center">Patient</th>
-                  <th class="text-center">Status</th>
+                  <!-- <th class="text-center">Status</th> -->
                   <th class="text-center">Option</th>
                 </tr>
               </thead>
@@ -172,15 +172,15 @@ else {
 
                       ?>
                     </td>
-                    <td class="text-center">
+                    <!-- <td class="text-center">
                       <?php echo $rs['Status']; ?>
-                    </td>
+                    </td> -->
 
 
 
                     <td class="text-center">
-                      N/A
-                      <!--  <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary doctorDetails">Details</button> -->
+                   
+                       <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary doctorDetails">Details</button>
 
                       <!--   <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-danger docDelete">Remove</button> -->
 

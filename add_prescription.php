@@ -143,88 +143,128 @@ $patientResult = $conn->query($patientQuery);
 
         const params = new URLSearchParams(formData);
         const doctorName = $('#doctorid option:selected').text();
-        const doctorMobile = $('#doctorid option:selected').data('mobile'); // Get doctor's mobile number
+        const doctorMobile = $('#doctorid option:selected').data('mobile');
         const patientName = $('#patientid option:selected').text();
-        const patientGender = $('#patientid option:selected').data('gender'); // Get patient's gender
+        const patientGender = $('#patientid option:selected').data('gender');
         const medicine = params.get('medicine');
         const duration = params.get('duration');
         const dosage = params.get('dosage');
         const notes = params.get('notes');
         const refNo = params.get('refNo');
 
-        // Define colors
-        const primaryColor = [3, 169, 244]; // Light Blue for title
-        const secondaryColor = [40, 40, 40]; // Dark text color
-        const borderColor = [0, 0, 0]; // Black for borders
+        const textColor = [0, 0, 0];
+        const borderColor = [0, 0, 0];
+        const margin = 20;
 
-        // 1. Header Section: Doctor Information
+        // 1. Header Section: Clinic Name with Gray Background
+        const headerHeight = 30; // Height of the header section
+        pdf.setFillColor(200, 200, 200); // Light gray color for the header background
+        pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), headerHeight, 'F'); // Fill header background
+
+        // Clinic Name - Centered
+        pdf.setFontSize(24); // Larger font size for the header
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(...textColor);
+        pdf.text('Emon Dental', pdf.internal.pageSize.getWidth() / 2, 20, {
+            align: 'center'
+        }); // Centered
+
+        // 2. Doctor Information (Left Aligned)
         pdf.setFontSize(18);
-        pdf.setTextColor(...primaryColor);
-        pdf.text('Dr. ' + doctorName, 20, 20);
+        pdf.setFont("helvetica", "bold");
+        pdf.setTextColor(...textColor);
+        pdf.text('Dr. ' + doctorName, margin, 40);
+
+        // Doctor Contact and Certification Info
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "normal");
+        pdf.text('Mobile: ' + doctorMobile, margin, 48);
+        pdf.text('Certification No: ' + refNo, margin, 54);
+
+        // 3. Clinic Info: Right-Aligned
         pdf.setFontSize(12);
-        pdf.setTextColor(100);
-        pdf.text('Mobile: ' + doctorMobile, 20, 26); // Doctor's mobile number
-        pdf.text('Certification: ' + refNo, 20, 32); // Doctor's certification number
+        pdf.setFont("helvetica", "bold");
+        pdf.text('123 Demo Street, Dhaka, Bangladesh', 200, 40, {
+            align: 'right'
+        });
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        pdf.text('+880 1234-567890', 200, 46, {
+            align: 'right'
+        });
 
-        // 2. Patient Information Section
+        // Horizontal Line Separator
+        pdf.setDrawColor(...borderColor);
+        pdf.line(margin, 60, 200, 60);
+
+        // 4. Patient Information Section (Left-Aligned)
         pdf.setFontSize(12);
-        pdf.setTextColor(...secondaryColor);
-        pdf.text('Patient Name: ' + patientName, 20, 50);
-        pdf.text('Gender: ' + patientGender, 20, 56); // Patient's gender
-        pdf.text('Date: ' + new Date().toLocaleDateString(), 150, 68); // Today's date
+        pdf.setFont("helvetica", "bold");
+        pdf.text('Patient Information', margin, 70);
+        pdf.setFont("helvetica", "normal");
+        pdf.text('Name: ' + patientName, margin, 78);
+        pdf.text('Gender: ' + patientGender, margin, 84);
+        pdf.text('Date: ' + new Date().toLocaleDateString(), 150, 84);
 
-        // 3. Medicine Details Section
-        pdf.setTextColor(...primaryColor);
-        pdf.setFontSize(14);
-        pdf.text('Medicine Details', 20, 90);
+        // Horizontal Line Separator for Neatness
+        pdf.line(margin, 90, 200, 90);
 
-        // Medicine Details Box with outer border
-        pdf.setDrawColor(...borderColor); // Set border color to black
-        pdf.setLineWidth(0.5);
-
-        // Inner border for Medicine Details
-        pdf.setDrawColor(...borderColor); // Set inner border color to black
-        pdf.setLineWidth(0.5);
-
-        // Populate the Medicine Details
+        // 5. Medicine Details (Professionally added)
         pdf.setFontSize(12);
-        pdf.setTextColor(...secondaryColor);
-        pdf.text('Medicine: ' + (medicine || '_________________'), 25, 105);
-        pdf.text('Duration: ' + (duration || '_________________'), 25, 113);
-        pdf.text('Dosage: ' + (dosage || '_________________'), 25, 121);
+        pdf.setFont("helvetica", "bold");
+        pdf.text('Prescription Details', margin, 100);
 
-        // 4. Notes Section
+        // Medicine Name, Duration, Dosage (in table form)
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "normal");
+        pdf.text('Medicine: ' + (medicine || '_________________'), margin, 110);
+        pdf.text('Duration: ' + (duration || '_________________'), margin, 120);
+        pdf.text('Dosage: ' + (dosage || '_________________'), margin, 130);
+
+        // 6. Notes Section (Professionally boxed if applicable)
         if (notes) {
-            pdf.setFontSize(14);
-            pdf.setTextColor(...primaryColor);
-            pdf.text('Notes:', 20, 135);
-
-            pdf.setDrawColor(...borderColor); // Set notes section border to black
-            pdf.rect(20, 140, 170, 30); // Rectangle border for the notes section
             pdf.setFontSize(12);
-            pdf.setTextColor(...secondaryColor);
-            pdf.text(notes, 25, 150);
+            pdf.setFont("helvetica", "bold");
+            pdf.text('Notes:', margin, 145);
+            pdf.setDrawColor(...borderColor);
+            pdf.rect(margin, 150, 170, 30);
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(11);
+            pdf.text(notes, margin + 5, 160);
         }
 
-        // 5. Signature Section
+        // 7. Signature Section
         pdf.setFontSize(12);
-        pdf.text('Signature:', 150, 180);
-        pdf.setDrawColor(...secondaryColor);
-        pdf.line(150, 182, 200, 182); // Signature line
-
-        // 6. Footer Section: Hospital Information
-        pdf.setDrawColor(200);
-        pdf.rect(0, 270, 210, 20); // Footer background (light gray)
-
+        pdf.setFont("helvetica", "bold");
+        pdf.text('', 150, 190);
+        pdf.line(150, 192, 200, 192);
+        pdf.setFont("helvetica", "italic");
         pdf.setFontSize(10);
-        pdf.setTextColor(60);
-        pdf.text('HOSPITAL', 20, 280);
-        pdf.text('Phone: 55 47 79 94 15', 20, 285);
-        pdf.text('Email: hospital@email.com', 80, 280);
-        pdf.text('Address: 123 Street, City', 80, 285);
-        pdf.text('Website: www.hospital.com', 150, 285);
+        pdf.text('Doctor\'s signature', 150, 200);
 
-        // Open print dialog
-        pdf.output('dataurlnewwindow');
+        // 8. Footer Section (With Thank-You Note)
+        pdf.setFontSize(10);
+        pdf.setDrawColor(...borderColor);
+        pdf.setFillColor(230, 230, 230);
+        pdf.rect(0, 270, 210, 20, 'F');
+
+        // Footer Text and Thank You Note
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(...textColor);
+        pdf.text('Emon Dental, 123 Demo Street, Dhaka, Bangladesh | Phone: +880 1234-567890', margin, 278);
+        pdf.setFont("helvetica", "italic");
+        pdf.text('Thank you for choosing Emon Dental. We wish you a speedy recovery!', margin, 285);
+
+        // Next Appointment Section
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "normal");
+        pdf.text('Next Appointment Date: ___________________________', margin, 260);
+
+        // PDF Name with Patient's Name
+        const fileName = patientName ? `${patientName}.pdf` : "Prescription.pdf";
+
+        // Trigger print dialog (not download)
+        pdf.autoPrint();
+        window.open(pdf.output('bloburl'), '_blank');
     }
 </script>
