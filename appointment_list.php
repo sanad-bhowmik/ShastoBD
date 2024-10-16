@@ -1,4 +1,5 @@
 <?php
+
 include_once("include/header.php");
 if (isset($_POST['submit'])) {
 
@@ -38,15 +39,51 @@ else {
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
 }
 
-
-
-
-
-
-
-
-
 ?>
+
+<style>
+  .prescription-inputs {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .prescription-inputs input {
+    margin-bottom: .625rem;
+    /* Space between inputs */
+  }
+
+  .table td {
+    vertical-align: middle;
+    /* Aligns content vertically center */
+  }
+
+  .table .btn-primary {
+    margin-top: .625rem;
+    /* Space above button */
+  }
+
+  /* Modal styles */
+  .modal-content {
+    padding: 1.25rem;
+  }
+
+  .modal-header {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .modal-footer {
+    background-color: #f7f7f7;
+  }
+
+  .form-control {
+    border-radius: .3125rem;
+  }
+
+  .form-label {
+    font-weight: bold;
+  }
+</style>
 <div class="app-main__inner">
 
 
@@ -56,13 +93,6 @@ else {
         <div class="main-card mb-3 card">
           <div class="card-header">Search Appointment</div>
           <div class="card-body">
-
-
-
-
-
-
-
             <div class="position-relative row form-group">
 
               <div class="col-sm-3">
@@ -156,35 +186,39 @@ else {
                     <td class="text-center">
                       <?php echo $rs['DocName']; ?>
                     </td>
+
                     <td class="text-center">
                       <?php echo $rs['MobileNum']; ?>
                     </td>
+
                     <td class="text-center">
                       <?php echo $rs['Appointment_Time']; ?>
                     </td>
+
                     <td class="text-center">
                       <?php echo $rs['AppointmentDate']; ?>
                     </td>
+
                     <td class="text-center">
                       <?php
-
-                      echo  "<a href='#' id='" . $rs['PatientID'] . "' class='patientDetails'>" . $rs['PatientName'] . "</a><br>" . $rs['PatientMobile'] . "";
-
+                      echo $rs['PatientName'] . "<br>" . $rs['PatientMobile'];
                       ?>
                     </td>
                     <!-- <td class="text-center">
                       <?php echo $rs['Status']; ?>
                     </td> -->
-
-
-
                     <td class="text-center">
-                   
-                       <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary doctorDetails">Details</button>
-
-                      <!--   <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-danger docDelete">Remove</button> -->
-
+                      <?php
+                      echo "<a href='#' id='" . $rs['PatientID'] . "' class='patientDetails btn-sm mr-2 mb-2 btn-primary' 
+                      data-doctorid='" . $rs['DOCID'] . "'
+                      data-doctorname='" . $rs['DocName'] . "'
+                      data-patientname='" . $rs['PatientName'] . "'
+                      data-appointmenttime='" . $rs['Appointment_Time'] . "'
+                      data-appointmentdate='" . $rs['AppointmentDate'] . "'>Prescription</a>";
+                      ?>
                     </td>
+
+
 
                   </tr>
                 <?php $i++;
@@ -195,6 +229,7 @@ else {
               </tbody>
             </table>
           </div>
+
 
         </div>
       </div>
@@ -208,33 +243,210 @@ include_once("include/footer.php");
 
 <!-- Large modal -->
 
+<!-- Large modal -->
 <div id="pModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">
-          <div id="pdt">Details</div>
-        </h5>
+        <h5 class="modal-title" id="exampleModalLongTitle">Add Prescription</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form id="UpdateDoctor" method="post" enctype="multipart/form-data">
-        <div class="modal-body" id="patient-details">
+      <form id="prescriptionForm" method="post" enctype="multipart/form-data">
+        <div class="modal-body">
+          <input type="hidden" id="doctorId" name="doctorId">
+          <input type="hidden" id="patientId" name="patientId">
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="doctorName" class="form-label">Doctor Name</label>
+              <input type="text" class="form-control" id="doctorName" name="doctorName" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="patientName" class="form-label">Patient Name</label>
+              <input type="text" class="form-control" id="patientName" name="patientName" readonly>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="appointmentTime" class="form-label">Appointment Time</label>
+              <input type="text" class="form-control" id="appointmentTime" name="appointmentTime" readonly>
+            </div>
+            <div class="col-md-6">
+              <label for="appointmentDate" class="form-label">Appointment Date</label>
+              <input type="text" class="form-control" id="appointmentDate" name="appointmentDate" readonly>
+            </div>
+          </div>
+
+          <div class="row mb-3 ">
+            <div class="col-md-6 d-none">
+              <label for="refNo" class="form-label">Reference Number</label>
+              <input type="text" class="form-control" id="refNo" name="refNo">
+            </div>
+            <div class="col-md-6">
+              <label for="medicine" class="form-label">Medicine</label>
+              <input type="text" class="form-control" id="medicine" name="medicine" required>
+            </div>
+            <div class="col-md-6">
+              <label for="dosage" class="form-label">Dosage</label>
+              <input type="text" class="form-control" id="dosage" name="dosage" required>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="instructions" class="form-label">Instructions</label>
+              <textarea class="form-control" id="instructions" name="instructions" required></textarea>
+            </div>
+            <div class="col-md-6">
+              <label for="duration" class="form-label">Duration</label>
+              <input type="text" class="form-control" id="duration" name="duration" required>
+            </div>
+          </div>
 
         </div>
         <div class="modal-footer">
-
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <!-- <button id="saveChanges" type="submit" class="btn btn-primary">Save changes</button> -->
+          <button id="saveChanges" type="submit" class="btn btn-primary">Save Prescription</button>
         </div>
       </form>
     </div>
   </div>
 </div>
 
+<!-- Include Toastr CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const prescriptionForm = document.getElementById('prescriptionForm');
+    let isSubmitting = false; // Flag to prevent multiple submissions
+
+    // Listener for Prescription buttons
+    document.querySelectorAll('.patientDetails').forEach(button => {
+      button.addEventListener('click', function(event) {
+        // Prevent default action
+        event.preventDefault();
+
+        // Populate the modal with data
+        const doctorId = this.getAttribute('data-doctorid');
+        const doctorName = this.getAttribute('data-doctorname');
+        const patientId = this.id; // Patient ID is stored in the button's ID
+        const patientName = this.getAttribute('data-patientname');
+        const appointmentTime = this.getAttribute('data-appointmenttime');
+        const appointmentDate = this.getAttribute('data-appointmentdate');
+
+        // Set values in the modal
+        document.getElementById('doctorId').value = doctorId;
+        document.getElementById('doctorName').value = doctorName;
+        document.getElementById('patientId').value = patientId;
+        document.getElementById('patientName').value = patientName;
+        document.getElementById('appointmentTime').value = appointmentTime;
+        document.getElementById('appointmentDate').value = appointmentDate;
+
+        // Show the modal
+        $('#pModal').modal('show');
+      });
+    });
+
+    // Form submission listener
+    prescriptionForm.addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent the form from submitting the traditional way
+
+      if (isSubmitting) {
+        return; // If already submitting, exit the function
+      }
+
+      isSubmitting = true; // Set flag to true
+      const saveButton = document.getElementById('saveChanges'); // Reference to the save button
+      saveButton.disabled = true; // Disable the button to prevent further clicks
+
+      const formData = new FormData(this);
+
+      fetch('insert_prescription.php', { // Ensure the path is correct
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log(data.message);
+            $('#pModal').modal('hide');
+            window.location.href = 'appointment_list.php';
+            toastr.success("Added appointment");
+          } else {
+            console.error(data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error); // Network error
+        })
+        .finally(() => {
+          isSubmitting = false;
+          saveButton.disabled = false;
+        });
+    });
+  });
+</script>
+
 
 <script type="text/javascript">
+  $(document).ready(function() {
+    $('.patientDetails').click(function() {
+      var patientId = $(this).attr('id');
+      var doctorId = $(this).data('doctorid');
+      var doctorName = $(this).data('doctorname');
+      var patientName = $(this).data('patientname');
+      var appointmentTime = $(this).data('appointmenttime');
+      var appointmentDate = $(this).data('appointmentdate');
+
+      // Populate modal fields
+      $('#doctorId').val(doctorId);
+      $('#patientId').val(patientId);
+      $('#doctorName').val(doctorName);
+      $('#patientName').val(patientName);
+      $('#appointmentTime').val(appointmentTime);
+      $('#appointmentDate').val(appointmentDate);
+
+      // Show the modal
+      $('#pModal').modal('show');
+    });
+  });
+
+  // Handle form submission
+  $('#prescriptionForm').on('submit', function(e) {
+    e.preventDefault();
+
+    // Collect form data
+    const formData = $(this).serialize();
+
+    // Send data to the server via AJAX
+    $.ajax({
+      type: 'POST',
+      url: 'insert_prescription.php', // Replace with your server-side script
+      data: formData,
+      success: function(response) {
+        toastr.success("Prescription Added Successfully!!");
+        setTimeout(() => {
+          location.reload(); // Reload the page after 2 seconds
+        }, 2000);
+        $('#pModal').modal('hide');
+        // Optionally refresh the table or handle the response
+      },
+      error: function() {
+        // Handle error
+        alert('Error adding prescription!');
+      }
+    });
+  });
+
+
+
+
+
   $(document).ready(function() {
 
 
@@ -242,7 +454,7 @@ include_once("include/footer.php");
     $(document).on('click', '.patientDetails', function() {
 
       var p_id = $(this).attr("id");
-      //  console.log(product_id);
+      // console.log(product_id);
 
       $.ajax({
         url: "get/get_patient_details_admin.php",
@@ -259,15 +471,6 @@ include_once("include/footer.php");
     });
 
     //=======================end
-
-
-
-
-
-
-
-
-
 
 
 
@@ -315,7 +518,7 @@ include_once("include/footer.php");
 
 
 
-    }); // end  li click function
+    }); // end li click function
 
 
   }); // end document ready
