@@ -17,23 +17,45 @@ $message = "";
 $alertType = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['supplier_name'];
-    $address = $_POST['address'];
-    $phone = $_POST['phone'];
-    $status = $_POST['status'];
+    if (isset($_POST['edit_supplier_id'])) {
+        // Edit supplier
+        $id = $_POST['edit_supplier_id'];
+        $name = $_POST['edit_supplier_name'];
+        $address = $_POST['edit_supplier_address'];
+        $phone = $_POST['edit_supplier_phone'];
 
-    $stmt = $conn->prepare("INSERT INTO suppliers (name, address, phone, status) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("sssi", $name, $address, $phone, $status);
+        $stmt = $conn->prepare("UPDATE suppliers SET name = ?, address = ?, phone = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $name, $address, $phone, $id);
 
-    if ($stmt->execute()) {
-        $message = "Supplier added successfully!";
-        $alertType = "success";
+        if ($stmt->execute()) {
+            $message = "Supplier updated successfully!";
+            $alertType = "info"; // Update type to info for toastr
+        } else {
+            $message = "Error updating supplier: " . $conn->error;
+            $alertType = "error";
+        }
+
+        $stmt->close();
     } else {
-        $message = "Error adding supplier: " . $conn->error;
-        $alertType = "error";
-    }
+        // Add new supplier
+        $name = $_POST['supplier_name'];
+        $address = $_POST['address'];
+        $phone = $_POST['phone'];
+        $status = $_POST['status'];
 
-    $stmt->close();
+        $stmt = $conn->prepare("INSERT INTO suppliers (name, address, phone, status) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("sssi", $name, $address, $phone, $status);
+
+        if ($stmt->execute()) {
+            $message = "Supplier added successfully!";
+            $alertType = "info"; // Update type to info for toastr
+        } else {
+            $message = "Error adding supplier: " . $conn->error;
+            $alertType = "error";
+        }
+
+        $stmt->close();
+    }
 }
 
 $sql = "SELECT * FROM suppliers";
@@ -83,6 +105,7 @@ $result = $conn->query($sql);
             </div>
         </form>
 
+        <!-- Toastr messages -->
         <?php if (!empty($message)): ?>
             <script>
                 toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
@@ -93,7 +116,8 @@ $result = $conn->query($sql);
     <div class="container" style="margin: -28px auto;">
         <h2>Suppliers List</h2>
 
-        <div style="margin-bottom: 10px;display: flex;gap: 12px;">
+        <!-- Filters for suppliers -->
+        <div style="margin-bottom: 10px; display: flex; gap: 12px;">
             <div class="form-group">
                 <select id="filter_name" class="select2" style="width: 100%;">
                     <option value="">Select Name</option>
@@ -117,8 +141,7 @@ $result = $conn->query($sql);
                 </select>
             </div>
             <div class="form-group">
-                <!-- <button id="searchBtn" class="btn-primary">Search</button> -->
-                <button id="clearBtn" class="btn-primary" style="  background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(3, 31, 213, 1) 82.8%, rgba(248, 101, 248, 1) 87.9%);">Clear</button>
+                <button id="clearBtn" class="btn-primary" style="background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(3, 31, 213, 1) 82.8%, rgba(248, 101, 248, 1) 87.9%);">Clear</button>
             </div>
         </div>
 
@@ -130,26 +153,37 @@ $result = $conn->query($sql);
                     <th>Address</th>
                     <th>Phone</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT name, address, phone, status FROM suppliers";
+                $sql = "SELECT * FROM suppliers";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
                     $index = 1;
                     while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
+                        echo "<tr data-id='" . $row['id'] . "'>";
                         echo "<td>" . $index++ . "</td>";
-                        echo "<td>" . $row['name'] . "</td>";
-                        echo "<td>" . $row['address'] . "</td>";
-                        echo "<td>" . $row['phone'] . "</td>";
+                        echo "<td class='supplier-name'>" . $row['name'] . "</td>";
+                        echo "<td class='supplier-address'>" . $row['address'] . "</td>";
+                        echo "<td class='supplier-phone'>" . $row['phone'] . "</td>";
                         echo "<td>" . ($row['status'] == 1 ? 'Active' : 'Inactive') . "</td>";
+                        echo "<td>
+                        <button class='edit-btn'>Edit 
+                            <svg class='svg' viewBox='0 0 512 512'>
+                                <path d='M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z'></path>
+                            </svg>
+                        </button>
+                        <button class='save-btn' style='display: none;'>
+                            <span>SAVE</span>
+                        </button>
+                      </td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No suppliers found</td></tr>";
+                    echo "<tr><td colspan='6'>No suppliers found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -159,11 +193,6 @@ $result = $conn->query($sql);
     <script>
         $(document).ready(function() {
             $('.select2').select2();
-
-            $('#searchBtn').on('click', function(e) {
-                e.preventDefault(); // Prevent form submission
-                filterTable();
-            });
 
             $('#clearBtn').on('click', function(e) {
                 e.preventDefault(); // Prevent form submission
@@ -190,13 +219,170 @@ $result = $conn->query($sql);
                     );
                 });
             }
+
+            // Edit button functionality
+            $(document).on('click', '.edit-btn', function() {
+                var row = $(this).closest('tr');
+                var supplierId = row.data('id');
+
+                // Show inputs for editing
+                row.find('.supplier-name').html('<input type="text" value="' + row.find('.supplier-name').text() + '">');
+                row.find('.supplier-address').html('<input type="text" value="' + row.find('.supplier-address').text() + '">');
+                row.find('.supplier-phone').html('<input type="text" value="' + row.find('.supplier-phone').text() + '">');
+
+                row.find('.edit-btn').hide(); // Hide edit button
+                row.find('.save-btn').show(); // Show save button
+            });
+
+            // Save button functionality
+            $(document).on('click', '.save-btn', function() {
+                var row = $(this).closest('tr');
+                var supplierId = row.data('id');
+
+                var name = row.find('.supplier-name input').val();
+                var address = row.find('.supplier-address input').val();
+                var phone = row.find('.supplier-phone input').val();
+
+                $.ajax({
+                    url: 'add_supplier.php',
+                    type: 'POST',
+                    data: {
+                        edit_supplier_id: supplierId,
+                        edit_supplier_name: name,
+                        edit_supplier_address: address,
+                        edit_supplier_phone: phone
+                    },
+                    success: function(response) {
+                        // Update the row with the new values
+                        row.find('.supplier-name').text(name);
+                        row.find('.supplier-address').text(address);
+                        row.find('.supplier-phone').text(phone);
+
+                        row.find('.edit-btn').show(); // Show edit button
+                        row.find('.save-btn').hide(); // Hide save button
+
+                        // Show Toastr success message
+                        toastr.info('Supplier updated successfully!');
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error('Error updating supplier');
+                    }
+                });
+            });
         });
     </script>
 </body>
 
 </html>
-
 <style>
+    .save-btn {
+        width: 59px;
+        height: 28px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 5px;
+        background: #183153;
+        font-family: "Montserrat", sans-serif;
+        box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        cursor: pointer;
+        border: none;
+    }
+
+    .save-btn:after {
+        content: " ";
+        width: 0%;
+        height: 100%;
+        background: #ffd401;
+        position: absolute;
+        transition: all 0.4s ease-in-out;
+        right: 0;
+    }
+
+    .save-btn:hover::after {
+        right: auto;
+        left: 0;
+        width: 100%;
+    }
+
+    .save-btn span {
+        text-align: center;
+        text-decoration: none;
+        width: 100%;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        z-index: 20;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .save-btn:hover span {
+        color: #183153;
+        animation: scaleUp 0.3s ease-in-out;
+    }
+
+    @keyframes scaleUp {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(0.95);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .edit-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 59px;
+        height: 28px;
+        border: none;
+        padding: 0px 20px;
+        background-color: rgb(168, 38, 255);
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 10px;
+        box-shadow: 3px 3px 0px rgb(140, 32, 212);
+        transition-duration: .3s;
+    }
+
+    .svg {
+        width: 10px;
+        position: absolute;
+        right: 0;
+        margin-right: 6px;
+        fill: white;
+        transition-duration: .3s;
+    }
+
+    .edit-btn:hover {
+        color: transparent;
+    }
+
+    .edit-btn:hover svg {
+        right: 43%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        transition-duration: .3s;
+    }
+
+    .edit-btn:active {
+        transform: translate(3px, 3px);
+        transition-duration: .3s;
+        box-shadow: 2px 2px 0px rgb(140, 32, 212);
+    }
+
     .container {
         max-width: 97%;
         margin: 50px auto;

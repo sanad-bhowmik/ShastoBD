@@ -14,7 +14,8 @@ if ($_SESSION['logged_in'] != true) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Admin</title>
+    <title>Emon Dental | We Care</title>
+    <link rel="icon" type="image/x-icon" href="https://png.pngtree.com/png-vector/20220701/ourmid/pngtree-tooth-shape-dental-logo-template-illustration-design-png-image_5676375.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="description" content="This is an example dashboard created using build-in elements and components.">
     <meta name="msapplication-tap-highlight" content="no">

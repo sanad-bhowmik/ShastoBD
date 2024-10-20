@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Fetch the list of medicines along with their categories
-$sql = "SELECT m.name AS medicine_name, m.status, c.name AS category_name 
+$sql = "SELECT m.id, m.name AS medicine_name, m.status, c.name AS category_name 
         FROM medicine m 
         JOIN medicine_category c ON m.cat_id = c.id";
 $result = $conn->query($sql);
@@ -104,7 +104,7 @@ $result = $conn->query($sql);
         <div class="flex-container">
             <div id="noflex">
                 <div class="form-group Mname" style="width: 16%;">
-                    <input type="text" id="filter_name" placeholder="Search by Medicine Name" style="" />
+                    <input type="text" id="filter_name" placeholder="Search by Medicine Name" />
                 </div>
                 <div class="form-group" style="width: 16%;">
                     <select id="filter_category" class="select2">
@@ -134,6 +134,7 @@ $result = $conn->query($sql);
                     <th>Medicine Name</th>
                     <th>Category</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -143,13 +144,17 @@ $result = $conn->query($sql);
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . $index++ . "</td>";
-                        echo "<td>" . $row['medicine_name'] . "</td>";
+                        echo "<td><span class='medicine-name'>" . $row['medicine_name'] . "</span><input type='text' class='medicine-input' value='" . $row['medicine_name'] . "' style='display:none;'></td>";
                         echo "<td>" . $row['category_name'] . "</td>";
                         echo "<td>" . ($row['status'] == 1 ? 'Active' : 'Inactive') . "</td>";
+                        echo "<td>
+                                <button class='edit-btn'>Edit</button>
+                                <button class='save-btn' style='display: none;' data-id='" . $row['id'] . "'>Save</button>
+                              </td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='4'>No medicines found</td></tr>";
+                    echo "<tr><td colspan='5'>No medicines found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -177,12 +182,52 @@ $result = $conn->query($sql);
                 var categoryFilter = $('#filter_category').val();
 
                 $('#medicineTable tbody tr').filter(function() {
-                    var nameMatch = $(this).children('td:nth-child(2)').text().toLowerCase().indexOf(nameFilter) > -1 || nameFilter === "";
+                    var nameMatch = $(this).find('.medicine-name').text().toLowerCase().indexOf(nameFilter) > -1 || nameFilter === "";
                     var categoryMatch = $(this).children('td:nth-child(3)').text() === categoryFilter || categoryFilter === "";
 
                     $(this).toggle(nameMatch && categoryMatch);
                 });
             }
+
+            // Edit and save functionality
+            $(document).on('click', '.edit-btn', function() {
+                var $row = $(this).closest('tr');
+                $row.find('.medicine-input').show(); // Show input field
+                $row.find('.medicine-name').hide(); // Hide the normal text
+                $(this).hide(); // Hide edit button
+                $row.find('.save-btn').show(); // Show save button
+            });
+
+            $(document).on('click', '.save-btn', function() {
+                var $row = $(this).closest('tr');
+                var newMedicineName = $row.find('.medicine-input').val();
+                var medicineId = $(this).data('id'); // Get the id of the medicine
+
+                // Make the input read-only again
+                $row.find('.medicine-input').hide(); // Hide input field
+                $row.find('.medicine-name').text(newMedicineName).show(); // Update and show the normal text
+                $(this).hide(); // Hide save button
+                $row.find('.edit-btn').show(); // Show edit button again
+
+                // Send AJAX request to update the medicine name
+                $.ajax({
+                    type: 'POST',
+                    url: 'update_medicine.php', // The script that will handle the update
+                    data: { id: medicineId, name: newMedicineName },
+                    success: function(response) {
+                        // Handle response if necessary
+                        var res = JSON.parse(response);
+                        if (res.status === "success") {
+                            toastr.success('Medicine updated successfully!');
+                        } else {
+                            toastr.error('Error updating medicine: ' + res.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Error updating medicine.');
+                    }
+                });
+            });
         });
     </script>
 </body>
@@ -190,7 +235,118 @@ $result = $conn->query($sql);
 </html>
 
 
+
 <style>
+    .save-btn {
+        width: 59px;
+        height: 28px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 5px;
+        background: #183153;
+        font-family: "Montserrat", sans-serif;
+        box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        cursor: pointer;
+        border: none;
+        color: white;
+    }
+
+    .save-btn:after {
+        content: " ";
+        width: 0%;
+        height: 100%;
+        background: #ffd401;
+        position: absolute;
+        transition: all 0.4s ease-in-out;
+        right: 0;
+        color: black;
+    }
+
+    .save-btn:hover::after {
+        right: auto;
+        left: 0;
+        width: 100%;
+    }
+
+    .save-btn span {
+        text-align: center;
+        text-decoration: none;
+        width: 100%;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3em;
+        z-index: 20;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .save-btn:hover span {
+        color: #183153;
+        animation: scaleUp 0.3s ease-in-out;
+    }
+
+    @keyframes scaleUp {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(0.95);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .edit-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 59px;
+        height: 28px;
+        border: none;
+        padding: 0px 20px;
+        background-color: rgb(168, 38, 255);
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 10px;
+        box-shadow: 3px 3px 0px rgb(140, 32, 212);
+        transition-duration: .3s;
+    }
+
+    .svg {
+        width: 10px;
+        position: absolute;
+        right: 0;
+        margin-right: 6px;
+        fill: white;
+        transition-duration: .3s;
+    }
+
+    .edit-btn:hover {
+        color: transparent;
+    }
+
+    .edit-btn:hover svg {
+        right: 43%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        transition-duration: .3s;
+    }
+
+    .edit-btn:active {
+        transform: translate(3px, 3px);
+        transition-duration: .3s;
+        box-shadow: 2px 2px 0px rgb(140, 32, 212);
+    }
+
     .container {
         max-width: 97%;
         margin: 50px auto;
@@ -340,11 +496,13 @@ $result = $conn->query($sql);
         #filter_category {
             width: 614%;
         }
-        #searchBtn{
+
+        #searchBtn {
             margin-top: 10px;
             width: 98%;
         }
-        #clearBtn{
+
+        #clearBtn {
             margin-top: 10px;
             width: 98%;
         }
@@ -357,7 +515,7 @@ $result = $conn->query($sql);
         }
 
         #searchBtn {
-            margin-right:-144px;
+            margin-right: -144px;
         }
 
         .savebtn {

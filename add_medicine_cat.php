@@ -59,7 +59,162 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <style>
+    
+</head>
+
+<body>
+    <div class="container">
+        <form method="POST" action="">
+            <div class="flex-container">
+                <!-- Category Name Input -->
+                <div class="form-group">
+                    <label for="category_name">Category Name:</label>
+                    <input type="text" id="category_name" name="category_name" placeholder="Enter category name" required>
+                </div>
+
+                <!-- Status Dropdown -->
+                <div class="form-group status">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status" required>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Save Button -->
+                <div class="form-group">
+                    <button type="submit" class="btn-green savebtn">Save</button>
+                </div>
+            </div>
+        </form>
+
+        <?php if (!empty($message)): ?>
+            <script>
+                toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
+            </script>
+        <?php endif; ?>
+    </div>
+
+    <div class="container" style="margin: -28px auto;">
+        <h2>Medicines List</h2>
+
+        <div class="flex-container">
+            <!-- Category Name Dropdown -->
+            <div class="form-group">
+                <select id="filter_name" class="select2">
+                    <option value="">Select Category</option>
+                    <?php
+                    // Fetch distinct categories for filtering
+                    $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
+                    while ($row = $result_categories->fetch_assoc()) {
+                        echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <!-- Status Dropdown -->
+            <div class="form-group">
+                <select id="filter_status" class="select2">
+                    <option value="">Select Status</option>
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                </select>
+            </div>
+
+            <!-- Single Date Picker for Filtering -->
+            <div class="form-group">
+                <input type="date" id="filter_date" />
+            </div>
+
+            <!-- Search Button -->
+            <div class="form-group">
+                <button id="searchBtn" class="btn-warning">Search</button>
+            </div>
+            <div class="form-group">
+                <button id="clearBtn" class="btn-red">Clear</button>
+            </div>
+        </div>
+
+        <table id="medicineTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Category Name</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Fetch categories from the medicine_category table
+                $result = $conn->query("SELECT id, name, status, created_at FROM medicine_category");
+
+                if ($result->num_rows > 0) {
+                    $index = 1;
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>" . $index++ . "</td>";
+                        echo "<td>" . htmlspecialchars($row['name']) . "</td>";
+
+                        // Status with badge design
+                        $statusClass = $row['status'] == 1 ? 'badge-success' : 'badge-danger';
+                        $statusText = $row['status'] == 1 ? 'Active' : 'Inactive';
+                        echo "<td><span class='badge $statusClass' style='padding: 5px; color: white;'>" . $statusText . "</span></td>";
+
+                        // Display created_at date
+                        echo "<td>" . date('Y-m-d', strtotime($row['created_at'])) . "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='4'>No categories found</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2(); // Initialize select2 for dropdowns
+
+            // Clear filter button functionality
+            $('#clearBtn').on('click', function(e) {
+                e.preventDefault(); // Prevent form submission
+                $('#filter_name').val('').trigger('change'); // Clear category filter
+                $('#filter_status').val('').trigger('change'); // Clear status filter
+                $('#filter_date').val(''); // Clear date filter
+                $('#medicineTable tbody tr').show(); // Show all medicines
+            });
+
+            $('#searchBtn').on('click', function(e) {
+                e.preventDefault(); // Prevent form submission
+                filterTable();
+            });
+
+            function filterTable() {
+                var nameFilter = $('#filter_name').val();
+                var statusFilter = $('#filter_status').val();
+                var filterDate = $('#filter_date').val();
+
+                $('#medicineTable tbody tr').filter(function() {
+                    var nameMatch = nameFilter === "" || $(this).children('td:nth-child(2)').text() === nameFilter;
+                    var statusMatch = statusFilter === "" || $(this).children('td:nth-child(3)').text().trim() === (statusFilter == 1 ? 'Active' : 'Inactive');
+
+                    // Date filter logic
+                    var createdAt = $(this).children('td:nth-child(4)').text();
+                    var dateMatch = filterDate === "" || createdAt === filterDate;
+
+                    $(this).toggle(nameMatch && statusMatch && dateMatch);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
+
+<style>
         .badge-success {
             background-color: green;
         }
@@ -226,156 +381,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
     </style>
-</head>
-
-<body>
-    <div class="container">
-        <form method="POST" action="">
-            <div class="flex-container">
-                <!-- Category Name Input -->
-                <div class="form-group">
-                    <label for="category_name">Category Name:</label>
-                    <input type="text" id="category_name" name="category_name" placeholder="Enter category name" required>
-                </div>
-
-                <!-- Status Dropdown -->
-                <div class="form-group status">
-                    <label for="status">Status:</label>
-                    <select id="status" name="status" required>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-
-                <!-- Save Button -->
-                <div class="form-group">
-                    <button type="submit" class="btn-green savebtn">Save</button>
-                </div>
-            </div>
-        </form>
-
-        <?php if (!empty($message)): ?>
-            <script>
-                toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
-            </script>
-        <?php endif; ?>
-    </div>
-
-    <div class="container" style="margin: -28px auto;">
-        <h2>Medicines List</h2>
-
-        <div class="flex-container">
-            <!-- Category Name Dropdown -->
-            <div class="form-group">
-                <select id="filter_name" class="select2">
-                    <option value="">Select Category</option>
-                    <?php
-                    // Fetch distinct categories for filtering
-                    $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
-                    while ($row = $result_categories->fetch_assoc()) {
-                        echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <!-- Status Dropdown -->
-            <div class="form-group">
-                <select id="filter_status" class="select2">
-                    <option value="">Select Status</option>
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
-            </div>
-
-            <!-- Single Date Picker for Filtering -->
-            <div class="form-group">
-                <input type="date" id="filter_date" />
-            </div>
-
-            <!-- Search Button -->
-            <div class="form-group">
-                <button id="searchBtn" class="btn-warning">Search</button>
-            </div>
-            <div class="form-group">
-                <button id="clearBtn" class="btn-red">Clear</button>
-            </div>
-        </div>
-
-        <table id="medicineTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Category Name</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch categories from the medicine_category table
-                $result = $conn->query("SELECT id, name, status, created_at FROM medicine_category");
-
-                if ($result->num_rows > 0) {
-                    $index = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $index++ . "</td>";
-                        echo "<td>" . htmlspecialchars($row['name']) . "</td>";
-
-                        // Status with badge design
-                        $statusClass = $row['status'] == 1 ? 'badge-success' : 'badge-danger';
-                        $statusText = $row['status'] == 1 ? 'Active' : 'Inactive';
-                        echo "<td><span class='badge $statusClass' style='padding: 5px; color: white;'>" . $statusText . "</span></td>";
-
-                        // Display created_at date
-                        echo "<td>" . date('Y-m-d', strtotime($row['created_at'])) . "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4'>No categories found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
-
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2(); // Initialize select2 for dropdowns
-
-            // Clear filter button functionality
-            $('#clearBtn').on('click', function(e) {
-                e.preventDefault(); // Prevent form submission
-                $('#filter_name').val('').trigger('change'); // Clear category filter
-                $('#filter_status').val('').trigger('change'); // Clear status filter
-                $('#filter_date').val(''); // Clear date filter
-                $('#medicineTable tbody tr').show(); // Show all medicines
-            });
-
-            $('#searchBtn').on('click', function(e) {
-                e.preventDefault(); // Prevent form submission
-                filterTable();
-            });
-
-            function filterTable() {
-                var nameFilter = $('#filter_name').val();
-                var statusFilter = $('#filter_status').val();
-                var filterDate = $('#filter_date').val();
-
-                $('#medicineTable tbody tr').filter(function() {
-                    var nameMatch = nameFilter === "" || $(this).children('td:nth-child(2)').text() === nameFilter;
-                    var statusMatch = statusFilter === "" || $(this).children('td:nth-child(3)').text().trim() === (statusFilter == 1 ? 'Active' : 'Inactive');
-
-                    // Date filter logic
-                    var createdAt = $(this).children('td:nth-child(4)').text();
-                    var dateMatch = filterDate === "" || createdAt === filterDate;
-
-                    $(this).toggle(nameMatch && statusMatch && dateMatch);
-                });
-            }
-        });
-    </script>
-</body>
-
-</html>
