@@ -39,51 +39,53 @@ $result = $conn->query($sql);
         <h2>Sale Invoice Data</h2>
 
         <!-- Filters -->
-        <div class="filters" style="display: flex; align-items: flex-start; gap: 10px; margin-top: 5%;">
-            <input type="text" id="filterInvoiceNum" placeholder="Search by Invoice Number" style="margin-right: 10px;">
-            <input type="text" id="filterCustomerName" placeholder="Search by Customer Name" style="margin-right: 10px;">
-            <input type="text" id="filterCustomerPhone" placeholder="Search by Customer Phone" style="margin-right: 10px;">
-            <button id="searchBtn" style="margin-right: 10px;">Search</button>
-            <button id="clearBtn" class="clearBtn">Clear</button>
+        <div class="filters" style="display: flex; align-items: flex-start; gap: 10px; margin-top: 5%; flex-wrap: wrap;">
+            <input type="text" id="filterInvoiceNum" placeholder="Search by Invoice Number" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+            <input type="text" id="filterCustomerName" placeholder="Search by Customer Name" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+            <input type="text" id="filterCustomerPhone" placeholder="Search by Customer Phone" style="margin-right: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+            <button id="searchBtn" style="margin-right: 10px; padding: 10px; background-color: #4CAF50; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+            <button id="clearBtn" class="clearBtn" style="padding: 10px; background-color: #f44336; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Clear</button>
         </div>
 
-        <!-- Table to display sale invoice data -->
-        <table id="invoiceTable">
-            <thead>
-                <tr>
-                    <th>Invoice Number</th>
-                    <th>Total Price</th>
-                    <th>Discount</th>
-                    <th>Payable Price</th>
-                    <th>Customer Name</th>
-                    <th>Customer Phone</th>
-                    <th>File Name</th>
-                    <th>Action</th> <!-- New Action Column -->
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    // Output data for each row
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $row['inv_num'] . "</td>";
-                        echo "<td>" . $row['totalPrice'] . "</td>";
-                        echo "<td>" . $row['discount'] . "</td>";
-                        echo "<td>" . $row['payable_price'] . "</td>";
-                        echo "<td>" . $row['customer_name'] . "</td>";
-                        echo "<td>" . $row['customer_phone'] . "</td>";
-                        echo "<td>" . $row['file_name'] . "</td>";
-                        // Add action button with relative URL
-                        echo "<td><a href='themefiles/assets/pdf/" . $row['file_name'] . "' target='_blank' title='View PDF'><i class='fas fa-eye'></i></a></td>";
-                        echo "</tr>";
+        <div class="table-responsive">
+            <table id="invoiceTable">
+                <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Total Price</th>
+                        <th>Discount</th>
+                        <th>Payable Price</th>
+                        <th>Customer Name</th>
+                        <th>Customer Phone</th>
+                        <th>File Name</th>
+                        <th>Action</th> <!-- New Action Column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if ($result->num_rows > 0) {
+                        // Output data for each row
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . $row['inv_num'] . "</td>";
+                            echo "<td>" . $row['totalPrice'] . "</td>";
+                            echo "<td>" . $row['discount'] . "</td>";
+                            echo "<td>" . $row['payable_price'] . "</td>";
+                            echo "<td>" . $row['customer_name'] . "</td>";
+                            echo "<td>" . $row['customer_phone'] . "</td>";
+                            echo "<td>" . $row['file_name'] . "</td>";
+                            // Add action button with relative URL
+                            echo "<td><a href='themefiles/assets/pdf/" . $row['file_name'] . "' target='_blank' title='View PDF'><i class='fas fa-eye'></i></a></td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='8'>No data found</td></tr>"; // Update colspan
                     }
-                } else {
-                    echo "<tr><td colspan='8'>No data found</td></tr>"; // Update colspan
-                }
-                ?>
-            </tbody>
-        </table>
+                    ?>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -429,6 +431,65 @@ $result = $conn->query($sql);
 
         button.btn-primary {
             width: 100%;
+        }
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+
+    th,
+    td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+    }
+
+    @media (max-width: 768px) {
+
+        table {
+            font-size: 12px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        table {
+            font-size: 10px;
+        }
+
+        th,
+        td {
+            padding: 6px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filters input[type="text"],
+        .filters button {
+            width: 61%;
+            margin-left: 21%;
+            margin-bottom: 10px;
+        }
+
+        .filters button {
+            margin-bottom: 0;
         }
     }
 </style>
