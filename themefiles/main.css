@@ -9064,8 +9064,8 @@ button,
   transition: width 0.2s;
 }
 .app-header__logo .logo-src {
-height: 45px;
-    width: 203px;
+  height: 45px;
+  width: 203px;
   background: url(assets/images/logo-inverse.png);
 }
 .app-header__menu,
@@ -10471,11 +10471,10 @@ height: 45px;
   ) !important;
 }
 .bg-arielle-smile {
-  background-image: radial-gradient(
-    circle 248px at center,
-    #16d9e3 0%,
-    #30c7ec 47%,
-    #46aef7 100%
+  background-image: linear-gradient(
+    85.2deg,
+    rgba(33, 3, 40, 1) 7.5%,
+    rgba(65, 5, 72, 1) 88.7%
   ) !important;
 }
 .bg-plum-plate {
@@ -10516,7 +10515,13 @@ height: 45px;
   ) !important;
 }
 .bg-grow-early {
-  
+}
+.bg-grow-early2 {
+  background-image: linear-gradient(
+    179deg,
+    rgb(196 71 71) 9.2%,
+    rgba(127, 16, 16, 1) 103.9%
+  ) !important;
 }
 .bg-love-kiss {
   background-image: linear-gradient(
@@ -10533,16 +10538,20 @@ height: 45px;
   ) !important;
 }
 .bg-happy-green {
-  background-image: linear-gradient(to bottom, rgb(23 120 180), rgb(3 35 40)) !important;
+  background-image: linear-gradient(
+    to bottom,
+    rgb(23 120 180),
+    rgb(3 35 40)
+  ) !important;
 }
 .bg-vicious-stance {
   background-image: linear-gradient(60deg, #29323c 0%, #485563 100%) !important;
 }
 .bg-midnight-bloom {
-  background-image: linear-gradient(
-    -20deg,
-    #2b5876 0%,
-    #4e4376 100%
+  background-image: radial-gradient(
+    circle 382px at 50% 50.2%,
+    rgba(73, 76, 212, 1) 0.1%,
+    rgba(3, 1, 50, 1) 100.2%
   ) !important;
 }
 .bg-night-sky {

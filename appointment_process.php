@@ -32,10 +32,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $doctorStmt->fetch();
     $doctorStmt->close();
 
-    if (empty($docDegree) || empty($bmdcReg) || empty($docName) || empty($docType) || empty($dayOfPractice) || empty($docImage) || empty($mobileNum)) {
-        die("Error: Doctor with DOCID $doctorid not found.");
-    }
-
     // Generate random values for OID and PatientID
     $OID = rand(10, 99); // Generates a random number between 10 and 99
     $PatientID = rand(1000, 9999); // Generates a random number between 1000 and 9999

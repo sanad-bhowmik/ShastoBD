@@ -28,13 +28,15 @@ $patientResult = $conn->query($patientQuery);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<div class="form-container" style="margin-left: 9%;margin-top: 32px;max-width: 866px;padding: 20px;border: 1px solid #ccc;border-radius: 8px;background-color: #f9f9f9;box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;">
-    <h2 style="text-align: center; margin-bottom: 20px;">Add Prescription</h2>
-    <form id="prescriptionForm" method="POST" style="font-size: 15px;">
-        <div class="form-row" style="margin-bottom: 15px; display: flex; flex-wrap: wrap;">
-            <div style="flex: 1; padding-right: 10px;">
-                <label for="doctorid" style="display: block; margin-bottom: 5px;">Doctor:
-                    <select name="doctorid" id="doctorid" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+<div class="form-container" style="margin-left: 9%; margin-top: 2rem; max-width: 54.125rem; padding: 1.25rem; border: .0625rem solid #ccc; border-radius: .5rem; background-color: #f9f9f9; box-shadow: rgba(0, 0, 0, 0.35) 0rem .3125rem .9375rem;">
+    <h2 style="text-align: center; margin-bottom: 1.25rem;">Add Prescription</h2>
+    <form id="prescriptionForm" method="POST" style="font-size: .9375rem;">
+
+        <!-- First Row: 3 Inputs -->
+        <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
+            <div style="flex: 1; padding-right: .625rem;">
+                <label for="doctorid" style="display: block; margin-bottom: .3125rem;">Doctor:
+                    <select name="doctorid" id="doctorid" required style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem;">
                         <option value="">Select Doctor</option>
                         <?php
                         if ($doctorResult->num_rows > 0) {
@@ -46,12 +48,12 @@ $patientResult = $conn->query($patientQuery);
                         }
                         ?>
                     </select>
-
                 </label>
             </div>
-            <div style="flex: 1; padding-left: 10px;">
-                <label for="patientid" style="display: block; margin-bottom: 5px;">Patient:
-                    <select name="patientid" id="patientid" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <div style="flex: 1; padding-right: .625rem; padding-left: .625rem;">
+                <label for="patientid" style="display: block; margin-bottom: .3125rem;">Patient:
+                    <select name="patientid" id="patientid" required style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem;">
                         <option value="">Select Patient</option>
                         <?php
                         if ($patientResult->num_rows > 0) {
@@ -63,38 +65,49 @@ $patientResult = $conn->query($patientQuery);
                         }
                         ?>
                     </select>
+                </label>
+            </div>
 
-                </label>
-            </div>
-        </div>
-        <div class="form-row" style="margin-bottom: 15px; display: flex; flex-wrap: wrap;">
-            <div style="flex: 1; padding-left: 10px;">
-                <label for="medicine" style="display: block; margin-bottom: 5px;">Medicine Name:
-                    <input type="text" name="medicine" id="medicine" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                </label>
-            </div>
-            <div style="flex: 1; padding-left: 10px;">
-                <label for="duration" style="display: block; margin-bottom: 5px;">Duration:
-                    <input type="text" name="duration" id="duration" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="flex: 1; padding-left: .625rem;">
+                <label for="medicine" style="display: block; margin-bottom: .3125rem;">Medicine Name:
+                    <input type="text" name="medicine" id="medicine" required style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem;">
                 </label>
             </div>
         </div>
 
-        <div class="form-row" style="margin-bottom: 15px; display: flex; flex-wrap: wrap;">
-            <div style="flex: 1; padding-left: 10px;">
-                <label for="dosage" style="display: block; margin-bottom: 5px;">Dosage:
-                    <input type="text" name="dosage" id="dosage" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+        <!-- Second Row: 2 Inputs -->
+        <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
+            <div style="flex: 1;padding-right: 3.625rem;">
+                <label for="duration" style="display: block; margin-bottom: .3125rem;">Duration:
+                    <input type="text" name="duration" id="duration" required style="width: 126%;padding: .5rem;border: .0625rem solid #ccc;border-radius: .25rem;">
                 </label>
             </div>
-            <div style="flex: 1; padding-left: 10px;">
-                <label for="notes" style="display: block; margin-bottom: 5px;">Additional Notes:
-                    <textarea name="notes" id="notes" rows="4" style="width: 100%;padding: 8px;border: 1px solid #ccc;border-radius: 4px;height: 40px;"></textarea>
+
+            <div style="flex: 1; padding-left: .625rem;">
+                <label for="dosage" style="display: block; margin-bottom: .3125rem;">Dosage:
+                    <input type="text" name="dosage" id="dosage" required style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem;">
                 </label>
+            </div>
+            <div style="flex: 1; padding-left: .625rem;">
+                <label for="notes" style="display: block; margin-bottom: .3125rem;">Additional Notes:
+                    <textarea name="notes" id="notes" rows="4" style="width: 146%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem; height: 2.5rem;"></textarea>
+                </label>
+            </div>
+            <div style="flex: 1; padding-left: .625rem;">
+                <input type="submit" value="Print" style="padding: .625rem;color: white;border: none;border-radius: .25rem;cursor: pointer;margin-left: 44%;background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(14,174,87,1) 0%, rgba(12,116,117,1) 90%);z-index: 10;position: relative;margin-top: 19px;margin-left: 52%;">
+
             </div>
         </div>
-        <input type="submit" value="Add Prescription" style="width: 16%;padding: 10px;color: white;border: none;border-radius: 4px;cursor: pointer;margin-left: 44%;background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(14,174,87,1) 0%, rgba(12,116,117,1) 90%);">
+
+        <!-- Additional Notes -->
+        <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
+
+        </div>
+
+
     </form>
 </div>
+
 
 <script>
     $(document).ready(function() {

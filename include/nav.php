@@ -1,104 +1,107 @@
-<?php 
+<?php
 
-    $role_id =$_SESSION['role_id'];
-    $menus = get_all_menus_by_role_id($role_id);
-    $company_id = $_SESSION['company_id'];
+$role_id = $_SESSION['role_id'];
+$menus = get_all_menus_by_role_id($role_id);
+$company_id = $_SESSION['company_id'];
 
-    if($role_id==4){
+if ($role_id == 4) {
 
-           $newapps= 0;
+    $newapps = 0;
+} else {
 
-         
-    }
-    else{
+    $newapps = 0;
+}
+// Get the current page URL
+$current_page = basename($_SERVER['PHP_SELF']);
 
-     $newapps= 0;
-    
-    }
-
-   
 
 
 ?>
 
 
 <ul class="vertical-nav-menu">
-                                <li class="app-sidebar__heading">Dashboards</li>
-                                <li>
-                                    <a href="dashboard.php" class="mm-active">
-                                        <i class="metismenu-icon pe-7s-rocket"></i>
-                                        HOME
-                                    </a>
-                                </li>
-                                <li class="app-sidebar__heading">Administrator</li>
-                                <?php
-                                        $output ='';
+    <li class="app-sidebar__heading">Dashboards</li>
+    <li>
+        <a href="dashboard.php" class="<?= $current_page == 'dashboard.php' ? 'mm-active' : '' ?>">
+            <i class="metismenu-icon pe-7s-home"></i>
+            HOME
+        </a>
+    </li>
+    <li class="app-sidebar__heading">Administrator</li>
+    <?php
+    $output = '';
 
 
-                                        foreach ($menus as $menu) {
-                                         
+    foreach ($menus as $menu) {
+        // Check if the current page is under this menu to keep it active
+        $is_active = '';
+        $menu_id = $menu['menu_id'];
+        $sub_menus = get_all_sub_menus_by_menu_id_role_id($menu_id, $role_id);
 
-                                            $output .='<li>
+        foreach ($sub_menus as $sub_menu) {
+            if ($current_page == basename($sub_menu['page_url'])) {
+                $is_active = 'mm-active';
+                break;
+            }
+        }
+
+        $output .= '<li class="' . $is_active . '">
                                     <a href="#">
-                                        <i class="metismenu-icon '.$menu['icon_class'].'">
-                                        </i>'. $menu['menu_name'] ;
+                                        <i class="metismenu-icon ' . $menu['icon_class'] . '">
+                                        </i>' . $menu['menu_name'];
 
 
-                                        if($menu['notification']==1){
+        if ($menu['notification'] == 1) {
 
-                                    $output .=	$newapps>0 ? ' <span style="color:red"> ('.$newapps.')</span>' : ''  ;
-                                                }
+            $output .=    $newapps > 0 ? ' <span style="color:red"> (' . $newapps . ')</span>' : '';
+        }
 
-                                       $output .=	' <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+        $output .=    ' <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                     </a>
                                      <ul>';
-                                     $menu_id= $menu['menu_id'];
-                                     $sub_menus = get_all_sub_menus_by_menu_id_role_id($menu_id,$role_id);
-                                     
+        $menu_id = $menu['menu_id'];
+        $sub_menus = get_all_sub_menus_by_menu_id_role_id($menu_id, $role_id);
 
-                                     
-                                     foreach ($sub_menus as  $sub_menu) {
-                                         
 
-                                         $output .=' <li>
-                                            <a href="'.$sub_menu['page_url'].'">
-                                                <i class="metismenu-icon">
-                                                </i>'. $sub_menu['sub_menu_name'] ;
 
-                                                 if($sub_menu['notification']==1 && $newapps>0 ){
+        foreach ($sub_menus as  $sub_menu) {
 
-                                    $output .=	'<img width=50 height=30 src="themefiles/assets/images/new.gif">'  ;
-                                                }
 
-                                                
-                                               
-                                          $output .='    </a>
+            $output .= ' <li>
+                                             <a href="' . $sub_menu['page_url'] . '" class="' . ($current_page == basename($sub_menu['page_url']) ? 'mm-active' : '') . '">
+                        <i class="metismenu-icon"></i>' . $sub_menu['sub_menu_name'];
+
+            if ($sub_menu['notification'] == 1 && $newapps > 0) {
+
+                $output .=    '<img width=50 height=30 src="themefiles/assets/images/new.gif">';
+            }
+
+
+
+            $output .= '    </a>
                                         </li>';
-                                     }
-                                     
+        }
 
-                                        
-                                     
-                                   
-                                   $output .=' </ul>
+
+
+
+
+        $output .= ' </ul>
 
 
                                 </li>';
+    }
+
+    echo $output;
+
+    ?>
 
 
 
-                                        }
-
-                                        echo $output;
-
-                                ?>
-
-                                
 
 
 
-                                
-                              <!--   <li class="">
+    <!--   <li class="">
                                     <a href="#">
                                         <i class="metismenu-icon pe-7s-car"></i>
                                         Viewing
@@ -120,7 +123,7 @@
 
                                     </ul>
                                 </li> -->
-                               <!--  <li  >
+    <!--  <li  >
                                     <a href="tables-regular.html">
                                         <i class="metismenu-icon pe-7s-display2"></i>
                                         Tables
@@ -167,5 +170,4 @@
                                         Upgrade to PRO
                                     </a>
                                 </li> -->
- </ul>
- 
+</ul>
