@@ -82,57 +82,67 @@ $appointmentResult = $conn->query($appointmentQuery);
     <!-- Appointment Data Table Section -->
     <section class="table-section">
         <!-- Filter Section -->
-        <div class="filter-section">
-            <div style="width: 144px;margin-right: 0%;">
-                <label for="filterDoctorName">Doctor Name:</label>
-                <input type="text" id="filterDoctorName" placeholder="Filter by Doctor Name">
+        <div class="filter-section" style="display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin-bottom: 30px;">
+            <div style="flex: 1;">
+                <label for="filterAppointmentNumber">Appointment Number:</label>
+                <input type="text" id="filterAppointmentNumber" placeholder="Filter by Appointment Number" style="width: 100%;">
             </div>
 
-            <div style="width: 144px;">
+
+            <div style="flex: 1;">
                 <label for="filterPatientName">Patient Name:</label>
-                <input type="text" id="filterPatientName" placeholder="Filter by Patient Name">
+                <input type="text" id="filterPatientName" placeholder="Filter by Patient Name" style="width: 100%;">
             </div>
 
-            <div style="width: 144px;">
+            <div style="flex: 1;">
                 <label for="filterMobile">Mobile:</label>
-                <input type="text" id="filterMobile" placeholder="Filter by Mobile">
+                <input type="text" id="filterMobile" placeholder="Filter by Mobile" style="width: 100%;">
             </div>
 
-            <div style="width: 144px;margin-right: 44%;">
+            <div style="flex: 1;">
+                <label for="filterDoctorName">Doctor Name:</label>
+                <input type="text" id="filterDoctorName" placeholder="Filter by Doctor Name" style="width: 100%;">
+            </div>
+            <div style="flex: 1;">
                 <label for="filterDate">Date:</label>
-                <input type="date" id="filterDate">
+                <input type="date" id="filterDate" style="width: 100%;">
             </div>
 
-            <div style="position: absolute;z-index: 1000;margin-left: 43%;margin-top: 37px;">
-                <button id="clearButton" class="btn-warning">Clear</button>
+            <div style="flex: 0; margin-left: 10px;">
+                <button id="clearButton" class="btn-warning" style="padding: 6px 12px;">Clear</button>
             </div>
         </div>
+
 
         <table class="appointment-table" id="appointmentTable">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Doctor Name</th>
+                    <th>Appointment Number</th>
                     <th>Patient Name</th>
                     <th>Mobile</th>
                     <th>Gender</th>
                     <th>Appointment Date</th>
                     <th>Appointment Time</th>
+                    <th>Doctor Name</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 if ($appointmentResult->num_rows > 0) {
-                    $index = 1; // Initialize counter for sequential numbering
+                    $index = 1;
                     while ($row = $appointmentResult->fetch_assoc()) {
                         echo "<tr>
                             <td>" . $index++ . "</td>
-                            <td class='doctor-name'>" . $row['DocName'] . "</td>
+                            <td class='appointment-number'>" . $row['appointment_number'] . "</td>
                             <td class='patient-name'>" . $row['PatientName'] . "</td>
                             <td class='patient-mobile'>" . $row['PatientMobile'] . "</td>
                             <td>" . $row['ParientGender'] . "</td>
                             <td class='appointment-date'>" . $row['AppointmentDate'] . "</td>
                             <td>" . $row['Appointment_Time'] . "</td>
+                            <td class='doctor-name'>" . $row['DocName'] . "</td>
+                            <td>" . $row['Status'] . "</td>
                         </tr>";
                     }
                 } else {
@@ -146,11 +156,12 @@ $appointmentResult = $conn->query($appointmentQuery);
 
 <script>
     document.getElementById('clearButton').addEventListener('click', function() {
-        // Reload the page
         location.reload();
     });
+
     // Filter function
     document.addEventListener("DOMContentLoaded", function() {
+        const filterAppointmentNumber = document.getElementById("filterAppointmentNumber");
         const filterDoctorName = document.getElementById("filterDoctorName");
         const filterPatientName = document.getElementById("filterPatientName");
         const filterMobile = document.getElementById("filterMobile");
@@ -159,24 +170,27 @@ $appointmentResult = $conn->query($appointmentQuery);
         const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
 
         function filterTable() {
+            const appointmentNumber = filterAppointmentNumber.value.toLowerCase();
             const doctorName = filterDoctorName.value.toLowerCase();
             const patientName = filterPatientName.value.toLowerCase();
             const mobile = filterMobile.value;
             const date = filterDate.value;
 
             for (let i = 0; i < rows.length; i++) {
+                const rowAppointmentNumber = rows[i].getElementsByClassName("appointment-number")[0].textContent.toLowerCase();
                 const rowDoctorName = rows[i].getElementsByClassName("doctor-name")[0].textContent.toLowerCase();
                 const rowPatientName = rows[i].getElementsByClassName("patient-name")[0].textContent.toLowerCase();
                 const rowMobile = rows[i].getElementsByClassName("patient-mobile")[0].textContent;
                 const rowDate = rows[i].getElementsByClassName("appointment-date")[0].textContent;
 
                 // Check if the row matches all filters
+                const matchesAppointmentNumber = rowAppointmentNumber.includes(appointmentNumber);
                 const matchesDoctor = rowDoctorName.includes(doctorName);
                 const matchesPatient = rowPatientName.includes(patientName);
                 const matchesMobile = rowMobile.includes(mobile);
                 const matchesDate = !date || rowDate === date;
 
-                if (matchesDoctor && matchesPatient && matchesMobile && matchesDate) {
+                if (matchesAppointmentNumber && matchesDoctor && matchesPatient && matchesMobile && matchesDate) {
                     rows[i].style.display = ""; // Show row
                 } else {
                     rows[i].style.display = "none"; // Hide row
@@ -185,11 +199,13 @@ $appointmentResult = $conn->query($appointmentQuery);
         }
 
         // Add event listeners for filtering
+        filterAppointmentNumber.addEventListener("input", filterTable);
         filterDoctorName.addEventListener("input", filterTable);
         filterPatientName.addEventListener("input", filterTable);
         filterMobile.addEventListener("input", filterTable);
         filterDate.addEventListener("change", filterTable);
     });
+
     $(document).ready(function() {
         $('#doctorid').select2({
             placeholder: "Select Doctor",
@@ -202,6 +218,7 @@ $appointmentResult = $conn->query($appointmentQuery);
         <?php endif; ?>
     });
 </script>
+
 
 <style>
     .filter-section {

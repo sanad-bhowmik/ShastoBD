@@ -37,10 +37,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $PatientID = rand(1000, 9999); // Generates a random number between 1000 and 9999
     $type = 'Regular'; // Default type value
 
+    // Generate a 4-digit random number for appointment_number and prepend with "ED-"
+    $appointmentNumber = "ED-" . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+    $status = "active"; // Set status to active
+
     // Insert appointment data into appointmentview table
     $insertQuery = "INSERT INTO appointmentview 
-        (OID, PatientName, PatientMobile, PatientID, DOCID, Appointment_Time, AppointmentDate, Created_at, Updatedat, ParientGender, MobileNum, DocDegree, BmdcReg, DocName, DocType, DayOfPractice, type) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?,?)";
+        (OID, PatientName, PatientMobile, PatientID, DOCID, Appointment_Time, AppointmentDate, Created_at, Updatedat, ParientGender, MobileNum, DocDegree, BmdcReg, DocName, DocType, DayOfPractice, type, appointment_number, Status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($insertQuery);
     if ($stmt === false) {
@@ -48,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $stmt->bind_param(
-        "ississsssssssss",
+        "ississsssssssssss",
         $OID, 
         $patientName,
         $patientMobile,
@@ -63,7 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $docName,
         $docType,
         $dayOfPractice,
-        $type // Default type value
+        $type, // Default type value
+        $appointmentNumber, // Generated appointment number
+        $status // Set status to active
     );
 
     if ($stmt->execute()) {
@@ -78,3 +84,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 $conn->close();
+?>
