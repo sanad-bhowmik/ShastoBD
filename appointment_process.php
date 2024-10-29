@@ -14,7 +14,7 @@ if ($conn->connect_error) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get posted data
     $doctorid = $_POST['doctorid'];
-    $patientName = $_POST['patientName'];
+    $patientOID = $_POST['patientName']; // This now holds the OID from the dropdown
     $patientMobile = $_POST['PatientMobile'];
     $gender = $_POST['gender'];
     $appointmentTime = $_POST['AppointmentTime'];
@@ -31,10 +31,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $doctorStmt->bind_result($docDegree, $bmdcReg, $docName, $docType, $dayOfPractice, $docImage, $mobileNum);
     $doctorStmt->fetch();
     $doctorStmt->close();
+    // Get posted data
 
-    // Generate random values for OID and PatientID
-    $OID = rand(10, 99); // Generates a random number between 10 and 99
-    $PatientID = rand(1000, 9999); // Generates a random number between 1000 and 9999
+
+    $patientOID = $_POST['patientName']; // This holds the OID from the dropdown
+    $gender = $_POST['gender'];
+    $appointmentTime = $_POST['AppointmentTime'];
+    $appointmentDate = $_POST['AppointmentDate'];
+
+    // Query to fetch patient name and mobile based on OID
+    $patientQuery = "SELECT Name, Mobile FROM tbl_patient WHERE OID = ?";
+    $patientStmt = $conn->prepare($patientQuery);
+    $patientStmt->bind_param("i", $patientOID);
+    $patientStmt->execute();
+    $patientStmt->bind_result($patientName, $patientMobile);
+    $patientStmt->fetch();
+    $patientStmt->close();
+
+    $OID = rand(10, 99);
+    $PatientID = $patientOID; // Use the selected patient's OID as the PatientID
     $type = 'Regular'; // Default type value
 
     // Generate a 4-digit random number for appointment_number and prepend with "ED-"
@@ -53,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt->bind_param(
         "ississsssssssssss",
-        $OID, 
+        $OID,
         $patientName,
         $patientMobile,
         $PatientID,
@@ -84,4 +99,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 $conn->close();
-?>

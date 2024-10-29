@@ -374,7 +374,7 @@ $json_day_time = json_encode($allDaysWithTime);
       $result = mysqli_query($GLOBALS['con'],$sql);
 
                   if($result){
-                     echo "Data Added & " .$upload_msg ."---ALL success !!";
+                     echo "Doctor Added ";
 
                  }
                  else{

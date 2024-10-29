@@ -20,9 +20,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $patientAddress = mysqli_real_escape_string($con, $_POST['patientAddress']);
     $patientGender = mysqli_real_escape_string($con, $_POST['patientGender']);
 
-    // SQL query to insert patient data
-    $sql = "INSERT INTO tbl_patient (Name, Mobile, Email, Address, Gender, Active) 
-            VALUES ('$patientName', '$patientMobile', '$patientEmail', '$patientAddress', '$patientGender', '1')";
+    // Generate two random uppercase letters
+    $firstChar = chr(rand(65, 90)); // A-Z
+    $secondChar = chr(rand(65, 90)); // A-Z
+
+    // Generate a random 3-digit number
+    $randomNumber = rand(100, 999);
+
+    // Combine to form si_num
+    $si_num = "{$firstChar}{$secondChar}-{$randomNumber}";
+
+    // SQL query to insert patient data with si_num
+    $sql = "INSERT INTO tbl_patient (Name, Mobile, Email, Address, Gender, Active, si_num) 
+            VALUES ('$patientName', '$patientMobile', '$patientEmail', '$patientAddress', '$patientGender', '1', '$si_num')";
 
     // Execute the query
     if (mysqli_query($con, $sql)) {

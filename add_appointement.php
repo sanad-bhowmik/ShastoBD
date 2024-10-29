@@ -17,8 +17,23 @@ $doctorResult = $conn->query($doctorQuery);
 // Query for appointment data
 $appointmentQuery = "SELECT * FROM appointmentview";
 $appointmentResult = $conn->query($appointmentQuery);
-?>
 
+// Query for patients
+$patientQuery = "SELECT OID, Name FROM tbl_patient";
+$patientResult = $conn->query($patientQuery);
+?>
+<script>
+   $(document).ready(function() {
+    $('#patientNameSelect').select2(); // Initialize Select2 for the patient dropdown
+
+    $('#patientNameSelect').change(function() {
+        var selectedOption = $(this).find('option:selected');
+        var mobile = selectedOption.data('mobile'); // Get mobile number
+        $('#PatientMobile').val(mobile); // Set mobile input value
+    });
+});
+
+</script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
@@ -45,8 +60,19 @@ $appointmentResult = $conn->query($appointmentQuery);
                     </select>
                 </label>
 
-                <label for="patientName">Patient Name:
-                    <input type="text" name="patientName" id="patientName" required placeholder="Name" style="height: 29px;">
+                <label for="patientNameSelect">Patient Name:
+                    <select name="patientName" id="patientNameSelect" required>
+                        <option value="">Select Patient</option>
+                        <?php
+                        if ($patientResult->num_rows > 0) {
+                            while ($row = $patientResult->fetch_assoc()) {
+                                echo "<option value='" . $row['OID'] . "' data-mobile='" . $row['Mobile'] . "'>" . $row['Name'] . "</option>"; // Assuming 'Mobile' is the patient's mobile number
+                            }
+                        } else {
+                            echo "<option value=''>No Patients Available</option>";
+                        }
+                        ?>
+                    </select>
                 </label>
 
                 <label for="PatientMobile">Patient Mobile:

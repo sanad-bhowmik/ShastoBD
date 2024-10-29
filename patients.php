@@ -113,6 +113,7 @@ include_once("include/header.php");
             <table id="DocTable" class="align-middle mb-0 table table-borderless table-striped table-hover">
               <thead>
                 <tr>
+                  <th class="text-center">#</th>
                   <th class="text-center">Sl</th>
                   <th class="text-center">Name</th>
                   <th class="text-center">Mobile</th>
@@ -127,6 +128,7 @@ include_once("include/header.php");
                 while ($rs = mysqli_fetch_array($result)) { ?>
                   <tr>
                     <td class="text-muted text-center"><?php echo $i; ?></td>
+                    <td class="text-center"><?php echo $rs['si_num']; ?></td>
                     <td class="text-center"><?php echo $rs['Name']; ?></td>
                     <td class="text-center"><?php echo $rs['Mobile']; ?></td>
                     <td class="text-center"><?php echo $rs['Email']; ?></td>

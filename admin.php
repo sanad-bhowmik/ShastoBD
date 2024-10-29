@@ -3,18 +3,10 @@
 $today = date("Y-m-d");
 $doctors = get_count_by_sql("select count(*) from tbl_doctor where Active=1 ");
 $patients = get_count_by_sql("select count(*) from tbl_patient where 1=1 ");
-$appointment = get_count_by_sql("select count(*) from appointmentview where AppointmentDate='$today' ");
+$appointment = get_count_by_sql("SELECT count(*) FROM appointmentview WHERE DATE(created_at) = '$today'");
 $appointment2 = get_count_by_sql("select count(*) from appointmentview");
 $medicine_sale = get_value_by_sql("select sum(InQty) from stock_in");
-$total_payable_price = get_payable_price_sum();
-// Calculate heights as percentages based on the maximum value for proper scaling
-$max_value = max($doctors, $patients, $appointments_today, $total_appointments, $medicine_sale, $total_payable_price);
-$doctor_height = ($doctors / $max_value) * 100;
-$patient_height = ($patients / $max_value) * 100;
-$appointment_height = ($appointments_today / $max_value) * 100;
-$total_appointment_height = ($total_appointments / $max_value) * 100;
-$medicine_sale_height = ($medicine_sale / $max_value) * 100;
-$total_payable_price_height = ($total_payable_price / $max_value) * 100;
+$total_payable_price = get_payable_price_count();
 
 ?>
 
@@ -75,7 +67,7 @@ $total_payable_price_height = ($total_payable_price / $max_value) * 100;
                         <div class="widget-subheading">Medicine Stock</div>
                     </div>
                     <div class="widget-content-right">
-                        <div class="widget-numbers text-white"><span><?= $medicine_sale ?></span> ৳</div>
+                        <div class="widget-numbers text-white"><span><?= $medicine_sale ?></span></div>
                     </div>
                 </div>
             </div>
@@ -88,7 +80,7 @@ $total_payable_price_height = ($total_payable_price / $max_value) * 100;
                         <div class="widget-subheading">Medicine Sale</div>
                     </div>
                     <div class="widget-content-right">
-                        <div class="widget-numbers text-white"><span><?= $total_payable_price ?></span> ৳</div>
+                        <div class="widget-numbers text-white"><span><?= $total_payable_price ?></span></div>
                     </div>
                 </div>
             </div>
@@ -108,75 +100,8 @@ $total_payable_price_height = ($total_payable_price / $max_value) * 100;
         </div>
     </div>
 
-    <div>
-        <ul class="chart">
-            <li>
-                <span style="height: <?= $doctor_height ?>%" title="Doctors: <?= $doctors ?>"></span>
-            </li>
-            <li>
-                <span style="height: <?= $patient_height ?>%" title="Patients: <?= $patients ?>"></span>
-            </li>
-            <li>
-                <span style="height: <?= $appointment_height ?>%" title="Appointments Today: <?= $appointments_today ?>"></span>
-            </li>
-            <li>
-                <span style="height: <?= $total_appointment_height ?>%" title="Total Appointments: <?= $total_appointments ?>"></span>
-            </li>
-            <li>
-                <span style="height: <?= $medicine_sale_height ?>%" title="Medicine Sale: <?= $medicine_sale ?>"></span>
-            </li>
-            <li>
-                <span style="height: <?= $total_payable_price_height ?>%" title="Total Payable Price: <?= $total_payable_price ?>"></span>
-            </li>
-        </ul>
-    </div>
-
 </div>
 <style>
-    .chart {
-        display: table;
-        table-layout: fixed;
-        width: 60%;
-        max-width: 700px;
-        height: 200px;
-        margin: 0 auto;
-        background-image: linear-gradient(bottom, rgba(0, 0, 0, 0.1) 2%, transparent 2%);
-        background-size: 100% 50px;
-        background-position: left top;
-    }
-
-    .chart li {
-        position: relative;
-        display: table-cell;
-        vertical-align: bottom;
-        height: 200px;
-    }
-
-    .chart span {
-        margin: 0 1em;
-        display: block;
-        background: rgb(3 96 144 / 87%);
-        animation: draw 1s ease-in-out;
-    }
-
-    .chart span:before {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 100%;
-        padding: 5px 1em 0;
-        display: block;
-        text-align: center;
-        content: attr(title);
-        word-wrap: break-word;
-    }
-
-    @keyframes draw {
-        0% {
-            height: 0;
-        }
-    }
-
     .c-dashboardInfo {
         margin-bottom: 15px;
     }

@@ -208,15 +208,9 @@ else {
                       <?php echo $rs['Status']; ?>
                     </td> -->
                     <td class="text-center">
-                      <?php
-                      echo "<a href='#' id='" . $rs['PatientID'] . "' class='patientDetails btn-sm mr-2 mb-2 btn-primary' 
-                      data-doctorid='" . $rs['DOCID'] . "'
-                      data-doctorname='" . $rs['DocName'] . "'
-                      data-patientname='" . $rs['PatientName'] . "'
-                      data-appointmenttime='" . $rs['Appointment_Time'] . "'
-                      data-appointmentdate='" . $rs['AppointmentDate'] . "'>Prescription</a>";
-                      ?>
+                      <a href="add_prescription.php" class="btn-sm mr-2 mb-2 btn-primary">Prescription</a>
                     </td>
+
 
 
 
