@@ -17,29 +17,25 @@ $message = "";
 $alertType = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['medicine_name'];
-    $category = $_POST['category'];
-    $group = $_POST['medicine_group'];
+    $groupName = $_POST['group_name'];
+    $status = $_POST['status'];
 
-    $stmt = $conn->prepare("INSERT INTO medicine (name, cat_id, group_id, status) VALUES (?, ?, ?, ?)"); // Update query to include group_id
-    $stmt->bind_param("ssii", $name, $category, $group, $status);
+    $stmt = $conn->prepare("INSERT INTO medicine_group (name, status) VALUES (?, ?)");
+    $stmt->bind_param("si", $groupName, $status);
 
     if ($stmt->execute()) {
-        $message = "Medicine added successfully!";
+        $message = "Group added successfully!";
         $alertType = "success";
     } else {
-        $message = "Error adding medicine: " . $conn->error;
+        $message = "Error adding group: " . $conn->error;
         $alertType = "error";
     }
 
     $stmt->close();
 }
 
-// Fetch the list of medicines along with their categories
-$sql = "SELECT m.id, m.name AS medicine_name, m.status, c.name AS category_name, g.name AS group_name 
-        FROM medicine m 
-        JOIN medicine_category c ON m.cat_id = c.id
-        JOIN medicine_group g ON m.group_id = g.id";
+// Fetch the list of groups
+$sql = "SELECT id, name, status FROM medicine_group";
 $result = $conn->query($sql);
 ?>
 
@@ -49,7 +45,7 @@ $result = $conn->query($sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Medicine</title>
+    <title>Add Group</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -61,39 +57,11 @@ $result = $conn->query($sql);
     <div class="container">
         <form method="POST" action="">
             <div class="flex-container">
-                <div class="form-group Mname">
-                    <label for="medicine_name">Medicine Name:</label>
-                    <input type="text" id="medicine_name" name="medicine_name" placeholder="Enter medicine name" required>
+                <div class="form-group Gname" style="margin-right: -24%;">
+                    <label for="group_name">Group Name:</label>
+                    <input type="text" id="group_name" name="group_name" placeholder="Enter group name" required>
                 </div>
-                <div class="form-group categoryf">
-                    <label for="category">Category:</label>
-                    <select id="category" name="category" required>
-                        <option value="">Select Category</option>
-                        <?php
-                        // Fetch categories from the database
-                        $categoryQuery = "SELECT id, name FROM medicine_category WHERE status = 1";
-                        $categoryResult = $conn->query($categoryQuery);
-                        while ($row = $categoryResult->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group groupf" style="margin-left: -28%;"> <!-- New Medicine Group Dropdown -->
-                    <label for="medicine_group">Medicine Group:</label>
-                    <select id="medicine_group" name="medicine_group" class="select2" required>
-                        <option value="">Select Medicine Group</option>
-                        <?php
-                        // Fetch medicine groups from the database
-                        $groupQuery = "SELECT id, name FROM medicine_group WHERE status = 1"; // Update with your condition
-                        $groupResult = $conn->query($groupQuery);
-                        while ($row = $groupResult->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group status"style="margin-right: -36%;">
+                <div class="form-group status">
                     <label for="status">Status:</label>
                     <select id="status" name="status" required>
                         <option value="1">Active</option>
@@ -101,7 +69,7 @@ $result = $conn->query($sql);
                     </select>
                 </div>
                 <div class="form-group" style="margin-top: 19px;">
-                    <button type="submit" class="btn-primary" style="margin-left: 36%;">Save</button>
+                    <button type="submit" class="btn-primary" style="margin-left: -208%;">Save</button>
                 </div>
             </div>
         </form>
@@ -113,55 +81,36 @@ $result = $conn->query($sql);
         <?php endif; ?>
     </div>
 
-    <div class="container " style="margin: -28px auto;">
+    <div class="container" style="margin: -28px auto;">
 
-        <div class="flex-container">
-            <div id="noflex">
-                <div class="form-group Mname" style="width: 16%;">
-                    <input type="text" id="filter_name" placeholder="Search by Medicine Name" />
-                </div>
-                <div class="form-group" style="width: 16%;">
-                    <select id="filter_category" class="select2">
-                        <option value="">Select Category</option>
-                        <?php
-                        // Fetch distinct categories for filtering
-                        $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
-                        while ($row = $result_categories->fetch_assoc()) {
-                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
 
-                <div class="form-group" style="width: 16%;">
-                    <select id="filter_group" class="select2"> <!-- New filter for Medicine Group -->
-                        <option value="">Select Medicine Group</option>
-                        <?php
-                        // Fetch distinct medicine groups for filtering
-                        $result_groups = $conn->query("SELECT DISTINCT id, name FROM medicine_group WHERE status = 1");
-                        while ($row = $result_groups->fetch_assoc()) {
-                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                </thead>
-                <div class="form-group">
-                    <button id="searchBtn" class="btn-primary">Search</button>
-                </div>
-                <div class="form-group">
-                    <button id="clearBtn" class="btn-primary" style="background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(3, 31, 213, 1) 82.8%, rgba(248, 101, 248, 1) 87.9%);">Clear</button>
-                </div>
+        <!-- Select2 Filter for Group Names -->
+        <section style="display: flex;">
+            <div class="form-group" style="width: 30%; margin-bottom: 15px; ">
+                <label for="filter_group">Search by Group Name:</label>
+                <select id="filter_group" class="select2" style="width: 100%;">
+                    <option value="">All Groups</option>
+                    <?php
+                    // Fetch distinct group names for the Select2 dropdown
+                    $groupQuery = "SELECT DISTINCT name FROM medicine_group";
+                    $groupResult = $conn->query($groupQuery);
+                    while ($row = $groupResult->fetch_assoc()) {
+                        echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                    }
+                    ?>
+                </select>
             </div>
-        </div>
+            <div>
+                <button id="clearBtn" class="btn-clear btn-info" style="margin-left: 10px;margin-top: 25px;">Clear</button>
+            </div>
+        </section>
 
-        <table id="medicineTable">
+        <table id="groupTable">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Medicine Name</th>
-                    <th>Category</th>
-                    <th>Group</th>
+                    <th>Group Name</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -172,9 +121,8 @@ $result = $conn->query($sql);
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . $index++ . "</td>";
-                        echo "<td><span class='medicine-name'>" . $row['medicine_name'] . "</span><input type='text' class='medicine-input' value='" . $row['medicine_name'] . "' style='display:none;'></td>";
-                        echo "<td>" . $row['category_name'] . "</td>";
-                        echo "<td>" . $row['group_name'] . "</td>";
+                        echo "<td><span class='group-name'>" . $row['name'] . "</span><input type='text' class='group-input' value='" . $row['name'] . "' style='display:none;'></td>";
+                        echo "<td>" . ($row['status'] == 1 ? 'Active' : 'Inactive') . "</td>";
                         echo "<td>
                                 <button class='edit-btn'>Edit</button>
                                 <button class='save-btn' style='display: none;' data-id='" . $row['id'] . "'>Save</button>
@@ -182,7 +130,7 @@ $result = $conn->query($sql);
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No medicines found</td></tr>";
+                    echo "<tr><td colspan='4'>No groups found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -190,83 +138,67 @@ $result = $conn->query($sql);
     </div>
 
     <script>
-    $(document).ready(function() {
-        $('.select2').select2();
-
-        $('#clearBtn').on('click', function(e) {
-            e.preventDefault(); // Prevent form submission
-            $('#filter_name').val(''); // Clear medicine name input
-            $('#filter_category').val('').trigger('change'); // Clear category filter
-            $('#filter_group').val('').trigger('change'); // Clear group filter
-            $('#medicineTable tbody tr').show(); // Show all medicines
+        // Clear button functionality
+        $('#clearBtn').on('click', function() {
+            $('#filter_group').val(null).trigger('change'); // Reset Select2 dropdown
+            $('#groupTable tbody tr').show(); // Show all table rows
         });
+        $(document).ready(function() {
+            $('.select2').select2(); // Initialize Select2 dropdown
 
-        $('#searchBtn').on('click', function(e) {
-            e.preventDefault(); // Prevent form submission
-            filterTable();
-        });
+            $('#filter_group').on('change', function() {
+                var selectedGroup = $(this).val().toLowerCase();
 
-        function filterTable() {
-            var nameFilter = $('#filter_name').val().toLowerCase();
-            var categoryFilter = $('#filter_category').val();
-            var groupFilter = $('#filter_group').val(); // Get the selected group filter
-
-            $('#medicineTable tbody tr').filter(function() {
-                var nameMatch = $(this).find('.medicine-name').text().toLowerCase().indexOf(nameFilter) > -1 || nameFilter === "";
-                var categoryMatch = $(this).children('td:nth-child(3)').text() === categoryFilter || categoryFilter === "";
-                var groupMatch = $(this).children('td:nth-child(4)').text() === groupFilter || groupFilter === ""; // Filter by group
-
-                $(this).toggle(nameMatch && categoryMatch && groupMatch); // Show rows that match all filters
+                $('#groupTable tbody tr').filter(function() {
+                    var groupName = $(this).find('.group-name').text().toLowerCase();
+                    $(this).toggle(selectedGroup === "" || groupName === selectedGroup);
+                });
             });
-        }
 
-        // Edit and save functionality
-        $(document).on('click', '.edit-btn', function() {
-            var $row = $(this).closest('tr');
-            $row.find('.medicine-input').show(); // Show input field
-            $row.find('.medicine-name').hide(); // Hide the normal text
-            $(this).hide(); // Hide edit button
-            $row.find('.save-btn').show(); // Show save button
-        });
+            // Edit and save functionality for group name
+            $(document).on('click', '.edit-btn', function() {
+                var $row = $(this).closest('tr');
+                $row.find('.group-input').show(); // Show input field
+                $row.find('.group-name').hide(); // Hide the normal text
+                $(this).hide(); // Hide edit button
+                $row.find('.save-btn').show(); // Show save button
+            });
 
-        $(document).on('click', '.save-btn', function() {
-            var $row = $(this).closest('tr');
-            var newMedicineName = $row.find('.medicine-input').val();
-            var medicineId = $(this).data('id'); // Get the id of the medicine
+            $(document).on('click', '.save-btn', function() {
+                var $row = $(this).closest('tr');
+                var newGroupName = $row.find('.group-input').val();
+                var groupId = $(this).data('id');
 
-            // Send AJAX request to update the medicine name
-            $.ajax({
-                type: 'POST',
-                url: 'update_medicine.php', // The script that will handle the update
-                data: {
-                    id: medicineId,
-                    name: newMedicineName
-                },
-                success: function(response) {
-                    var res = JSON.parse(response);
-                    if (res.status === "success") {
-                        $row.find('.medicine-input').hide(); // Hide input field
-                        $row.find('.medicine-name').text(newMedicineName).show(); // Update and show the normal text
-                        $(this).hide(); // Hide save button
-                        $row.find('.edit-btn').show(); // Show edit button again
-                        toastr.success('Medicine updated successfully!');
-                    } else {
-                        toastr.error('Error updating medicine: ' + res.message);
+                $row.find('.group-input').hide(); // Hide input field
+                $row.find('.group-name').text(newGroupName).show(); // Update and show the normal text
+                $(this).hide(); // Hide save button
+                $row.find('.edit-btn').show(); // Show edit button again
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'update_group.php', // Script to handle group update
+                    data: {
+                        id: groupId,
+                        name: newGroupName
+                    },
+                    success: function(response) {
+                        var res = JSON.parse(response);
+                        if (res.status === "success") {
+                            toastr.success('Group updated successfully!');
+                        } else {
+                            toastr.error('Error updating group: ' + res.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('Error updating group.');
                     }
-                },
-                error: function() {
-                    toastr.error('Error updating medicine.');
-                }
+                });
             });
         });
-    });
-</script>
-
+    </script>
 </body>
 
 </html>
-
-
 
 <style>
     .save-btn {
@@ -543,7 +475,7 @@ $result = $conn->query($sql);
 
     @media (min-width: 1024px) {
         .status {
-            margin-left: -29%;
+            margin-left: -16%;
         }
 
         #searchBtn {
@@ -591,7 +523,7 @@ $result = $conn->query($sql);
         }
 
         .categoryf {
-            margin-left: -28%;
+            margin-left: -16%;
         }
 
         #filter_name {

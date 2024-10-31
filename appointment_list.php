@@ -2,44 +2,40 @@
 
 include_once("include/header.php");
 if (isset($_POST['submit'])) {
-
   $param = array();
 
-  if (isset($_POST['doc_id']) &&  $_POST['doc_id'] != "" &&  !empty($_POST['doc_id'])) {
-
+  if (isset($_POST['doc_id']) && $_POST['doc_id'] != "" && !empty($_POST['doc_id'])) {
     $docID = $_POST['doc_id'];
     $condition = "DOCID =" . $docID;
     array_push($param, $condition);
   }
+
   if (isset($_POST['status'])) {
     if ($_POST['status'] != "all") {
-      $condition = " Status = '" . $_POST['status'] . "' ";
+      $condition = "Status = '" . $_POST['status'] . "'";
       array_push($param, $condition);
     }
   }
+
   if (isset($_POST['fdate']) && isset($_POST['todate'])) {
-
-
-    $condition = " AppointmentDate between '" . $_POST['fdate'] . "' and '" . $_POST['todate'] . "' ";
+    $condition = "AppointmentDate BETWEEN '" . $_POST['fdate'] . "' AND '" . $_POST['todate'] . "'";
     array_push($param, $condition);
   }
 
+  array_push($param, "Status = 'active'");
 
-  $condition = implode(" and ", $param);
+  $condition = implode(" AND ", $param);
 
-
-  $sql_get_data = "select * from appointmentview  where  " . $condition . "  order by AppointmentDate desc";
-  //var_dump($sql_get_data);
-  //die;
+  $sql_get_data = "SELECT * FROM appointmentview WHERE " . $condition . " ORDER BY AppointmentDate DESC";
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
-} // end if submit
-else {
-  $sql_get_data = "select * from appointmentview  where 1=1 order by AppointmentDate desc ";
+} else {
+  $sql_get_data = "SELECT * FROM appointmentview WHERE Status = 'active' ORDER BY AppointmentDate DESC";
 
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
 }
 
 ?>
+
 
 <style>
   .prescription-inputs {
