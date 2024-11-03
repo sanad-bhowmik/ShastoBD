@@ -13,7 +13,11 @@ if ($conn->connect_error) {
 
 // Query to fetch doctor names
 $doctorQuery = "SELECT DOCID, DocName, MobileNum FROM tbl_doctor WHERE Active = 1";
+
 $doctorResult = $conn->query($doctorQuery);
+// Query to fetch medicine names
+$medicineQuery = "SELECT name FROM medicine";
+$medicineResult = $conn->query($medicineQuery);
 
 // Query to fetch patient names
 $patientQuery = "SELECT OID, Name, Address, Gender FROM tbl_patient WHERE Active = 1";
@@ -38,7 +42,7 @@ $appointmentResult = $conn->query($appointmentQuery);
         <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
             <!-- Appointment Number Select2 Searchable Dropdown -->
             <div style="flex: 1; padding-left: .625rem; margin-top: 5px;">
-                <label for="appointmentNumber" style="display: block; margin-bottom: .3125rem; margin-right: 10px; margin-top: -2px;">
+                <label for="appointmentNumber" style="display: block; margin-bottom: 10%; margin-right: 10px; margin-top: -2px;">
                     <span>Appointment Number:</span>
                     <select name="appointmentNumber" id="appointmentNumber" style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem; height: 33px; font-size: 11px; padding: 1px; text-align: center;">
                         <option value="" disabled selected>Select</option>
@@ -69,33 +73,51 @@ $appointmentResult = $conn->query($appointmentQuery);
                 </label>
             </div>
 
-
-            <!-- Medicine Name Input -->
-            <div style="flex: 1; padding-left: .625rem;">
-                <label for="medicine" style="display: block; margin-bottom: .3125rem;">Medicine Name:
-                    <input type="text" name="medicine" id="medicine" required style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
-                </label>
-            </div>
         </div>
 
-        <div class="form-row" style="display: flex;flex-wrap: wrap;gap: 1rem;margin-left: 9px;">
-            <div style="flex: 1;">
-                <label for="duration">Duration:</label>
-                <input type="text" name="duration" id="duration" required style="width: 100%; padding: .5rem; border: .0625rem solid #b2adad; border-radius: .25rem; height: 40px;">
+        <div class="form-row" style="display: flex;flex-wrap: wrap;gap: 1rem;">
+            <!-- Medicine Name Select2 Dropdown -->
+            <div style="flex: 1; padding-left: .625rem;">
+                <label for="medicine" style="display: block; margin-bottom: .3125rem;">Medicine Name:
+                    <select name="medicine" id="medicine" style="width: 100%; padding: .5rem; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
+                        <option value="" disabled selected>Select Medicine</option>
+                        <?php
+                        if ($medicineResult->num_rows > 0) {
+                            while ($row = $medicineResult->fetch_assoc()) {
+                                echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
+                            }
+                        } else {
+                            echo "<option value=''>No Medicines Available</option>";
+                        }
+                        ?>
+                    </select>
+                </label>
             </div>
 
-            <div style="flex: 1;">
-                <label for="dosage">Dosage:</label>
-                <input type="text" name="dosage" id="dosage" required style="width: 100%; padding: .5rem; border: .0625rem solid #b2adad; border-radius: .25rem; height: 40px;">
+            <!-- Medicine Group (Readonly) -->
+            <div style="flex: 1; padding-right: .625rem;">
+                <label for="medicineGroup" style="display: block; margin-bottom: .3125rem;">Medicine Group:
+                    <input type="text" name="medicineGroup" id="medicineGroup" readonly style="width: 100%; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
+                </label>
             </div>
 
-            <div style="flex: 1;">
-                <label for="notes">Additional Notes:</label>
-                <textarea name="notes" id="notes" rows="2" style="width: 100%; padding: .5rem; border: .0625rem solid #b2adad; border-radius: .25rem;height: 42px;" required></textarea>
+            <div style="flex: 1;margin-top: -2px;">
+                <label for="duration" style="margin-bottom: 1px;">Duration:</label>
+                <input type="text" name="duration" id="duration" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
+            </div>
+
+            <div style="flex: 1;margin-top: -2px;">
+                <label for="dosage" style="margin-bottom: 1px;">Dosage:</label>
+                <input type="text" name="dosage" id="dosage" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
+            </div>
+
+            <div style="flex: 1;margin-top: -2px;">
+                <label for="notes" style="margin-bottom: 1px;">Additional Notes:</label>
+                <textarea name="notes" id="notes" rows="2" style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;" required></textarea>
             </div>
 
             <div style="flex: 1; display: flex; align-items: flex-end;">
-                <button type="button" id="saveButton" style="width: 42%;padding: 4px;color: white;border: none;border-radius: .25rem;cursor: pointer;margin-bottom: 14px;background-image: linear-gradient( 91.2deg,  rgba(136,80,226,1) 4%, rgba(16,13,91,1) 96.5% );">Add To List</button>
+                <button type="button" id="saveButton" style="width: 64%;padding: 4px;color: white;border: none;border-radius: .25rem;cursor: pointer;margin-bottom: 10px;background-image: linear-gradient( 91.2deg,  rgba(136,80,226,1) 4%, rgba(16,13,91,1) 96.5% );">Add To List</button>
             </div>
         </div>
     </form>
@@ -109,6 +131,7 @@ $appointmentResult = $conn->query($appointmentQuery);
                 <th>Appointment Number</th>
                 <th>Patient</th>
                 <th>Medicine</th>
+                <th>Group</th>
                 <th>Duration</th>
                 <th>Dosage</th>
                 <th>Notes</th>
@@ -156,6 +179,29 @@ $appointmentResult = $conn->query($appointmentQuery);
 <!-- Your existing HTML code remains here -->
 
 <script>
+    $('#medicine').on('change', function() {
+        var selectedMedicine = $(this).val();
+
+        if (selectedMedicine) {
+            $.ajax({
+                type: "POST",
+                url: "getMedicineGroup.php",
+                data: {
+                    medicineName: selectedMedicine
+                },
+                success: function(response) {
+                    console.log("Received group name: ", response);
+                    $('#medicineGroup').val(response);
+                },
+                error: function() {
+                    $('#medicineGroup').val("Error retrieving group");
+                }
+            });
+        } else {
+            $('#medicineGroup').val("");
+        }
+    });
+
     $(document).ready(function() {
         // Event listener for Appointment Number selection
         $('#appointmentNumber').on('change', function() {
@@ -187,6 +233,12 @@ $appointmentResult = $conn->query($appointmentQuery);
                 $('#patientName').val('');
             }
         });
+        $(document).ready(function() {
+            $('#medicine').select2({
+                placeholder: "Select Medicine",
+                allowClear: true
+            });
+        });
 
         // Event listener for the Save button
         $('#saveButton').on('click', function() {
@@ -195,6 +247,7 @@ $appointmentResult = $conn->query($appointmentQuery);
             var doctorName = $('#doctorName').val();
             var patientName = $('#patientName').val();
             var medicine = $('#medicine').val();
+            var group = $('#medicineGroup').val();
             var duration = $('#duration').val();
             var dosage = $('#dosage').val();
             var notes = $('#notes').val();
@@ -205,6 +258,7 @@ $appointmentResult = $conn->query($appointmentQuery);
                 <td>${appointmentNumber}</td>
                 <td>${patientName}</td>
                 <td>${medicine}</td>
+                <td>${group}</td>
                 <td>${duration}</td>
                 <td>${dosage}</td>
                 <td>${notes}</td>
