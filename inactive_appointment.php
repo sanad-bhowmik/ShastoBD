@@ -27,63 +27,7 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointments</title>
-    <style>
-        .container {
-            width: 96%;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        #dataTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-        }
-
-        #dataTable thead {
-            background-color: #f2f2f2;
-        }
-
-        #dataTable th,
-        #dataTable td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ccc;
-        }
-
-        #dataTable th {
-            background-color: #e0e0e0;
-            font-weight: bold;
-        }
-
-        #dataTable tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        #dataTable tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            #dataTable {
-                font-size: 14px;
-            }
-
-            #dataTable th,
-            #dataTable td {
-                padding: 8px;
-            }
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script>
         function filterTable() {
             const appointmentNumberInput = document.getElementById("appointment_number").value.toLowerCase();
@@ -134,7 +78,7 @@ $result = $conn->query($sql);
             <input type="text" id="patient_name" placeholder="Patient Name" onkeyup="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
             <input type="text" id="patient_mobile" placeholder="Patient Mobile" onkeyup="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
             <input type="date" id="appointment_date" oninput="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
-            <button type="button" class="btn-danger" onclick="clearFilters()"style="padding: 4px;border-radius: 10px;width: 53px;height: 31px;">Clear</button> <!-- Clear Button -->
+            <button type="button" class="btn-danger" onclick="clearFilters()" style="padding: 4px;border-radius: 10px;width: 53px;height: 31px;">Clear</button> <!-- Clear Button -->
         </form>
 
         <table id="dataTable">
@@ -184,3 +128,65 @@ $result = $conn->query($sql);
 // Close the database connection
 $conn->close();
 ?>
+
+
+
+
+
+<style>
+    .container {
+        width: 96%;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    #dataTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    #dataTable thead {
+        background-color: #f2f2f2;
+    }
+
+    #dataTable th,
+    #dataTable td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ccc;
+    }
+
+    #dataTable th {
+        background-color: #e0e0e0;
+        font-weight: bold;
+    }
+
+    #dataTable tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    #dataTable tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            padding: 10px;
+        }
+
+        #dataTable {
+            font-size: 14px;
+        }
+
+        #dataTable th,
+        #dataTable td {
+            padding: 8px;
+        }
+    }
+</style>

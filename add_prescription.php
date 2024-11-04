@@ -349,116 +349,123 @@ $appointmentResult = $conn->query($appointmentQuery);
             }
         });
 
-
-
-
-        const formData = $('#prescriptionForm').serialize();
         const {
             jsPDF
         } = window.jspdf;
         const pdf = new jsPDF();
 
-        const params = new URLSearchParams(formData);
         const doctorName = $('#doctorName').val();
-        const doctorMobile = '0123456789';
         const patientName = $('#patientName').val();
-        const patientGender = $('#patientid option:selected').data('gender');
-        const textColor = [0, 0, 0];
-        const borderColor = [0, 0, 0];
         const margin = 20;
 
-        // 1. Header Section: Clinic Name with Gray Background
-        const headerHeight = 30;
-        pdf.setFillColor(200, 200, 200);
+        // Header Section
+        const headerHeight = 35;
+        pdf.setFillColor(0, 102, 204);
         pdf.rect(0, 0, pdf.internal.pageSize.getWidth(), headerHeight, 'F');
 
-        // Clinic Name - Centered
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(doctorName, margin, 15);
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "italic");
+        pdf.text("General Physician, Internal Medicine Specialist", margin, 25);
+
+        // Logo
+        const logoImg = new Image();
+        logoImg.src = 'https://i.ibb.co.com/TqfJdhm/logo-inverse.png'; // Replace with actual logo URL
+
+        logoImg.onload = function() {
+            pdf.addImage(logoImg, 'PNG', pdf.internal.pageSize.getWidth() - 45, 5, 40, 25);
+            createPrescriptionContent(pdf, doctorName, patientName);
+        };
+
+        logoImg.onerror = function() {
+            console.error('Failed to load logo image.');
+            createPrescriptionContent(pdf, doctorName, patientName);
+        }
+    }
+
+    function createPrescriptionContent(pdf, doctorName, patientName) {
+        const margin = 20;
+        const headerHeight = 35;
+
+        // Positioning at the bottom of the blue header section
+        const patientInfoY = headerHeight + 10;
+
+        // Display patient information below the header section with flexible positioning
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+
+        // Date, Name, Age, and Weight positioning
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const patientInfoWidth = (pageWidth - margin * 2) / 3;
+
+        pdf.text(`Name: ${patientName || "____________________"}`, margin, patientInfoY);
+        pdf.text(`Age: __________`, margin + patientInfoWidth, patientInfoY);
+        pdf.text(`Weight: __________`, margin + 2 * patientInfoWidth, patientInfoY);
+
+        // Left Panel for Patient Information
+        const leftPanelWidth = 70;
+        const currentYStart = headerHeight + 25;
+        pdf.setFillColor(245, 245, 245);
+        pdf.rect(margin, currentYStart, leftPanelWidth, pdf.internal.pageSize.getHeight() - headerHeight - 40, 'F');
+
+        pdf.setFontSize(10);
+
+        // Rx Symbol
         pdf.setFontSize(24);
         pdf.setFont("helvetica", "bold");
-        pdf.setTextColor(...textColor);
-        pdf.text('Emon Dental', pdf.internal.pageSize.getWidth() / 2, 20, {
-            align: 'center'
-        });
+        pdf.setTextColor(0, 102, 204);
+        pdf.text("Rx", leftPanelWidth + margin + 15, currentYStart + 25);
 
-        // 2. Doctor Information (Left Aligned)
-        pdf.setFontSize(18);
-        pdf.setFont("helvetica", "bold");
-        pdf.setTextColor(...textColor);
-        pdf.text('Dr. ' + doctorName, margin, 40);
+        // Table Section
+        const startY = currentYStart + 45;
+        const medicineX = leftPanelWidth + margin + 10;
+        const durationX = medicineX + 40;
+        const dosageX = durationX + 40;
 
-        // Doctor Contact Info
-        pdf.setFontSize(11);
-        pdf.setFont("helvetica", "normal");
-        pdf.text('Mobile: ' + doctorMobile, margin, 48);
-
-        // 3. Clinic Info: Right-Aligned
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        pdf.text('123 Demo Street, Dhaka, Bangladesh', 200, 40, {
-            align: 'right'
-        });
-        pdf.setFontSize(10);
-        pdf.setFont("helvetica", "normal");
-        pdf.text('+880 1234-567890', 200, 46, {
-            align: 'right'
-        });
-
-        // Horizontal Line Separator
-        pdf.setDrawColor(...borderColor);
-        pdf.line(margin, 60, 200, 60);
-
-        // 4. Patient Information Section (Left-Aligned)
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        pdf.text('Patient Information', margin, 70);
-        pdf.setFont("helvetica", "normal");
-        pdf.text('Name: ' + patientName, margin, 78);
-        // pdf.text('Gender: ' + patientGender, margin, 84);
-        pdf.text('Date: ' + new Date().toLocaleDateString(), margin, 90);
-
-        // Appointment Number (Right Aligned)
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        pdf.text('Appointment No: ' + $('#appointmentNumber').val(), 190, 70, {
-            align: 'right'
-        }); // Adjust for your appointment number field
-
-        // Horizontal Line Separator for Neatness
-        pdf.line(margin, 95, 200, 95);
-
-        // 5. Prescription Details Section (Table)
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        pdf.text('Prescription Details', margin, 105);
-
-        // Table Header
-        const startY = 115;
+        // Table Headers
         pdf.setFontSize(11);
         pdf.setFont("helvetica", "bold");
-        pdf.text('Medicine', margin, startY);
-        pdf.text('Duration', 100, startY);
-        pdf.text('Dosage', 140, startY);
-        pdf.line(margin, startY + 2, 200, startY + 2); // Header line
+        pdf.setTextColor(0, 0, 0);
+        pdf.text("Medicine", medicineX, startY);
+        pdf.text("Duration", durationX, startY);
+        pdf.text("Dosage", dosageX, startY);
+        pdf.line(medicineX, startY + 2, pdf.internal.pageSize.getWidth() - margin, startY + 2);
 
-        let currentY = startY + 10; // Starting Y position for the data rows
+        let currentY = startY + 10;
+        const lineHeight = 10;
+        const maxWidth = {
+            medicine: 30,
+            duration: 30,
+            dosage: 30
+        };
+
         pdf.setFont("helvetica", "normal");
 
-        // Loop through each row in the prescription table
         $('#dataTable tbody tr').each(function() {
-            const medicine = $(this).find('td').eq(3).text();
+            const medicineName = $(this).find('td').eq(3).text();
+            const groupName = $(this).find('td').eq(2).text();
             const duration = $(this).find('td').eq(4).text();
             const dosage = $(this).find('td').eq(5).text();
-            const notes = $(this).find('td').eq(6).text();
 
-            // Add each prescription entry to the PDF
-            pdf.text(medicine || '_________________', margin, currentY);
-            pdf.text(duration || '_________________', 100, currentY);
-            pdf.text(dosage || '_________________', 140, currentY);
+            const medicineText = `${groupName} (${medicineName})`;
+            const medicineLines = pdf.splitTextToSize(medicineText || '____', maxWidth.medicine);
+            const durationLines = pdf.splitTextToSize(duration || '____', maxWidth.duration);
+            const dosageLines = pdf.splitTextToSize(dosage || '____', maxWidth.dosage);
 
-            currentY += 10; // Adjust for the height of each row
+            const rowHeight = Math.max(medicineLines.length, durationLines.length, dosageLines.length) * lineHeight;
+
+            pdf.text(medicineLines, medicineX, currentY);
+            pdf.text(durationLines, durationX, currentY);
+            pdf.text(dosageLines, dosageX, currentY);
+
+            currentY += rowHeight;
         });
 
-        // 6. Notes Section (if applicable)
+        // Notes Section
         if ($('#dataTable tbody tr').length > 0) {
             const lastRow = $('#dataTable tbody tr').last();
             const notes = lastRow.find('td').eq(6).text();
@@ -466,43 +473,36 @@ $appointmentResult = $conn->query($appointmentQuery);
             if (notes) {
                 pdf.setFontSize(12);
                 pdf.setFont("helvetica", "bold");
-                pdf.text('Notes:', margin, currentY);
-                pdf.setDrawColor(...borderColor);
-                pdf.rect(margin, currentY + 5, 170, 30);
+                pdf.setTextColor(0, 102, 204);
+                pdf.text('Notes:', medicineX, currentY + 10);
                 pdf.setFont("helvetica", "normal");
-                pdf.setFontSize(11);
-                pdf.text(notes, margin + 5, currentY + 15);
-                currentY += 40; // Adjust for notes box height
+                pdf.setFontSize(10);
+                pdf.text(notes, medicineX + 5, currentY + 20, {
+                    maxWidth: pdf.internal.pageSize.getWidth() - margin * 2 - 10
+                });
+                currentY += 30;
             }
         }
 
-        // 7. Signature Section
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        pdf.line(150, currentY + 2, 200, currentY + 2);
+        // Signature Section
+        currentY = pdf.internal.pageSize.getHeight() - 45;
+        pdf.setFontSize(10);
         pdf.setFont("helvetica", "italic");
-        pdf.setFontSize(10);
-        pdf.text('Doctor\'s signature', 150, currentY + 10);
+        pdf.text("Doctor's Signature", pdf.internal.pageSize.getWidth() - 60, currentY + 10);
 
-        // 8. Footer Section (With Thank-You Note)
-        pdf.setFontSize(10);
-        pdf.setDrawColor(...borderColor);
-        pdf.setFillColor(230, 230, 230);
-        pdf.rect(0, currentY + 30, 210, 20, 'F');
+        // Footer Section
+        pdf.setFillColor(0, 102, 204);
+        pdf.rect(0, pdf.internal.pageSize.getHeight() - 20, pdf.internal.pageSize.getWidth(), 20, 'F');
 
-        // Footer Text and Thank You Note
         pdf.setFont("helvetica", "normal");
-        pdf.setTextColor(...textColor);
-        pdf.text('Emon Dental, 123 Demo Street, Dhaka, Bangladesh | Phone: +880 1234-567890', margin, currentY + 38);
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(10);
+        pdf.text("Emon Dental, 123 Demo Street, Dhaka, Bangladesh | Phone: +880 1234-567890", margin, pdf.internal.pageSize.getHeight() - 10);
         pdf.setFont("helvetica", "italic");
-        pdf.text('Thank you for choosing Emon Dental. We wish you a speedy recovery!', margin, currentY + 45);
-
-        // PDF Name with Patient's Name
-        const fileName = patientName ? `${patientName}.pdf` : "Prescription.pdf";
+        pdf.text("Thank you for choosing Emon Dental. We wish you a speedy recovery!", margin, pdf.internal.pageSize.getHeight() - 5);
 
         pdf.autoPrint();
         window.open(pdf.output('bloburl'), '_blank');
-
     }
 </script>
 

@@ -19,31 +19,85 @@ $appointmentQuery = "SELECT * FROM appointmentview";
 $appointmentResult = $conn->query($appointmentQuery);
 
 // Query for patients
-$patientQuery = "SELECT OID, Name FROM tbl_patient";
+$patientQuery = "SELECT OID, Name, Mobile FROM tbl_patient"; // Added Mobile to the query
 $patientResult = $conn->query($patientQuery);
 ?>
-<script>
-   $(document).ready(function() {
-    $('#patientNameSelect').select2(); // Initialize Select2 for the patient dropdown
 
-    $('#patientNameSelect').change(function() {
-        var selectedOption = $(this).find('option:selected');
-        var mobile = selectedOption.data('mobile'); // Get mobile number
-        $('#PatientMobile').val(mobile); // Set mobile input value
-    });
-});
-
-</script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+<script>
+$(document).ready(function() {
+    $('#patientNameSelect').select2(); // Initialize Select2 for the patient dropdown
+
+    $('#patientNameSelect').change(function() {
+        var selectedOption = $(this).find('option:selected');
+        var mobile = selectedOption.data('mobile'); // Get mobile number
+        var patientName = selectedOption.data('patient-name'); // Get patient name
+        $('#PatientMobile').val(mobile); // Set mobile input value
+        $('#patient_name').val(patientName); // Set patient name hidden input
+    });
+
+    $('#doctorid').change(function() {
+        var selectedOption = $(this).find('option:selected');
+        var doctorName = selectedOption.data('doctor-name'); // Get doctor name
+        $('#doctor_name').val(doctorName); // Set doctor name hidden input
+    });
+
+    $('#appointmentForm').submit(function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Collect data for appointment processing
+        var formData = $(this).serialize(); // Serialize form data
+
+        // Collect data for JSON to send to add_prescription.php
+        var appointmentData = {
+            appointment_number: Math.floor(Math.random() * 10000), // Replace with your actual logic to get the appointment number
+            doctor_id: $('#doctorid').val(),
+            doctor_name: $('#doctor_name').val(),
+            patient_id: $('#patientNameSelect').val(),
+            patient_name: $('#patient_name').val(),
+            patient_mobile: $('#PatientMobile').val(),
+            gender: $('#gender').val(),
+            appointment_date: $('input[name="AppointmentDate"]').val(),
+            appointment_time: $('input[name="AppointmentTime"]').val()
+        };
+
+        // Send AJAX request to add_prescription.php
+        $.ajax({
+            url: 'add_prescription.php',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(appointmentData),
+            success: function(response) {
+                // Handle the response from the server
+                toastr.success('Prescription added successfully!');
+                console.log(response); // For debugging purposes
+
+                // After successful AJAX request, submit the form to appointment_process.php
+                $.post('appointment_process.php', formData, function(data) {
+                    // Handle the response from appointment_process.php
+                    // Redirect, update the UI, or show a success message as needed
+                    toastr.success('Appointment processed successfully!');
+                });
+            },
+            error: function(xhr, status, error) {
+                // Handle any errors
+                toastr.error('Error adding prescription: ' + error);
+                console.error(xhr.responseText); // For debugging purposes
+            }
+        });
+    });
+});
+</script>
+
 <div class="container">
     <!-- Appointment Form Section -->
     <section class="form-section">
-        <form action="appointment_process.php" method="POST" class="appointment-form">
+        <form id="appointmentForm">
             <div class="form-row">
                 <label for="doctorid">Doctor Name:
                     <select name="doctorid" id="doctorid" required>
@@ -51,7 +105,7 @@ $patientResult = $conn->query($patientQuery);
                         <?php
                         if ($doctorResult->num_rows > 0) {
                             while ($row = $doctorResult->fetch_assoc()) {
-                                echo "<option value='" . $row['DOCID'] . "'>" . $row['DocName'] . "</option>";
+                                echo "<option value='" . $row['DOCID'] . "' data-doctor-name='" . $row['DocName'] . "'>" . $row['DocName'] . "</option>";
                             }
                         } else {
                             echo "<option value=''>No Doctors Available</option>";
@@ -66,7 +120,7 @@ $patientResult = $conn->query($patientQuery);
                         <?php
                         if ($patientResult->num_rows > 0) {
                             while ($row = $patientResult->fetch_assoc()) {
-                                echo "<option value='" . $row['OID'] . "' data-mobile='" . $row['Mobile'] . "'>" . $row['Name'] . "</option>"; // Assuming 'Mobile' is the patient's mobile number
+                                echo "<option value='" . $row['OID'] . "' data-mobile='" . $row['Mobile'] . "' data-patient-name='" . $row['Name'] . "'>" . $row['Name'] . "</option>";
                             }
                         } else {
                             echo "<option value=''>No Patients Available</option>";
@@ -76,7 +130,7 @@ $patientResult = $conn->query($patientQuery);
                 </label>
 
                 <label for="PatientMobile">Patient Mobile:
-                    <input type="text" name="PatientMobile" id="PatientMobile" required placeholder="Mobile" style="height: 29px;">
+                    <input type="text" name="PatientMobile" id="PatientMobile" required placeholder="Mobile" style="height: 29px;" readonly>
                 </label>
             </div>
 
@@ -100,6 +154,10 @@ $patientResult = $conn->query($patientQuery);
 
                 <input type="submit" value="Book" class="submit-button">
             </div>
+
+            <!-- Hidden inputs for prescription -->
+            <input type="hidden" name="doctor_name" id="doctor_name">
+            <input type="hidden" name="patient_name" id="patient_name">
         </form>
     </section>
 </div>
@@ -113,7 +171,6 @@ $patientResult = $conn->query($patientQuery);
                 <label for="filterAppointmentNumber">Appointment Number:</label>
                 <input type="text" id="filterAppointmentNumber" placeholder="Filter by Appointment Number" style="width: 100%;">
             </div>
-
 
             <div style="flex: 1;">
                 <label for="filterPatientName">Patient Name:</label>
@@ -139,7 +196,6 @@ $patientResult = $conn->query($patientQuery);
             </div>
         </div>
 
-
         <table class="appointment-table" id="appointmentTable">
             <thead>
                 <tr>
@@ -157,22 +213,21 @@ $patientResult = $conn->query($patientQuery);
             <tbody>
                 <?php
                 if ($appointmentResult->num_rows > 0) {
-                    $index = 1;
                     while ($row = $appointmentResult->fetch_assoc()) {
                         echo "<tr>
-                            <td>" . $index++ . "</td>
+                            <td>" . $row['id'] . "</td>
                             <td class='appointment-number'>" . $row['appointment_number'] . "</td>
                             <td class='patient-name'>" . $row['PatientName'] . "</td>
-                            <td class='patient-mobile'>" . $row['PatientMobile'] . "</td>
-                            <td>" . $row['ParientGender'] . "</td>
+                            <td class='patient-mobile'>" . $row['PatientjMobile'] . "</td>
+                            <td>" . $row['gender'] . "</td>
                             <td class='appointment-date'>" . $row['AppointmentDate'] . "</td>
-                            <td>" . $row['Appointment_Time'] . "</td>
-                            <td class='doctor-name'>" . $row['DocName'] . "</td>
+                            <td>" . $row['AppointmentTime'] . "</td>
+                            <td class='doctor-name'>" . $row['DoctorName'] . "</td>
                             <td>" . $row['Status'] . "</td>
                         </tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='7'>No Appointments Available</td></tr>";
+                    echo "<tr><td colspan='9'>No appointments found.</td></tr>";
                 }
                 ?>
             </tbody>
@@ -181,69 +236,60 @@ $patientResult = $conn->query($patientQuery);
 </div>
 
 <script>
-    document.getElementById('clearButton').addEventListener('click', function() {
-        location.reload();
-    });
-
-    // Filter function
     document.addEventListener("DOMContentLoaded", function() {
         const filterAppointmentNumber = document.getElementById("filterAppointmentNumber");
-        const filterDoctorName = document.getElementById("filterDoctorName");
         const filterPatientName = document.getElementById("filterPatientName");
         const filterMobile = document.getElementById("filterMobile");
+        const filterDoctorName = document.getElementById("filterDoctorName");
         const filterDate = document.getElementById("filterDate");
         const table = document.getElementById("appointmentTable");
-        const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+        const tbody = table.querySelector("tbody");
 
         function filterTable() {
             const appointmentNumber = filterAppointmentNumber.value.toLowerCase();
-            const doctorName = filterDoctorName.value.toLowerCase();
             const patientName = filterPatientName.value.toLowerCase();
-            const mobile = filterMobile.value;
+            const mobile = filterMobile.value.toLowerCase();
+            const doctorName = filterDoctorName.value.toLowerCase();
             const date = filterDate.value;
 
-            for (let i = 0; i < rows.length; i++) {
-                const rowAppointmentNumber = rows[i].getElementsByClassName("appointment-number")[0].textContent.toLowerCase();
-                const rowDoctorName = rows[i].getElementsByClassName("doctor-name")[0].textContent.toLowerCase();
-                const rowPatientName = rows[i].getElementsByClassName("patient-name")[0].textContent.toLowerCase();
-                const rowMobile = rows[i].getElementsByClassName("patient-mobile")[0].textContent;
-                const rowDate = rows[i].getElementsByClassName("appointment-date")[0].textContent;
+            const rows = tbody.querySelectorAll("tr");
 
-                // Check if the row matches all filters
-                const matchesAppointmentNumber = rowAppointmentNumber.includes(appointmentNumber);
-                const matchesDoctor = rowDoctorName.includes(doctorName);
-                const matchesPatient = rowPatientName.includes(patientName);
-                const matchesMobile = rowMobile.includes(mobile);
-                const matchesDate = !date || rowDate === date;
+            rows.forEach(row => {
+                const appointmentNumberText = row.querySelector(".appointment-number").textContent.toLowerCase();
+                const patientNameText = row.querySelector(".patient-name").textContent.toLowerCase();
+                const mobileText = row.querySelector(".patient-mobile").textContent.toLowerCase();
+                const doctorNameText = row.querySelector(".doctor-name").textContent.toLowerCase();
+                const dateText = row.querySelector(".appointment-date").textContent;
 
-                if (matchesAppointmentNumber && matchesDoctor && matchesPatient && matchesMobile && matchesDate) {
-                    rows[i].style.display = ""; // Show row
-                } else {
-                    rows[i].style.display = "none"; // Hide row
-                }
-            }
+                const isMatch =
+                    (appointmentNumber === "" || appointmentNumberText.includes(appointmentNumber)) &&
+                    (patientName === "" || patientNameText.includes(patientName)) &&
+                    (mobile === "" || mobileText.includes(mobile)) &&
+                    (doctorName === "" || doctorNameText.includes(doctorName)) &&
+                    (date === "" || dateText === date);
+
+                row.style.display = isMatch ? "" : "none";
+            });
         }
 
-        // Add event listeners for filtering
-        filterAppointmentNumber.addEventListener("input", filterTable);
-        filterDoctorName.addEventListener("input", filterTable);
-        filterPatientName.addEventListener("input", filterTable);
-        filterMobile.addEventListener("input", filterTable);
+        filterAppointmentNumber.addEventListener("keyup", filterTable);
+        filterPatientName.addEventListener("keyup", filterTable);
+        filterMobile.addEventListener("keyup", filterTable);
+        filterDoctorName.addEventListener("keyup", filterTable);
         filterDate.addEventListener("change", filterTable);
-    });
 
-    $(document).ready(function() {
-        $('#doctorid').select2({
-            placeholder: "Select Doctor",
-            allowClear: true
+        // Clear filters
+        document.getElementById("clearButton").addEventListener("click", function() {
+            filterAppointmentNumber.value = '';
+            filterPatientName.value = '';
+            filterMobile.value = '';
+            filterDoctorName.value = '';
+            filterDate.value = '';
+            filterTable();
         });
-
-        <?php if (isset($_SESSION['success_message'])): ?>
-            toastr.success("<?php echo $_SESSION['success_message']; ?>");
-            <?php unset($_SESSION['success_message']); ?>
-        <?php endif; ?>
     });
 </script>
+
 
 
 <style>
