@@ -48,47 +48,43 @@ if ($result_medicines->num_rows > 0) {
 </head>
 
 <body>
-    <div class="container" style="display: flex;justify-content: space-between;margin: 20px;height: 76%;">
-        <div class="form-container" style="flex: 1; margin-right: 20px; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+    <div class="container" style="display: flex; justify-content: space-between; margin: 20px; height: 76%;">
+        <div class="form-container" style="flex: 1; padding: 20px; margin-right: 10px; border-radius: 8px; ">
             <h2>Add Sale Info</h2>
-            <form id="saleForm" method="POST" action="" style="margin-bottom: 49px;">
-                <div class="flex-container">
-                    <!-- Medicine Name Dropdown -->
-                    <div class="form-group" style="min-width: 200px;">
-                        <label for="medicine_name">Medicine Name:</label>
-                        <select id="medicine_name" name="medicine_name" required class="select2" style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
-                            <option value="">Select Medicine</option>
-                            <?php foreach ($medicines as $medicine): ?>
-                                <option value="<?php echo $medicine['id']; ?>"><?php echo htmlspecialchars($medicine['name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+            <form id="saleForm" method="POST" action="" style="margin-bottom: 49px;display: flex;align-items: center;gap: 10px;width: 112%;">
+                <!-- Medicine Name Dropdown -->
+                <div class="form-group" style="flex: 1;">
+                    <label for="medicine_name">Medicine Name:</label>
+                    <select id="medicine_name" name="medicine_name" required class="select2" style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
+                        <option value="">Select Medicine</option>
+                        <?php foreach ($medicines as $medicine): ?>
+                            <option value="<?php echo $medicine['id']; ?>"><?php echo htmlspecialchars($medicine['name']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                    <!-- Unit Price Input -->
-                    <div class="form-group" style="min-width: 200px;">
-                        <label for="unit_price">Unit Price:</label>
-                        <input type="number" id="unit_price" name="unit_price" style="border: 1px solid #778899b5;height: 31px;width: 100%;border-radius: 5px;" placeholder="Enter unit price" required>
-                    </div>
+                <!-- Unit Price Input -->
+                <div class="form-group" style="flex: 1;">
+                    <label for="unit_price">Unit Price:</label>
+                    <input type="number" id="unit_price" name="unit_price" style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;" placeholder="Enter unit price" required>
+                </div>
 
-                    <!-- Quantity Input -->
-                    <div class="form-group" style="min-width: 200px;">
-                        <label for="quantity">Quantity:</label>
-                        <input type="number" id="quantity" name="quantity" placeholder="Enter quantity" style="border: 1px solid #778899b5;height: 31px;width: 100%;border-radius: 5px;" required>
-                    </div>
+                <!-- Quantity Input -->
+                <div class="form-group" style="flex: 1;">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" placeholder="Enter quantity" style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;" required>
+                </div>
 
-                    <!-- Add Button -->
-                    <div class="form-group" style="min-width: 100px; ">
-                        <button type="button" class="btn-green" id="addBtn" style="width: 100%;">Add</button>
-                    </div>
+                <!-- Add Button -->
+                <div class="form-group" style="min-width: 100px;">
+                    <button type="button" class="btn-green" id="addBtn" style="width: 63%;margin-left: 3%;">Add</button>
                 </div>
             </form>
-
-
         </div>
 
-        <div class="table-container" style="flex: 1; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+        <div class="table-container" style="flex: 1; padding: 20px; margin-left: 10px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
             <h2>Added Items</h2>
-            <table id="addedItemsTable" style="width: 100%;border-collapse: collapse;margin-top: 15px;margin-bottom: 10%;">
+            <table id="addedItemsTable" style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10%;">
                 <thead>
                     <tr style="background-color: #eaeaea;">
                         <th style="border: 1px solid #ccc; padding: 8px;">#</th>
@@ -102,19 +98,19 @@ if ($result_medicines->num_rows > 0) {
                 </tbody>
             </table>
             <div class="flex-container priceSec" style="margin-top: 15px; display: flex; align-items: center;">
-                <div class="form-group">
+                <div class="form-group" style="flex: 1;">
                     <label for="total_price">Total Price:</label>
                     <input type="text" id="total_price" name="total_price" placeholder="00" readonly style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="flex: 1;">
                     <label for="discount">Discount:</label>
                     <input type="number" id="discount" name="discount" value="0" style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="flex: 1;">
                     <label for="payable">Payable:</label>
                     <input type="text" id="payable" name="payable" placeholder="00" readonly style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                 </div>
-                <div class="form-group" style="width: 10%; margin-top: 17px;">
+                <div class="form-group" style="width: 100px; margin-top: 17px;">
                     <button type="button" class="btn-danger" id="saveBtn" style="width: 100%;">Save</button>
                 </div>
             </div>
