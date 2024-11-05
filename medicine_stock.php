@@ -44,12 +44,12 @@ $supplierResult = $conn->query("SELECT id, name FROM suppliers");
 $addressResult = $conn->query("SELECT id, name FROM medicine_category");
 $phoneResult = $conn->query("SELECT id, name FROM medicine");
 
-// Initialize filter query
-$filterQuery = "SELECT s.name AS supplier_name, c.name AS category_name, m.name AS medicine_name, stock.InQty, stock.created_at 
+$filterQuery = "SELECT s.name AS supplier_name, c.name AS category_name, m.name AS medicine_name, stock.InQty, stock.OutQty, stock.created_at 
                 FROM stock_in stock 
                 JOIN suppliers s ON stock.supplier_id = s.id 
                 JOIN medicine_category c ON stock.cat_id = c.id 
                 JOIN medicine m ON stock.medicine_id = m.id";
+
 
 // Apply filters if needed
 $conditions = [];
@@ -187,45 +187,6 @@ $stockResult = $conn->query($filterQuery);
             </div>
         </form>
 
-        <style>
-            @media (max-width: 600px) {
-                .form-group {
-                    flex: 1 1 48%;
-
-                }
-
-                .form-group:nth-child(odd) {
-                    margin-right: 4%;
-                    /* Add some spacing between odd and even elements */
-                }
-
-                .form-group:last-child {
-                    flex: 1 1 100%;
-                    /* Make the buttons take the full width */
-                }
-
-                #filter_date {
-                    width: 96%;
-                    border: 1px solid #b0a8a8;
-                    height: 29px;
-                    border-radius: 5px;
-                    background-color: white;
-                    color: black;
-                }
-            }
-
-            @media (min-width: 1024px) {
-                #filter_date {
-                    width: 100%;
-                    border: 1px solid #b0a8a8;
-                    height: 29px;
-                    border-radius: 5px;
-                    background-color: white;
-                    color: black;
-                }
-            }
-        </style>
-
         <table class="table" style="width: 100%; border-collapse: collapse; border-spacing: 0;">
             <thead style="background-color: #9ad8d6; text-align: center;">
                 <tr>
@@ -233,6 +194,7 @@ $stockResult = $conn->query($filterQuery);
                     <th>Category Name</th>
                     <th>Medicine Name</th>
                     <th>InQty</th>
+                    <th>OutQty</th>
                     <th>Created_at</th>
                 </tr>
             </thead>
@@ -243,6 +205,7 @@ $stockResult = $conn->query($filterQuery);
                         <td><?php echo $row['category_name']; ?></td>
                         <td><?php echo $row['medicine_name']; ?></td>
                         <td><?php echo $row['InQty']; ?></td>
+                        <td><?php echo $row['OutQty']; ?></td>
                         <td><?php echo $row['created_at']; ?></td>
                     </tr>
                 <?php endwhile; ?>
@@ -267,6 +230,43 @@ $stockResult = $conn->query($filterQuery);
 </script>
 
 <style>
+    @media (max-width: 600px) {
+        .form-group {
+            flex: 1 1 48%;
+
+        }
+
+        .form-group:nth-child(odd) {
+            margin-right: 4%;
+            /* Add some spacing between odd and even elements */
+        }
+
+        .form-group:last-child {
+            flex: 1 1 100%;
+            /* Make the buttons take the full width */
+        }
+
+        #filter_date {
+            width: 96%;
+            border: 1px solid #b0a8a8;
+            height: 29px;
+            border-radius: 5px;
+            background-color: white;
+            color: black;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        #filter_date {
+            width: 100%;
+            border: 1px solid #b0a8a8;
+            height: 29px;
+            border-radius: 5px;
+            background-color: white;
+            color: black;
+        }
+    }
+
     .container {
         max-width: 97%;
         margin: 50px auto;
@@ -380,7 +380,7 @@ $stockResult = $conn->query($filterQuery);
 
         button.btn-primary {
             width: 45%;
-            margin-bottom: 10px ;
+            margin-bottom: 10px;
         }
     }
 

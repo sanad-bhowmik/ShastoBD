@@ -1,362 +1,195 @@
 <?php
 include_once("include/header.php");
 
-
-
-
 if (isset($_POST['submit'])) {
-
   $param = array();
 
-  /* if(isset($_POST['doc_id']) &&  $_POST['doc_id'] !="" &&  !empty($_POST['doc_id'])){
-    
-    $docID = $_POST['doc_id'];
-    $condition = "doctorID =".$docID;
-    array_push($param,$condition);
-
-  }
-*/
-
-  if (isset($_POST['name'])) {
-
-    $name = $_POST['name'];
-    $condition = " (DocName like '%" . $name . "%' or PatientName like '%" . $name . "%') ";
-
-    array_push($param, $condition);
-  }
-  if (isset($_POST['status'])) {
-
-
-    if ($_POST['status'] != "all") {
-      $condition = " service_status = '" . $_POST['status'] . "' ";
-      array_push($param, $condition);
-    }
-  }
-
-
-  if (isset($_POST['fdate']) && isset($_POST['todate'])) {
-
-
-    $condition = " DATE(created_at) between '" . $_POST['fdate'] . "' and '" . $_POST['todate'] . "' ";
+  // Search by Invoice Number
+  if (!empty($_POST['inv_num'])) {
+    $inv_num = mysqli_real_escape_string($GLOBALS['con'], $_POST['inv_num']);
+    $condition = "inv_num LIKE '%" . $inv_num . "%'";
     array_push($param, $condition);
   }
 
-  if (isset($_POST['txn_id'])) {
-
-    $condition = " txn_id like '%" . $_POST['txn_id'] . "%'";
+  // Search by Customer Name
+  if (!empty($_POST['customer_name'])) {
+    $customer_name = mysqli_real_escape_string($GLOBALS['con'], $_POST['customer_name']);
+    $condition = "customer_name LIKE '%" . $customer_name . "%'";
     array_push($param, $condition);
   }
 
+  // Search by Customer Phone
+  if (!empty($_POST['customer_phone'])) {
+    $customer_phone = mysqli_real_escape_string($GLOBALS['con'], $_POST['customer_phone']);
+    $condition = "customer_phone LIKE '%" . $customer_phone . "%'";
+    array_push($param, $condition);
+  }
 
-  $condition = implode(" and ", $param);
+  // Search by Created Date (single date field)
+  if (!empty($_POST['created_date'])) {
+    $created_date = mysqli_real_escape_string($GLOBALS['con'], $_POST['created_date']);
+    $condition = "DATE(created_at) = '" . $created_date . "'";
+    array_push($param, $condition);
+  }
 
+  // Combine all conditions
+  $condition = implode(" AND ", $param);
+  $sql_get_data = "SELECT * FROM sale_info WHERE status = 1"; // Ensure to include status = 1
+  if (!empty($condition)) {
+    $sql_get_data .= " AND " . $condition;
+  }
+  $sql_get_data .= " ORDER BY created_at DESC";
 
-  $sql_get_data = "select * from invoiceList where  " . $condition . " order by  created_at desc";
-  //var_dump($sql_get_data);
-  //die;
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
-} // end if submit
-else {
-
-  $sql_get_data = "select * from invoiceList where 1=1 order by  created_at desc   ";
-
+} else {
+  // Default query without any filters
+  $sql_get_data = "SELECT * FROM sale_info WHERE status = 1 ORDER BY created_at DESC;";
   $result = mysqli_query($GLOBALS['con'], $sql_get_data);
 }
 ?>
 
-<div class="app-main__inner">
-  <form id="search" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+
+<body>
+  <div class="app-main__inner">
+    <form id="search" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="main-card mb-3 card">
+            <div class="card-header">Search Sales</div>
+            <div class="card-body">
+              <div class="position-relative row form-group">
+
+                <!-- Invoice Number -->
+                <div class="col-sm-3">
+                  <p class="text">Invoice Number:</p>
+                  <input autocomplete="off" type="text" name="inv_num" value="<?php if (isset($_POST['inv_num'])) echo $_POST['inv_num']; ?>" class="form-control" placeholder="Enter Invoice Number">
+                </div>
+
+                <!-- Customer Name -->
+                <div class="col-sm-3">
+                  <p class="text">Customer Name:</p>
+                  <input autocomplete="off" type="text" name="customer_name" value="<?php if (isset($_POST['customer_name'])) echo $_POST['customer_name']; ?>" class="form-control" placeholder="Enter Customer Name">
+                </div>
+
+                <!-- Customer Phone -->
+                <div class="col-sm-3">
+                  <p class="text">Customer Phone:</p>
+                  <input autocomplete="off" type="text" name="customer_phone" value="<?php if (isset($_POST['customer_phone'])) echo $_POST['customer_phone']; ?>" class="form-control" placeholder="Enter Customer Phone">
+                </div>
+
+                <!-- Created Date (single date field) -->
+                <div class="col-sm-3">
+                  <p class="text">Date:</p>
+                  <input class="form-control" type="date" name="created_date" value="<?php if (isset($_POST['created_date'])) echo $_POST['created_date']; ?>">
+                </div>
+
+              </div>
+              <div class="position-relative row form-group p-t-10">
+                <div class="col-sm-4">
+                  <input type="submit" value="Search" name="submit" class="btn btn-secondary">
+                  <button type="button" class="btn btn-info" id="clearBtn">Clear</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
     <div class="row">
       <div class="col-md-12">
         <div class="main-card mb-3 card">
-          <div class="card-header">Search Invoice</div>
+          <div class="card-header">Sales Information</div>
           <div class="card-body">
-            <div class="position-relative row form-group">
-
-              <div class="col-sm-3">
-                <input type="text" hidden="true" name="doc_id" class="form-control" id="doc_id">
-                <p class="text">Type Name :</p> <input autocomplete="off" type="text" name="name" value="<?php if (isset($_POST['name'])) echo $_POST['name']; ?>" class="form-control" placeholder="Type Name">
-                <div class="list-group" id="show-list">
-                </div>
-              </div>
-              <div class="col-sm-3">
-
-                <p class="text">Transaction ID :</p> <input autocomplete="off" type="text" value="<?php if (isset($_POST['txn_id'])) echo $_POST['txn_id']; ?>" name="txn_id" class="form-control" id="txn_id" placeholder="Type Transaction ">
-
-
-              </div>
-              <div class="col-sm-2">
-
-                <p class="text">From Date :</p>
-                <input class="form-control" required value="<?php if (isset($_POST['fdate'])) echo $_POST['fdate']; ?>" type="date" name="fdate" id="fdate">
-              </div>
-              <div class="col-sm-2">
-
-                <p class="text">To Date :</p>
-                <input class="form-control" required type="date" value="<?php if (isset($_POST['todate'])) echo $_POST['todate']; ?>" name="todate" id="todate">
-              </div>
-
-              <div class="col-sm-2">
-
-                <p class="text">Service</p>
-
-                <select name="status" id="status" class="form-control">
-                  <option value="all">All
-                  </option>
-
-                  <option value="active">Active
-                  </option>
-                  <option value="done">Done
-                  </option>
-                </select>
-
-              </div>
-
-            </div>
-
-
-
-            <div class="position-relative row form-group p-t-10 ">
-              <div class="col-sm-4 ">
-
-                <input type="submit" id="search" value="Search" name="submit" class="btn btn-secondary">
-
-
-              </div>
-            </div>
-
-
-
-
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </form>
-
-  <div class="row">
-    <div class="col-md-12">
-      <div class="main-card mb-3 card">
-        <div class="card-header"> <span id="total"></span> &nbsp;&nbsp;&nbsp;&nbsp; <span id="totalQty"></span>
-
-        </div>
-        <div class="card-body">
-          <div class="card-title">Doctors</div>
-          <!-- Button trigger modal -->
-
-
-          <div class="table-responsive">
-            <table id="DocTable" class="align-middle mb-0 table table-borderless table-striped table-hover">
-              <thead>
-                <tr>
-                  <th class="text-center">Sl</th>
-                  <th class="text-center">Paid By</th>
-
-                  <th class="text-center">To Doctor</th>
-
-                  <th class="text-center">Transaction ID</th>
-
-                  <th class="text-center">Paid</th>
-                  <th class="text-center">Received</th>
-                  <th class="text-center">Service</th>
-                  <th class="text-center">Pay Date</th>
-
-                  <th class="text-center">Option</th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php $i = 1;
-                while ($rs = mysqli_fetch_array($result)) { ?>
+            <div class="table-responsive">
+              <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                <thead>
                   <tr>
-
-                    <td class="text-muted text-center">
-                      <?php echo $i; ?>
-                    </td>
-                    <td class="text-center">
-                      <?php
-
-                      echo  "<a href='#' id='" . $rs['patientID'] . "' class='patientDetails'>" . $rs['PatientName'] . "</a><br>" . $rs['PatientNumber'] . "";
-
-                      ?>
-                    </td>
-
-                    <td class="text-center">
-                      <?php echo $rs['DocName']; ?>
-                    </td>
-
-                    <td class="text-center">
-                      <?php echo $rs['txn_id']; ?>
-                    </td>
-                    <td class="text-center">
-                      <?php echo $rs['amount']; ?>
-                    </td>
-                    <td class="text-center">
-                      <?php echo $rs['paid_amount']; ?>
-                    </td>
-                    <td class="text-center">
-                      <?php echo $rs['service_status']; ?>
-                    </td>
-                    <td class="text-center">
-                      <?php echo $rs['created_at']; ?>
-                    </td>
-
-
-
-                    <td class="text-center">
-                      N/A
-                      <!-- <button id="<?php echo $rs['id']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary doctorDetails">Details</button> -->
-
-                      <!--   <button id="<?php echo $rs['DOCID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-danger docDelete">Remove</button> -->
-
-                    </td>
-
+                    <th class="text-center">Sl</th>
+                    <th class="text-center">Invoice Number</th>
+                    <th class="text-center">Customer Name</th>
+                    <th class="text-center">Customer Phone</th>
+                    <th class="text-center">Customer Address</th>
+                    <th class="text-center">Total Price</th>
+                    <th class="text-center">Discount</th>
+                    <th class="text-center">Payable Price</th>
+                    <th class="text-center">Date</th>
+                    <th class="text-center">Action</th> <!-- New Action column -->
                   </tr>
-                <?php $i++;
-                } ?>
+                </thead>
+                <tbody>
+                  <?php
+                  $i = 1;
+                  while ($rs = mysqli_fetch_array($result)) { ?>
+                    <tr>
+                      <td class="text-center"><?php echo $i; ?></td>
+                      <td class="text-center"><?php echo $rs['inv_num']; ?></td>
+                      <td class="text-center"><?php echo $rs['customer_name']; ?></td>
+                      <td class="text-center"><?php echo $rs['customer_phone']; ?></td>
+                      <td class="text-center"><?php echo $rs['customer_address']; ?></td>
+                      <td class="text-center"><?php echo $rs['totalPrice']; ?></td>
+                      <td class="text-center"><?php echo $rs['discount']; ?></td>
+                      <td class="text-center"><?php echo $rs['payable_price']; ?></td>
+                      <td class="text-center">
+                        <?php
+                        // Format the created_at date
+                        $date = new DateTime($rs['created_at']);
+                        echo $date->format('d-m-Y'); // Output format: DD-MM-YYYY
+                        ?>
+                      </td>
+                      <td class="text-center">
+                        <button class="btn btn-danger" onclick="confirmDrop('<?php echo $rs['inv_num']; ?>')">Drop</button>
+                      </td>
+                    </tr>
+                  <?php
+                    $i++;
+                  } ?>
+                </tbody>
+              </table>
 
-
-
-              </tbody>
-            </table>
+            </div>
           </div>
-
         </div>
       </div>
     </div>
   </div>
-</div>
-<?php
-include_once("include/footer.php");
-?>
 
-<!-- Large modal -->
-
-<!-- Large modal -->
-
-<div id="pModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">
-          <div id="pdt">Details</div>
-        </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form id="UpdateDoctor" method="post" enctype="multipart/form-data">
-        <div class="modal-body" id="patient-details">
-
-        </div>
-        <div class="modal-footer">
-
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <!-- <button id="saveChanges" type="submit" class="btn btn-primary">Save changes</button> -->
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<script type="text/javascript">
-  $(document).ready(function() {
-
-
-
-
-    //===============================details
-    $(document).on('click', '.patientDetails', function() {
-
-      var p_id = $(this).attr("id");
-      //  console.log(product_id);
-
-      $.ajax({
-        url: "get/get_patient_details_admin.php",
-        method: "POST",
-        data: {
-          p_id: p_id
-        },
-        success: function(data) {
-          // console.log(data);
-          $("#patient-details").html(data);
-          $(".bd-example-modal-lg").modal('show');
-        }
-      });
-    });
-
-    //=======================end
-
-    $('#doc_name').keyup(function() {
-
-
-      console.log("11");
-
-      var searchText = $(this).val();
-
-      if (searchText != '') {
-
+  <script type="text/javascript">
+    function confirmDrop(invNum) {
+      if (confirm("Are you sure you want to drop this invoice?")) {
         $.ajax({
-          url: 'search/search_doctor.php',
-          method: 'POST',
+          url: 'drop_invoice.php', // The PHP file that will handle the drop request
+          type: 'POST',
           data: {
-            query: searchText
+            inv_num: invNum
           },
           success: function(response) {
-            $('#show-list').html(response);
+            // Use Toastr for success notifications
+            toastr.success(response, 'Success');
+            location.reload(); // Reload the page to see updated data
+          },
+          error: function() {
+            // Use Toastr for error notifications
+            toastr.error("An error occurred while dropping the invoice.", 'Error');
           }
-
         });
-
-      } else {
-        $('#show-list').html('');
       }
+    }
 
+    $(document).ready(function() {
+      $('#clearBtn').click(function() {
+        window.location.href = 'invoice_list.php'; // Clear the form by refreshing
+      });
     });
+  </script>
+</body>
 
-
-    $(document).on('click', 'li', function() {
-
-
-      var id_name = $(this).text();
-      id_name = id_name.split(":");
-      var id = id_name[0];
-      var name = id_name[1];
-      //console.log(id);
-      $('#doc_name').val(name);
-      $('#doc_id').val(id);
-      $('#show-list').html('');
-
-
-
-
-
-    }); // end  li click function
-
-
-  }); // end document ready
-
-
-  $(document).ready(function() {
-    $('#DocTable').DataTable({
-
-      lengthMenu: [15, 25, 50],
-      "columnDefs": [{
-        "className": "dt-center",
-        "targets": "_all"
-      }],
-
-
-    });
-
-    var table = $('#DocTable').DataTable();
-
-    var sum = table.column(4).data().sum();
-    var sum2 = table.column(5).data().sum();
-
-    $('#total').html("Total Amount : " + sum.toFixed(2));
-    $('#totalQty').html("Total Recevied: " + sum2.toFixed(2));
-
-  });
-</script>
+</html>

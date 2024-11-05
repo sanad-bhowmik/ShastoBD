@@ -19,9 +19,18 @@ if ($conn->connect_error) {
 $message = "";
 $alertType = ""; // Variable to hold alert type for toastr
 
-// Fetch medicines for dropdown
+// Fetch medicines for dropdown that exist in stock_in and have InQty > 0
 $medicines = [];
-$result_medicines = $conn->query("SELECT id, name FROM medicine");
+$sql = "
+    SELECT m.id, m.name 
+    FROM medicine m
+    WHERE EXISTS (
+        SELECT 1 
+        FROM stock_in si 
+        WHERE si.medicine_id = m.id AND si.InQty > 0
+    )
+";
+$result_medicines = $conn->query($sql);
 if ($result_medicines->num_rows > 0) {
     while ($row = $result_medicines->fetch_assoc()) {
         $medicines[] = $row;

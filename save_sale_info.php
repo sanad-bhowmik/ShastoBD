@@ -79,6 +79,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'message' => $stmtDetails->error]);
             exit;
         }
+
+        // Fetch medicine_id from medicine table based on medicine_name
+        $stmtMedicine = $conn->prepare("SELECT id FROM medicine WHERE name = ?");
+        $stmtMedicine->bind_param("s", $medicine_name);
+        $stmtMedicine->execute();
+        $resultMedicine = $stmtMedicine->get_result();
+
+        if ($resultMedicine->num_rows > 0) {
+            $medicineRow = $resultMedicine->fetch_assoc();
+            $medicine_id = $medicineRow['id']; // Get the medicine_id from the row
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Medicine not found.']);
+            exit;
+        }
+
+        // Fetch current InQty from stock_in table
+        $stmtStockFetch = $conn->prepare("SELECT InQty FROM stock_in WHERE medicine_id = ?");
+        $stmtStockFetch->bind_param("i", $medicine_id);
+        $stmtStockFetch->execute();
+        $resultStock = $stmtStockFetch->get_result();
+
+        if ($resultStock->num_rows > 0) {
+            $stockRow = $resultStock->fetch_assoc();
+            $currentInQty = $stockRow['InQty'];
+
+            // Check if there is enough stock to fulfill the sale
+            if ($currentInQty < $quantity) {
+                echo json_encode(['success' => false, 'message' => 'Not enough stock for ' . $medicine_name]);
+                exit;
+            }
+
+            // Update stock_in table
+            $stmtStockUpdate = $conn->prepare("UPDATE stock_in SET OutQty = OutQty + ?, InQty = InQty - ? WHERE medicine_id = ?");
+            $stmtStockUpdate->bind_param("iii", $quantity, $quantity, $medicine_id); // Update OutQty and reduce InQty
+            if (!$stmtStockUpdate->execute()) {
+                echo json_encode(['success' => false, 'message' => $stmtStockUpdate->error]);
+                exit;
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Medicine not found in stock.']);
+            exit;
+        }
     }
 
     echo json_encode(['success' => true]);
