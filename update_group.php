@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->affected_rows > 0) {
             echo json_encode(['status' => 'success', 'message' => 'Group updated successfully!']);
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'No changes made or group not found.']);
+            echo json_encode(['status'  => 'No changes made or group not found.']);
         }
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Error updating group: ' . $stmt->error]);

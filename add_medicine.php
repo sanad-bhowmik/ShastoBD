@@ -20,13 +20,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['medicine_name'];
     $category = $_POST['category'];
     $group = $_POST['medicine_group'];
+    $status = $_POST['status'];
 
-    $stmt = $conn->prepare("INSERT INTO medicine (name, cat_id, group_id, status) VALUES (?, ?, ?, ?)"); // Update query to include group_id
+    $stmt = $conn->prepare("INSERT INTO medicine (name, cat_id, group_id, status) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssii", $name, $category, $group, $status);
 
     if ($stmt->execute()) {
         $message = "Medicine added successfully!";
-        $alertType = "success";
+        echo "<script>toastr.success('$message');</script>";
     } else {
         $message = "Error adding medicine: " . $conn->error;
         $alertType = "error";
@@ -58,554 +59,220 @@ $result = $conn->query($sql);
 </head>
 
 <body>
-    <div class="container">
+    <div class="app-main__inner">
         <form method="POST" action="">
-            <div class="flex-container">
-                <div class="form-group Mname">
-                    <label for="medicine_name">Medicine Name:</label>
-                    <input type="text" id="medicine_name" name="medicine_name" placeholder="Enter medicine name" required>
-                </div>
-                <div class="form-group categoryf">
-                    <label for="category">Category:</label>
-                    <select id="category" name="category" required>
-                        <option value="">Select Category</option>
-                        <?php
-                        // Fetch categories from the database
-                        $categoryQuery = "SELECT id, name FROM medicine_category WHERE status = 1";
-                        $categoryResult = $conn->query($categoryQuery);
-                        while ($row = $categoryResult->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group groupf" style="margin-left: -28%;"> <!-- New Medicine Group Dropdown -->
-                    <label for="medicine_group">Medicine Group:</label>
-                    <select id="medicine_group" name="medicine_group" class="select2" required>
-                        <option value="">Select Medicine Group</option>
-                        <?php
-                        // Fetch medicine groups from the database
-                        $groupQuery = "SELECT id, name FROM medicine_group WHERE status = 1"; // Update with your condition
-                        $groupResult = $conn->query($groupQuery);
-                        while ($row = $groupResult->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group status"style="margin-right: -36%;">
-                    <label for="status">Status:</label>
-                    <select id="status" name="status" required>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-top: 19px;">
-                    <button type="submit" class="btn-primary" style="margin-left: 36%;">Save</button>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="main-card mb-3 card">
+                        <div class="card-header">Add Medicine</div>
+                        <div class="card-body">
+                            <div class="position-relative row form-group">
+                                <div class="col-sm-2">
+                                    <label for="medicine_name">Medicine Name:</label>
+                                    <input type="text" id="medicine_name" name="medicine_name" class="form-control" placeholder="Enter medicine name" required>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <label for="category">Category:</label>
+                                    <select id="category" class="form-control" name="category" required>
+                                        <option value="">Select Category</option>
+                                        <?php
+                                        // Fetch categories from the database
+                                        $categoryQuery = "SELECT id, name FROM medicine_category WHERE status = 1";
+                                        $categoryResult = $conn->query($categoryQuery);
+                                        while ($row = $categoryResult->fetch_assoc()) {
+                                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <label for="medicine_group">Medicine Group:</label>
+                                    <select id="medicine_group" name="medicine_group" class="form-control" required>
+                                        <option value="">Select Medicine Group</option>
+                                        <?php
+                                        // Fetch medicine groups from the database
+                                        $groupQuery = "SELECT id, name FROM medicine_group WHERE status = 1";
+                                        $groupResult = $conn->query($groupQuery);
+                                        while ($row = $groupResult->fetch_assoc()) {
+                                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <label for="status">Status:</label>
+                                    <select id="status" class="form-control" name="status" required>
+                                        <option value="1">Active</option>
+                                        <option value="0">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button type="submit" class="btn btn-secondary" style="margin-top: 20%;">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
 
-        <?php if (!empty($message)): ?>
-            <script>
-                toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
-            </script>
-        <?php endif; ?>
-    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        Medicine
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div style="margin-top: 10px; margin-bottom: 25px;">
+                                <div class="d-flex flex-wrap" style="gap: 10px;">
+                                    <input type="text" id="filter_name" class="form-control" placeholder="Search by Medicine Name" style="flex: 1 1 200px;" />
 
-    <div class="container " style="margin: -28px auto;">
+                                    <select id="filter_category" class="form-control" style="flex: 1 1 200px;">
+                                        <option value="">Select Category</option>
+                                        <?php
+                                        // Fetch distinct categories for filtering
+                                        $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
+                                        while ($row = $result_categories->fetch_assoc()) {
+                                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
 
-        <div class="flex-container">
-            <div id="noflex">
-                <div class="form-group Mname" style="width: 16%;">
-                    <input type="text" id="filter_name" placeholder="Search by Medicine Name" />
-                </div>
-                <div class="form-group" style="width: 16%;">
-                    <select id="filter_category" class="select2">
-                        <option value="">Select Category</option>
-                        <?php
-                        // Fetch distinct categories for filtering
-                        $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
-                        while ($row = $result_categories->fetch_assoc()) {
-                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
+                                    <select id="filter_group" class="form-control" style="flex: 1 1 200px;">
+                                        <option value="">Select Medicine Group</option>
+                                        <?php
+                                        // Fetch distinct medicine groups for filtering
+                                        $result_groups = $conn->query("SELECT DISTINCT id, name FROM medicine_group WHERE status = 1");
+                                        while ($row = $result_groups->fetch_assoc()) {
+                                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
 
-                <div class="form-group" style="width: 16%;">
-                    <select id="filter_group" class="select2"> <!-- New filter for Medicine Group -->
-                        <option value="">Select Medicine Group</option>
-                        <?php
-                        // Fetch distinct medicine groups for filtering
-                        $result_groups = $conn->query("SELECT DISTINCT id, name FROM medicine_group WHERE status = 1");
-                        while ($row = $result_groups->fetch_assoc()) {
-                            echo "<option value='" . $row['name'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                </thead>
-                <div class="form-group">
-                    <button id="searchBtn" class="btn-primary">Search</button>
-                </div>
-                <div class="form-group">
-                    <button id="clearBtn" class="btn-primary" style="background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(3, 31, 213, 1) 82.8%, rgba(248, 101, 248, 1) 87.9%);">Clear</button>
+                                    <button id="searchBtn" class="btn btn-success" style="flex: 0 0 auto;">Search</button>
+                                    <button id="clearBtn" class="btn btn-danger" style="flex: 0 0 auto;">Clear</button>
+                                </div>
+                            </div>
+
+                            <table id="medicineTable" class="align-middle mb-0 table table-borderless table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Sl</th>
+                                        <th class="text-center">Medicine Name</th>
+                                        <th class="text-center">Category</th>
+                                        <th class="text-center">Group</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    if ($result->num_rows > 0) {
+                                        $index = 1;
+                                        while ($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $index++ . "</td>";
+                                            echo "<td><span class='medicine-name'>" . $row['medicine_name'] . "</span><input type='text' class='medicine-input' value='" . $row['medicine_name'] . "' style='display:none;'></td>";
+                                            echo "<td>" . $row['category_name'] . "</td>";
+                                            echo "<td>" . $row['group_name'] . "</td>";
+                                            echo "<td>
+                                <button class='edit-btn btn btn-info'>Edit</button>
+                                <button class='btn btn-success save-btn' style='display: none;' data-id='" . $row['id'] . "'>Save</button>
+                              </td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='5'>No medicines found</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <table id="medicineTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Medicine Name</th>
-                    <th>Category</th>
-                    <th>Group</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    $index = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $index++ . "</td>";
-                        echo "<td><span class='medicine-name'>" . $row['medicine_name'] . "</span><input type='text' class='medicine-input' value='" . $row['medicine_name'] . "' style='display:none;'></td>";
-                        echo "<td>" . $row['category_name'] . "</td>";
-                        echo "<td>" . $row['group_name'] . "</td>";
-                        echo "<td>
-                                <button class='edit-btn'>Edit</button>
-                                <button class='save-btn' style='display: none;' data-id='" . $row['id'] . "'>Save</button>
-                              </td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='5'>No medicines found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
     </div>
-
     <script>
-    $(document).ready(function() {
-        $('.select2').select2();
-
-        $('#clearBtn').on('click', function(e) {
-            e.preventDefault(); // Prevent form submission
-            $('#filter_name').val(''); // Clear medicine name input
-            $('#filter_category').val('').trigger('change'); // Clear category filter
-            $('#filter_group').val('').trigger('change'); // Clear group filter
-            $('#medicineTable tbody tr').show(); // Show all medicines
-        });
-
-        $('#searchBtn').on('click', function(e) {
-            e.preventDefault(); // Prevent form submission
-            filterTable();
-        });
-
-        function filterTable() {
-            var nameFilter = $('#filter_name').val().toLowerCase();
-            var categoryFilter = $('#filter_category').val();
-            var groupFilter = $('#filter_group').val(); // Get the selected group filter
-
-            $('#medicineTable tbody tr').filter(function() {
-                var nameMatch = $(this).find('.medicine-name').text().toLowerCase().indexOf(nameFilter) > -1 || nameFilter === "";
-                var categoryMatch = $(this).children('td:nth-child(3)').text() === categoryFilter || categoryFilter === "";
-                var groupMatch = $(this).children('td:nth-child(4)').text() === groupFilter || groupFilter === ""; // Filter by group
-
-                $(this).toggle(nameMatch && categoryMatch && groupMatch); // Show rows that match all filters
+        $(document).ready(function() {
+            $('#clearBtn').on('click', function(e) {
+                e.preventDefault(); // Prevent form submission
+                $('#filter_name').val(''); // Clear medicine name input
+                $('#filter_category').val('').trigger('change'); // Clear category filter
+                $('#filter_group').val('').trigger('change'); // Clear group filter
+                $('#medicineTable tbody tr').show(); // Show all medicines
             });
+
+            $('#searchBtn').on('click', function(e) {
+                e.preventDefault(); // Prevent form submission
+                filterTable();
+            });
+
+            function filterTable() {
+                var nameFilter = $('#filter_name').val().toLowerCase();
+                var categoryFilter = $('#filter_category').val();
+                var groupFilter = $('#filter_group').val();
+
+                $('#medicineTable tbody tr').filter(function() {
+                    var nameMatch = $(this).find('.medicine-name').text().toLowerCase().includes(nameFilter) || nameFilter === "";
+                    var categoryMatch = categoryFilter === "" || $(this).children('td:nth-child(3)').text() === categoryFilter;
+                    var groupMatch = groupFilter === "" || $(this).children('td:nth-child(4)').text() === groupFilter;
+
+                    $(this).toggle(nameMatch && categoryMatch && groupMatch);
+                });
+            }
+
+            // Edit functionality
+            $('.edit-btn').on('click', function() {
+                var row = $(this).closest('tr');
+                row.find('.medicine-name').hide();
+                row.find('.medicine-input').show();
+                $(this).hide();
+                row.find('.save-btn').show();
+            });
+
+            // Save functionality
+            // Save functionality
+$('.save-btn').on('click', function() {
+    var row = $(this).closest('tr');
+    var medicineId = $(this).data('id');
+    var newMedicineName = row.find('.medicine-input').val();
+
+    $.ajax({
+        url: 'update_medicine.php', // Your update medicine script
+        method: 'POST',
+        data: {
+            id: medicineId,
+            name: newMedicineName
+        },
+        success: function(response) {
+            response = JSON.parse(response); // Ensure response is parsed
+            if (response.success) {
+                toastr.success('Medicine updated successfully!'); // Show success notification
+                row.find('.medicine-name').text(newMedicineName).show();
+                row.find('.medicine-input').hide();
+                row.find('.edit-btn').show();
+                row.find('.save-btn').hide();
+            } else {
+                toastr.error('Error updating medicine: ' + response.error); // Use the error key
+            }
+        },
+        error: function() {
+            toastr.error('An unexpected error occurred.');
         }
-
-        // Edit and save functionality
-        $(document).on('click', '.edit-btn', function() {
-            var $row = $(this).closest('tr');
-            $row.find('.medicine-input').show(); // Show input field
-            $row.find('.medicine-name').hide(); // Hide the normal text
-            $(this).hide(); // Hide edit button
-            $row.find('.save-btn').show(); // Show save button
-        });
-
-        $(document).on('click', '.save-btn', function() {
-            var $row = $(this).closest('tr');
-            var newMedicineName = $row.find('.medicine-input').val();
-            var medicineId = $(this).data('id'); // Get the id of the medicine
-
-            // Send AJAX request to update the medicine name
-            $.ajax({
-                type: 'POST',
-                url: 'update_medicine.php', // The script that will handle the update
-                data: {
-                    id: medicineId,
-                    name: newMedicineName
-                },
-                success: function(response) {
-                    var res = JSON.parse(response);
-                    if (res.status === "success") {
-                        $row.find('.medicine-input').hide(); // Hide input field
-                        $row.find('.medicine-name').text(newMedicineName).show(); // Update and show the normal text
-                        $(this).hide(); // Hide save button
-                        $row.find('.edit-btn').show(); // Show edit button again
-                        toastr.success('Medicine updated successfully!');
-                    } else {
-                        toastr.error('Error updating medicine: ' + res.message);
-                    }
-                },
-                error: function() {
-                    toastr.error('Error updating medicine.');
-                }
-            });
-        });
     });
-</script>
+});
 
+        });
+    </script>
 </body>
 
 </html>
 
-
-
-<style>
-    .save-btn {
-        width: 59px;
-        height: 28px;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 5px;
-        background: #183153;
-        font-family: "Montserrat", sans-serif;
-        box-shadow: 0px 6px 24px 0px rgba(0, 0, 0, 0.2);
-        overflow: hidden;
-        cursor: pointer;
-        border: none;
-        color: white;
-    }
-
-    .save-btn:after {
-        content: " ";
-        width: 0%;
-        height: 100%;
-        background: #ffd401;
-        position: absolute;
-        transition: all 0.4s ease-in-out;
-        right: 0;
-        color: black;
-    }
-
-    .save-btn:hover::after {
-        right: auto;
-        left: 0;
-        width: 100%;
-    }
-
-    .save-btn span {
-        text-align: center;
-        text-decoration: none;
-        width: 100%;
-        color: #fff;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.3em;
-        z-index: 20;
-        transition: all 0.3s ease-in-out;
-    }
-
-    .save-btn:hover span {
-        color: #183153;
-        animation: scaleUp 0.3s ease-in-out;
-    }
-
-    @keyframes scaleUp {
-        0% {
-            transform: scale(1);
-        }
-
-        50% {
-            transform: scale(0.95);
-        }
-
-        100% {
-            transform: scale(1);
-        }
-    }
-
-    .edit-btn {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        width: 59px;
-        height: 28px;
-        border: none;
-        padding: 0px 20px;
-        background-color: rgb(168, 38, 255);
-        color: white;
-        font-weight: 500;
-        cursor: pointer;
-        border-radius: 10px;
-        box-shadow: 3px 3px 0px rgb(140, 32, 212);
-        transition-duration: .3s;
-    }
-
-    .svg {
-        width: 10px;
-        position: absolute;
-        right: 0;
-        margin-right: 6px;
-        fill: white;
-        transition-duration: .3s;
-    }
-
-    .edit-btn:hover {
-        color: transparent;
-    }
-
-    .edit-btn:hover svg {
-        right: 43%;
-        margin: 0;
-        padding: 0;
-        border: none;
-        transition-duration: .3s;
-    }
-
-    .edit-btn:active {
-        transform: translate(3px, 3px);
-        transition-duration: .3s;
-        box-shadow: 2px 2px 0px rgb(140, 32, 212);
-    }
-
-    .container {
-        max-width: 97%;
-        margin: 50px auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-    }
-
-    h2 {
-        text-align: center;
-        color: #333;
-        font-size: 18px;
-        margin-bottom: 20px;
-    }
-
-    .flex-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .form-group {
-        width: 19%;
-    }
-
-    label {
-        font-size: 12px;
-        color: #555;
-        margin-bottom: 6px;
-        display: block;
-        font-weight: 600;
-    }
-
-    input[type="text"],
-    input[type="tel"],
-    select {
-        width: 100%;
-        padding: 6px 8px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        color: #333;
-        background-color: #f9f9f9;
-        transition: all 0.3s ease;
-    }
-
-    input[type="text"]:focus,
-    input[type="tel"]:focus,
-    select:focus {
-        border-color: #80bdff;
-        background-color: #fff;
-        outline: none;
-    }
-
-    button.btn-primary {
-        display: inline-block;
-        width: 28%;
-        padding: 6px 8px;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(14, 174, 87, 1) 0%, rgba(12, 116, 117, 1) 90%);
-        transition: background-color 0.3s ease;
-    }
-
-    button.btn-primary:hover {
-        background-color: #218838;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 30px;
-    }
-
-    table th,
-    table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    table th {
-        background-color: #f2f2f2;
-        font-size: 14px;
-    }
-
-    table td {
-        font-size: 12px;
-    }
-
-    table tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    table tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    @media (max-width: 768px) {
-        .form-group {
-            width: 100%;
-        }
-
-        .flex-container {
-            flex-direction: column;
-        }
-
-        .btn-green {
-            width: 100%;
-        }
-
-        .btn-warning {
-            width: 100%;
-        }
-
-        .btn-red {
-            width: 100%;
-        }
-
-        #filter_date {
-            margin-left: 5px;
-            width: 98%;
-        }
-
-        .Mname {
-            margin-left: 0%;
-        }
-
-        #noflex {
-            display: block;
-            width: 98%;
-        }
-
-        #filter_name {
-            width: 614%;
-            margin-bottom: 10px;
-        }
-
-        #filter_category {
-            width: 614%;
-        }
-
-        #searchBtn {
-            margin-top: 10px;
-            width: 98%;
-        }
-
-        #clearBtn {
-            margin-top: 10px;
-            width: 98%;
-        }
-
-    }
-
-    @media (min-width: 1024px) {
-        .status {
-            margin-left: -29%;
-        }
-
-        #searchBtn {
-            margin-right: -144px;
-        }
-
-        .savebtn {
-            margin-left: -204%;
-            margin-top: 19px;
-        }
-
-        #filter_date {
-            width: 82%;
-            text-align: center;
-            border: 1px solid #979797;
-            height: 29px;
-            border-radius: 3px;
-        }
-
-        .btn-green {
-            margin-left: -202%;
-        }
-
-        .btn-red {
-            margin-left: -90%;
-        }
-
-        .btn-warning {
-            margin-left: -17%;
-        }
-
-        #clearBtn {
-            margin-left: -72%;
-        }
-
-        #noflex {
-            margin-bottom: 10px;
-            display: flex;
-            gap: 12px;
-            width: 92%;
-        }
-
-        .Mname {
-            margin-right: -3px;
-        }
-
-        .categoryf {
-            margin-left: -28%;
-        }
-
-        #filter_name {
-            width: 100%;
-            border: 1px solid #b0a8a8;
-            height: 29px;
-            border-radius: 5px;
-            background-color: white;
-            color: black;
-        }
-
-        #filter_category {
-            width: 100%;
-
-        }
-    }
-</style>
+<?php
+$conn->close();
+?>

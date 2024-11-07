@@ -37,144 +37,161 @@ $appointmentResult = $conn->query($appointmentQuery);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<div class="form-container" style="width: 96%; margin: 26px auto; background-color: #fff; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
-    <form id="prescriptionForm" style="font-size: .9375rem;">
-        <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
-            <!-- Appointment Number Select2 Searchable Dropdown -->
-            <div style="flex: 1; padding-left: .625rem; margin-top: 5px;">
-                <label for="appointmentNumber" style="display: block; margin-bottom: 10%; margin-right: 10px; margin-top: -2px;">
-                    <span>Appointment Number:</span>
-                    <select name="appointmentNumber" id="appointmentNumber" style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem; height: 33px; font-size: 11px; padding: 1px; text-align: center;">
-                        <option value="" disabled selected>Select</option>
-                        <?php
-                        if ($appointmentResult->num_rows > 0) {
-                            while ($row = $appointmentResult->fetch_assoc()) {
-                                echo "<option value='" . $row['appointment_number'] . "'>" . $row['appointment_number'] . "</option>";
-                            }
-                        } else {
-                            echo "<option value=''>No Appointments Available</option>";
-                        }
-                        ?>
-                    </select>
-                </label>
-            </div>
+<div class="app-main__inner">
+    <form method="" id="prescriptionForm" action="">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">Add Medicine Stock</div>
+                    <div class="card-body">
+                        <div class="position-relative  form-group" style="margin-left: 1%;">
 
-            <!-- Doctor Name (Auto-filled based on Appointment) -->
-            <div style="flex: 1; padding-right: .625rem;">
-                <label for="doctorName" style="display: block; margin-bottom: .3125rem;">Doctor:
-                    <input type="text" name="doctorName" id="doctorName" readonly style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
-                </label>
-            </div>
+                            <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
+                                <!-- Appointment Number Select2 Searchable Dropdown -->
+                                <div style="flex: 1; padding-left: .625rem; margin-top: 5px;">
+                                    <label for="appointmentNumber" style="display: block; margin-bottom: 10%; margin-right: 10px; margin-top: -2px;">
+                                        <span>Appointment Number:</span>
+                                        <select name="appointmentNumber" id="appointmentNumber" style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem; height: 33px; font-size: 11px; padding: 1px; text-align: center;">
+                                            <option value="" disabled selected>Select</option>
+                                            <?php
+                                            if ($appointmentResult->num_rows > 0) {
+                                                while ($row = $appointmentResult->fetch_assoc()) {
+                                                    echo "<option value='" . $row['appointment_number'] . "'>" . $row['appointment_number'] . "</option>";
+                                                }
+                                            } else {
+                                                echo "<option value=''>No Appointments Available</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </label>
+                                </div>
 
-            <!-- Patient Name (Auto-filled based on Appointment) -->
-            <div style="flex: 1; padding-right: .625rem; padding-left: .625rem;">
-                <label for="patientName" style="display: block; margin-bottom: .3125rem;">Patient:
-                    <input type="text" name="patientName" id="patientName" readonly style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
-                </label>
-            </div>
+                                <!-- Doctor Name (Auto-filled based on Appointment) -->
+                                <div style="flex: 1; padding-right: .625rem;">
+                                    <label for="doctorName" style="display: block; margin-bottom: .3125rem;">Doctor:
+                                        <input type="text" name="doctorName" id="doctorName" readonly style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
+                                    </label>
+                                </div>
 
-        </div>
+                                <!-- Patient Name (Auto-filled based on Appointment) -->
+                                <div style="flex: 1; padding-right: .625rem; padding-left: .625rem;">
+                                    <label for="patientName" style="display: block; margin-bottom: .3125rem;">Patient:
+                                        <input type="text" name="patientName" id="patientName" readonly style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
+                                    </label>
+                                </div>
+                                <!-- Medicine Name Select2 Dropdown -->
+                                <div style="flex: 1; padding-left: .625rem;">
+                                    <label for="medicine" style="display: block; margin-bottom: .3125rem;">Medicine Name:
+                                        <select name="medicine" id="medicine" style="width: 100%; padding: .5rem; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
+                                            <option value="" disabled selected>Select Medicine</option>
+                                            <?php
+                                            if ($medicineResult->num_rows > 0) {
+                                                while ($row = $medicineResult->fetch_assoc()) {
+                                                    echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
+                                                }
+                                            } else {
+                                                echo "<option value=''>No Medicines Available</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
 
-        <div class="form-row" style="display: flex;flex-wrap: wrap;gap: 1rem;">
-            <!-- Medicine Name Select2 Dropdown -->
-            <div style="flex: 1; padding-left: .625rem;">
-                <label for="medicine" style="display: block; margin-bottom: .3125rem;">Medicine Name:
-                    <select name="medicine" id="medicine" style="width: 100%; padding: .5rem; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
-                        <option value="" disabled selected>Select Medicine</option>
-                        <?php
-                        if ($medicineResult->num_rows > 0) {
-                            while ($row = $medicineResult->fetch_assoc()) {
-                                echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
-                            }
-                        } else {
-                            echo "<option value=''>No Medicines Available</option>";
-                        }
-                        ?>
-                    </select>
-                </label>
-            </div>
+                            <div class="form-row" style="display: flex;flex-wrap: wrap;gap: 1rem;margin-left: 1%;margin-right: -1%;width: 99%;">
 
-            <!-- Medicine Group (Readonly) -->
-            <div style="flex: 1; padding-right: .625rem;">
-                <label for="medicineGroup" style="display: block; margin-bottom: .3125rem;">Medicine Group:
-                    <input type="text" name="medicineGroup" id="medicineGroup" readonly style="width: 100%; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
-                </label>
-            </div>
+                                <!-- Medicine Group (Readonly) -->
+                                <div style="flex: 1; padding-right: .625rem;">
+                                    <label for="medicineGroup" style="display: block; margin-bottom: .3125rem;">Medicine Group:
+                                        <input type="text" name="medicineGroup" id="medicineGroup" readonly style="width: 100%; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
+                                    </label>
+                                </div>
 
-            <div style="flex: 1;margin-top: -2px;">
-                <label for="duration" style="margin-bottom: 1px;">Duration:</label>
-                <input type="text" name="duration" id="duration" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
-            </div>
+                                <div style="flex: 1;margin-top: -2px;">
+                                    <label for="duration" style="margin-bottom: 1px;">Duration:</label>
+                                    <input type="text" name="duration" id="duration" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
+                                </div>
 
-            <div style="flex: 1;margin-top: -2px;">
-                <label for="dosage" style="margin-bottom: 1px;">Dosage:</label>
-                <input type="text" name="dosage" id="dosage" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
-            </div>
+                                <div style="flex: 1;margin-top: -2px;">
+                                    <label for="dosage" style="margin-bottom: 1px;">Dosage:</label>
+                                    <input type="text" name="dosage" id="dosage" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
+                                </div>
 
-            <div style="flex: 1;margin-top: -2px;">
-                <label for="notes" style="margin-bottom: 1px;">Additional Notes:</label>
-                <textarea name="notes" id="notes" rows="2" style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;" required></textarea>
-            </div>
+                                <div style="flex: 1;margin-top: -2px;">
+                                    <label for="notes" style="margin-bottom: 1px;">Additional Notes:</label>
+                                    <textarea name="notes" id="notes" rows="2" style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;" required></textarea>
+                                </div>
 
-            <div style="flex: 1; display: flex; align-items: flex-end;">
-                <button type="button" id="saveButton" style="width: 64%;padding: 4px;color: white;border: none;border-radius: .25rem;cursor: pointer;margin-bottom: 10px;background-image: linear-gradient( 91.2deg,  rgba(136,80,226,1) 4%, rgba(16,13,91,1) 96.5% );">Add To List</button>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" id="saveButton" style="width: 101%;padding: 6px;color: white;border: none;border-radius: .25rem;cursor: pointer;margin-bottom: 10px;margin-top: 17px;">Add To List</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 </div>
 
-<div class="form-container" style="width: 96%; margin: 26px auto; background-color: #fff; padding: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); border-radius: 8px;">
-    <!-- Table to display submitted data -->
-    <table id="dataTable" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
-        <thead>
-            <tr style="background-color: #f2f2f2;">
-                <th>Appointment Number</th>
-                <th>Patient</th>
-                <th>Medicine</th>
-                <th>Group</th>
-                <th>Duration</th>
-                <th>Dosage</th>
-                <th>Notes</th>
-                <th>Doctor</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data rows will be added here dynamically -->
-        </tbody>
-    </table>
-    <!-- Print Button -->
-    <!-- <button onclick="generatePDF()" style="margin-top: 20px; padding: 10px 15px; border: none; border-radius: 5px; background-color: #4CAF50; color: white; cursor: pointer;">
-        Print
-    </button> -->
 
+<div class="row" style="margin-left: 10px;margin-right: 10px;">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-header">
+                Medicine Stock
 
-    <button onclick="generatePDF()" class="print-btn">
-        <span class="printer-wrapper">
-            <span class="printer-container">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 92 75">
-                    <path
-                        stroke-width="5"
-                        stroke="black"
-                        d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z"></path>
-                    <mask fill="white" id="path-2-inside-1_30_7">
-                        <path
-                            d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path>
-                    </mask>
-                    <path
-                        mask="url(#path-2-inside-1_30_7)"
-                        fill="black"
-                        d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z"></path>
-                    <circle fill="black" r="3" cy="49" cx="78"></circle>
-                </svg>
-            </span>
+            </div>
+            <div class="form-container" style="padding: 12px;">
+                <!-- Table to display submitted data -->
+                <table id="dataTable" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #f2f2f2;">
+                            <th>Appointment Number</th>
+                            <th>Patient</th>
+                            <th>Medicine</th>
+                            <th>Group</th>
+                            <th>Duration</th>
+                            <th>Dosage</th>
+                            <th>Notes</th>
+                            <th>Doctor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data rows will be added here dynamically -->
+                    </tbody>
+                </table>
 
-            <span class="printer-page-wrapper">
-                <span class="printer-page"></span>
-            </span>
-        </span>
-        Print
-    </button>
+                <button onclick="generatePDF()" class="print-btn">
+                    <span class="printer-wrapper">
+                        <span class="printer-container">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 92 75">
+                                <path
+                                    stroke-width="5"
+                                    stroke="black"
+                                    d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z"></path>
+                                <mask fill="white" id="path-2-inside-1_30_7">
+                                    <path
+                                        d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path>
+                                </mask>
+                                <path
+                                    mask="url(#path-2-inside-1_30_7)"
+                                    fill="black"
+                                    d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z"></path>
+                                <circle fill="black" r="3" cy="49" cx="78"></circle>
+                            </svg>
+                        </span>
 
+                        <span class="printer-page-wrapper">
+                            <span class="printer-page"></span>
+                        </span>
+                    </span>
+                    Print
+                </button>
+
+            </div>
+        </div>
+    </div>
 </div>
 <!-- Your existing HTML code remains here -->
 

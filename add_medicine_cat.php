@@ -59,325 +59,166 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    
+
 </head>
 
 <body>
-    <div class="container">
+    <div class="app-main__inner">
         <form method="POST" action="">
-            <div class="flex-container">
-                <!-- Category Name Input -->
-                <div class="form-group">
-                    <label for="category_name">Category Name:</label>
-                    <input type="text" id="category_name" name="category_name" placeholder="Enter category name" required>
-                </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="main-card mb-3 card">
+                        <div class="card-header">Add Medicine Category</div>
+                        <div class="card-body">
+                            <div class="position-relative row form-group">
 
-                <!-- Status Dropdown -->
-                <div class="form-group status">
-                    <label for="status">Status:</label>
-                    <select id="status" name="status" required>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                    </select>
-                </div>
+                                <!-- Invoice Number -->
+                                <div class="col-sm-3">
+                                    <label for="category_name">Category Name:</label>
+                                    <input type="text" id="category_name"class="form-control"  name="category_name" placeholder="Enter category name" required>
+                                </div>
 
-                <!-- Save Button -->
-                <div class="form-group">
-                    <button type="submit" class="btn-green savebtn">Save</button>
+                                <!-- Customer Name -->
+                                <div class="col-sm-3">
+                                    <label for="status">Status:</label>
+                                    <select id="status"class="form-control"  name="status" required>
+                                        <option value="1">Active</option>
+                                        <option value="0">Inactive</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="col-sm-3">
+                                    <button type="submit" class="btn btn-success savebtn"style="margin-top: 12%;">Save</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
-
         <?php if (!empty($message)): ?>
             <script>
                 toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
             </script>
         <?php endif; ?>
-    </div>
 
-    <div class="container" style="margin: -28px auto;">
-        <h2>Medicines List</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        Medicine Category
 
-        <div class="flex-container">
-            <!-- Category Name Dropdown -->
-            <div class="form-group">
-                <select id="filter_name" class="select2">
-                    <option value="">Select Category</option>
-                    <?php
-                    // Fetch distinct categories for filtering
-                    $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
-                    while ($row = $result_categories->fetch_assoc()) {
-                        echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
-                    }
-                    ?>
-                </select>
-            </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div style="margin-top: 10px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px;">
+                                <select id="filter_name" class="form-control" style="flex: 1;">
+                                    <option value="">Select Category</option>
+                                    <?php
+                                    // Fetch distinct categories for filtering
+                                    $result_categories = $conn->query("SELECT DISTINCT id, name FROM medicine_category WHERE status = 1");
+                                    while ($row = $result_categories->fetch_assoc()) {
+                                        echo "<option value='" . htmlspecialchars($row['name']) . "'>" . htmlspecialchars($row['name']) . "</option>";
+                                    }
+                                    ?>
+                                </select>
 
-            <!-- Status Dropdown -->
-            <div class="form-group">
-                <select id="filter_status" class="select2">
-                    <option value="">Select Status</option>
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
-            </div>
+                                <select id="filter_status" class="form-control" style="flex: 1;">
+                                    <option value="">Select Status</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
 
-            <!-- Single Date Picker for Filtering -->
-            <div class="form-group">
-                <input type="date" id="filter_date" />
-            </div>
+                                <input type="date" id="filter_date" class="form-control" style="flex: 1;" />
 
-            <!-- Search Button -->
-            <div class="form-group">
-                <button id="searchBtn" class="btn-warning">Search</button>
-            </div>
-            <div class="form-group">
-                <button id="clearBtn" class="btn-red">Clear</button>
+                                <button id="searchBtn" class="btn btn-warning" style="flex: 0 0 auto;">Search</button>
+                                <button id="clearBtn" class="btn btn-red" style="flex: 0 0 auto;">Clear</button>
+                            </div>
+                            <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="">Sl</th>
+                                        <th class="">Category Name</th>
+                                        <th class="">Status</th>
+                                        <th class="">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryTableBody">
+                                    <?php
+                                    // Fetch categories from the medicine_category table
+                                    $result = $conn->query("SELECT id, name, status, created_at FROM medicine_category");
+
+                                    if ($result->num_rows > 0) {
+                                        $index = 1;
+                                        while ($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $index++ . "</td>";
+                                            echo "<td>" . htmlspecialchars($row['name']) . "</td>";
+
+                                            // Status with badge design
+                                            $statusClass = $row['status'] == 1 ? 'badge-success' : 'badge-danger';
+                                            $statusText = $row['status'] == 1 ? 'Active' : 'Inactive';
+                                            echo "<td><span class='badge $statusClass' style='padding: 5px; color: white;'>" . $statusText . "</span></td>";
+
+                                            // Display created_at date
+                                            echo "<td>" . date('Y-m-d', strtotime($row['created_at'])) . "</td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='4'>No categories found</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
 
-        <table id="medicineTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Category Name</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch categories from the medicine_category table
-                $result = $conn->query("SELECT id, name, status, created_at FROM medicine_category");
-
-                if ($result->num_rows > 0) {
-                    $index = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $index++ . "</td>";
-                        echo "<td>" . htmlspecialchars($row['name']) . "</td>";
-
-                        // Status with badge design
-                        $statusClass = $row['status'] == 1 ? 'badge-success' : 'badge-danger';
-                        $statusText = $row['status'] == 1 ? 'Active' : 'Inactive';
-                        echo "<td><span class='badge $statusClass' style='padding: 5px; color: white;'>" . $statusText . "</span></td>";
-
-                        // Display created_at date
-                        echo "<td>" . date('Y-m-d', strtotime($row['created_at'])) . "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4'>No categories found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('.select2').select2(); // Initialize select2 for dropdowns
+    $(document).ready(function() {
+        $('.select2').select2(); // Initialize select2 for dropdowns
 
-            // Clear filter button functionality
-            $('#clearBtn').on('click', function(e) {
-                e.preventDefault(); // Prevent form submission
-                $('#filter_name').val('').trigger('change'); // Clear category filter
-                $('#filter_status').val('').trigger('change'); // Clear status filter
-                $('#filter_date').val(''); // Clear date filter
-                $('#medicineTable tbody tr').show(); // Show all medicines
-            });
-
-            $('#searchBtn').on('click', function(e) {
-                e.preventDefault(); // Prevent form submission
-                filterTable();
-            });
-
-            function filterTable() {
-                var nameFilter = $('#filter_name').val();
-                var statusFilter = $('#filter_status').val();
-                var filterDate = $('#filter_date').val();
-
-                $('#medicineTable tbody tr').filter(function() {
-                    var nameMatch = nameFilter === "" || $(this).children('td:nth-child(2)').text() === nameFilter;
-                    var statusMatch = statusFilter === "" || $(this).children('td:nth-child(3)').text().trim() === (statusFilter == 1 ? 'Active' : 'Inactive');
-
-                    // Date filter logic
-                    var createdAt = $(this).children('td:nth-child(4)').text();
-                    var dateMatch = filterDate === "" || createdAt === filterDate;
-
-                    $(this).toggle(nameMatch && statusMatch && dateMatch);
-                });
-            }
+        // Clear filter button functionality
+        $('#clearBtn').on('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            $('#filter_name').val('').trigger('change'); // Clear category filter
+            $('#filter_status').val('').trigger('change'); // Clear status filter
+            $('#filter_date').val(''); // Clear date filter
+            filterTable(); // Show all categories after clearing filters
         });
-    </script>
+
+        $('#searchBtn').on('click', function(e) {
+            e.preventDefault(); // Prevent form submission
+            filterTable();
+        });
+
+        function filterTable() {
+            var nameFilter = $('#filter_name').val();
+            var statusFilter = $('#filter_status').val();
+            var filterDate = $('#filter_date').val();
+
+            $('#categoryTableBody tr').filter(function() {
+                var nameMatch = nameFilter === "" || $(this).children('td:nth-child(2)').text().trim() === nameFilter;
+                var statusMatch = statusFilter === "" || $(this).children('td:nth-child(3)').find('span').text().trim() === (statusFilter == 1 ? 'Active' : 'Inactive');
+
+                // Date filter logic
+                var createdAt = $(this).children('td:nth-child(4)').text().trim();
+                var dateMatch = filterDate === "" || createdAt === filterDate;
+
+                // Show or hide the row based on the filter conditions
+                $(this).toggle(nameMatch && statusMatch && dateMatch);
+            });
+        }
+    });
+</script>
+
 </body>
 
 </html>
-
-<style>
-        .badge-success {
-            background-color: green;
-        }
-
-        .badge-danger {
-            background-color: red;
-        }
-
-        .container {
-            max-width: 97%;
-            margin: 50px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
-                rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-        }
-
-        h2 {
-            text-align: center;
-            color: #333;
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .flex-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .form-group {
-            width: 19%;
-        }
-
-        label {
-            font-size: 12px;
-            color: #555;
-            margin-bottom: 6px;
-            display: block;
-            font-weight: 600;
-        }
-
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        .btn-green {
-            display: inline-block;
-            width: 28%;
-            padding: 6px 8px;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(14, 174, 87, 1) 0%, rgba(12, 116, 117, 1) 90%);
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-red {
-            display: inline-block;
-            width: 28%;
-            padding: 6px 8px;
-            color: #fff;
-            font-size: 12px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(3, 31, 213, 1) 82.8%, rgba(248, 101, 248, 1) 87.9%);
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-green:hover {
-            background-color: #0056b3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ccc;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        /* Media query for mobile responsiveness */
-        @media (max-width: 768px) {
-            .form-group {
-                width: 100%;
-                /* Full width on small screens */
-            }
-
-            .flex-container {
-                flex-direction: column;
-                /* Stack elements on top of each other */
-            }
-
-            .btn-green {
-                width: 100%;
-            }
-
-            .btn-warning {
-                width: 100%;
-            }
-
-            .btn-red {
-                width: 100%;
-            }
-
-            #filter_date {
-                margin-left: 5px;
-                width: 98%;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .status {
-                margin-left: -38%;
-            }
-
-            .savebtn {
-                margin-left: -204%;
-                margin-top: 19px;
-            }
-
-            #filter_date {
-                width: 82%;
-                text-align: center;
-                border: 1px solid #979797;
-                height: 29px;
-                border-radius: 3px;
-            }
-
-            .btn-green {
-                margin-left: -202%;
-            }
-
-            .btn-red {
-                margin-left: -90%;
-            }
-
-            .btn-warning {
-                margin-left: -17%;
-            }
-        }
-    </style>

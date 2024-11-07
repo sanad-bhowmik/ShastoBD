@@ -111,81 +111,101 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 </head>
 
 <body>
-    <div class="container">
+    <div class="app-main__inner">
         <form method="POST" action="">
-            <div class="flex-container">
-                <!-- Customer Name Input -->
-                <div class="form-group" style="margin-right: -9%;">
-                    <label for="customer_name">Customer Name:</label>
-                    <input type="text" id="customer_name" name="customer_name" placeholder="Enter customer name" required>
-                </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="main-card mb-3 card">
+                        <div class="card-header">Add Customer</div>
+                        <div class="card-body">
+                            <div class="position-relative row form-group">
 
-                <!-- Address Input -->
-                <div class="form-group" style="margin-left: 0%;margin-right: -9%;">
-                    <label for="address">Address:</label>
-                    <input type="text" id="address" name="address" placeholder="Enter address">
-                </div>
+                                <!-- Invoice Number -->
+                                <div class="col-sm-3">
+                                    <label for="customer_name">Customer Name:</label>
+                                    <input type="text" id="customer_name" class="form-control" name="customer_name" placeholder="Enter customer name" required>
+                                </div>
 
-                <!-- Phone Input -->
-                <div class="form-group" style="  margin-left: -1%;">
-                    <label for="phone">Phone:</label>
-                    <input type="text" id="phone" name="phone" placeholder="Enter phone number">
-                </div>
+                                <!-- Customer Name -->
+                                <div class="col-sm-3">
+                                    <label for="address">Address:</label>
+                                    <input type="text" id="address" name="address" class="form-control" placeholder="Enter address">
+                                </div>
+                                <!-- Customer Name -->
+                                <div class="col-sm-3">
+                                    <label for="phone">Phone:</label>
+                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number">
+                                </div>
 
-                <!-- Save Button -->
-                <div class="form-group">
-                    <button type="submit" class="btn-green savebtn" name="action" value="add">Save</button>
+
+                                <div class="col-sm-3">
+                                    <button type="submit" class="btn btn-secondary savebtn" style="margin-top: 27px;" name="action" value="add">Save</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
-
         <?php if (!empty($message)): ?>
             <script>
                 toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
             </script>
         <?php endif; ?>
-    </div>
 
-    <div class="container" style="margin: -28px auto;">
-        <h2>Sale Customers List</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        Customers
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="groupTable">
+                                <thead>
+                                    <tr>
+                                        <th class="">#</th>
+                                        <th class="">Customer Name</th>
+                                        <th class="">Address</th>
+                                        <th class="">Phone</th>
+                                        <th class="">Date</th>
+                                        <th class="">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryTableBody">
+                                    <?php
+                                    // Fetch customers from the sale_customer table
+                                    $result = $conn->query("SELECT id, customer_name, address, phone, created_at FROM sale_customer");
 
-        <table id="customerTable">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Customer Name</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch customers from the sale_customer table
-                $result = $conn->query("SELECT id, customer_name, address, phone, created_at FROM sale_customer");
-
-                if ($result->num_rows > 0) {
-                    $index = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $index++ . "</td>";
-                        echo "<td><span class='customer-name'>" . htmlspecialchars($row['customer_name']) . "</span><input type='text' class='customer-input' value='" . htmlspecialchars($row['customer_name']) . "' style='display:none;'></td>";
-                        echo "<td><span class='customer-address'>" . htmlspecialchars($row['address']) . "</span><input type='text' class='address-input' value='" . htmlspecialchars($row['address']) . "' style='display:none;'></td>";
-                        echo "<td><span class='customer-phone'>" . htmlspecialchars($row['phone']) . "</span><input type='text' class='phone-input' value='" . htmlspecialchars($row['phone']) . "' style='display:none;'></td>";
-                        echo "<td>" . date('Y-m-d', strtotime($row['created_at'])) . "</td>";
-                        echo "<td>
-                                <button class='edit-btn' data-id='" . $row['id'] . "'>Edit</button>
-                                <button class='save-btn' style='display: none;' data-id='" . $row['id'] . "'>Save</button>
+                                    if ($result->num_rows > 0) {
+                                        $index = 1;
+                                        while ($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $index++ . "</td>";
+                                            echo "<td><span class='customer-name'>" . htmlspecialchars($row['customer_name']) . "</span><input type='text' class='customer-input' value='" . htmlspecialchars($row['customer_name']) . "' style='display:none;'></td>";
+                                            echo "<td><span class='customer-address'>" . htmlspecialchars($row['address']) . "</span><input type='text' class='address-input' value='" . htmlspecialchars($row['address']) . "' style='display:none;'></td>";
+                                            echo "<td><span class='customer-phone'>" . htmlspecialchars($row['phone']) . "</span><input type='text' class='phone-input' value='" . htmlspecialchars($row['phone']) . "' style='display:none;'></td>";
+                                            echo "<td>" . date('Y-m-d', strtotime($row['created_at'])) . "</td>";
+                                            echo "<td>
+                                <button class='btn btn-info edit-btn' data-id='" . $row['id'] . "'>Edit</button>
+                                <button class='btn btn-success save-btn' style='display: none;' data-id='" . $row['id'] . "'>Save</button>
                               </td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6'>No customers found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='6'>No customers found</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
 
@@ -255,173 +275,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 </body>
 
 </html>
-
-
-
-<style>
-    .badge-success {
-        background-color: green;
-    }
-
-    .badge-danger {
-        background-color: red;
-    }
-
-    .container {
-        max-width: 97%;
-        margin: 50px auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
-            rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-    }
-
-    h2 {
-        text-align: center;
-        color: #333;
-        font-size: 18px;
-        margin-bottom: 20px;
-    }
-
-    .flex-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .form-group {
-        width: 19%;
-    }
-
-    label {
-        font-size: 12px;
-        color: #555;
-        margin-bottom: 6px;
-        display: block;
-        font-weight: 600;
-    }
-
-    input[type="text"],
-    select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .btn-green {
-        display: inline-block;
-        width: 28%;
-        padding: 6px 8px;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(14, 174, 87, 1) 0%, rgba(12, 116, 117, 1) 90%);
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-red {
-        display: inline-block;
-        width: 28%;
-        padding: 6px 8px;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(3, 31, 213, 1) 82.8%, rgba(248, 101, 248, 1) 87.9%);
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-green:hover {
-        background-color: #0056b3;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th,
-    td {
-        padding: 10px;
-        text-align: left;
-        border: 1px solid #ccc;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-
-    /* Media query for mobile responsiveness */
-    @media (max-width: 768px) {
-        .form-group {
-            width: 100%;
-            /* Full width on small screens */
-        }
-
-        .flex-container {
-            flex-direction: column;
-            /* Stack elements on top of each other */
-        }
-
-        .btn-green {
-            width: 100%;
-        }
-
-        .btn-warning {
-            width: 100%;
-        }
-
-        .btn-red {
-            width: 100%;
-        }
-
-        #filter_date {
-            margin-left: 5px;
-            width: 98%;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .status {
-            margin-left: -48%;
-        }
-
-        .savebtn {
-            margin-left: -204%;
-            margin-top: 19px;
-        }
-
-        #filter_date {
-            width: 82%;
-            text-align: center;
-            border: 1px solid #979797;
-            height: 29px;
-            border-radius: 3px;
-        }
-
-        .btn-green {
-            margin-left: -63%;
-        }
-
-        .btn-red {
-            margin-left: -90%;
-        }
-
-        .btn-warning {
-            margin-left: -17%;
-        }
-    }
-</style>

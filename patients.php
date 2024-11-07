@@ -52,6 +52,7 @@ include_once("include/header.php");
   <div class="row">
     <div class="col-md-12">
       <div class="main-card mb-3 card">
+        <div class="card-header">Add Patient</div>
         <div class="card-body">
           <!-- Form to Add Patient -->
           <form id="addPatientForm" method="post" action="add_patient.php" class="mb-3">
@@ -99,7 +100,7 @@ include_once("include/header.php");
     <div class="col-md-12">
       <div class="main-card mb-3 card">
         <div class="card-body">
-          <div class="card-title">Doctors</div>
+          <div class="card-title">Patients</div>
 
 
           <!-- End Form -->

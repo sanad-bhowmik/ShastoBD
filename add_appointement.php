@@ -30,77 +30,77 @@ $patientResult = $conn->query($patientQuery);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    $('#patientNameSelect').select2(); // Initialize Select2 for the patient dropdown
+    $(document).ready(function() {
 
-    $('#patientNameSelect').change(function() {
-        var selectedOption = $(this).find('option:selected');
-        var mobile = selectedOption.data('mobile'); // Get mobile number
-        var patientName = selectedOption.data('patient-name'); // Get patient name
-        $('#PatientMobile').val(mobile); // Set mobile input value
-        $('#patient_name').val(patientName); // Set patient name hidden input
-    });
+        $('#patientNameSelect').change(function() {
+            var selectedOption = $(this).find('option:selected');
+            var mobile = selectedOption.data('mobile'); // Get mobile number
+            var patientName = selectedOption.data('patient-name'); // Get patient name
+            $('#PatientMobile').val(mobile); // Set mobile input value
+            $('#patient_name').val(patientName); // Set patient name hidden input
+        });
 
-    $('#doctorid').change(function() {
-        var selectedOption = $(this).find('option:selected');
-        var doctorName = selectedOption.data('doctor-name'); // Get doctor name
-        $('#doctor_name').val(doctorName); // Set doctor name hidden input
-    });
+        $('#doctorid').change(function() {
+            var selectedOption = $(this).find('option:selected');
+            var doctorName = selectedOption.data('doctor-name'); // Get doctor name
+            $('#doctor_name').val(doctorName); // Set doctor name hidden input
+        });
 
-    $('#appointmentForm').submit(function(event) {
-        event.preventDefault(); // Prevent the default form submission
+        $('#appointmentForm').submit(function(event) {
+            event.preventDefault(); // Prevent the default form submission
 
-        // Collect data for appointment processing
-        var formData = $(this).serialize(); // Serialize form data
+            // Collect data for appointment processing
+            var formData = $(this).serialize(); // Serialize form data
 
-        // Collect data for JSON to send to add_prescription.php
-        var appointmentData = {
-            appointment_number: Math.floor(Math.random() * 10000), // Replace with your actual logic to get the appointment number
-            doctor_id: $('#doctorid').val(),
-            doctor_name: $('#doctor_name').val(),
-            patient_id: $('#patientNameSelect').val(),
-            patient_name: $('#patient_name').val(),
-            patient_mobile: $('#PatientMobile').val(),
-            gender: $('#gender').val(),
-            appointment_date: $('input[name="AppointmentDate"]').val(),
-            appointment_time: $('input[name="AppointmentTime"]').val()
-        };
+            // Collect data for JSON to send to add_prescription.php
+            var appointmentData = {
+                appointment_number: Math.floor(Math.random() * 10000), // Replace with your actual logic to get the appointment number
+                doctor_id: $('#doctorid').val(),
+                doctor_name: $('#doctor_name').val(),
+                patient_id: $('#patientNameSelect').val(),
+                patient_name: $('#patient_name').val(),
+                patient_mobile: $('#PatientMobile').val(),
+                gender: $('#gender').val(),
+                appointment_date: $('input[name="AppointmentDate"]').val(),
+                appointment_time: $('input[name="AppointmentTime"]').val()
+            };
 
-        // Send AJAX request to add_prescription.php
-        $.ajax({
-            url: 'add_prescription.php',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(appointmentData),
-            success: function(response) {
-                // Handle the response from the server
-                toastr.success('Prescription added successfully!');
-                console.log(response); // For debugging purposes
+            // Send AJAX request to add_prescription.php
+            $.ajax({
+                url: 'add_prescription.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(appointmentData),
+                success: function(response) {
+                    // Handle the response from the server
+                    toastr.success('Prescription added successfully!');
+                    console.log(response); // For debugging purposes
 
-                // After successful AJAX request, submit the form to appointment_process.php
-                $.post('appointment_process.php', formData, function(data) {
-                    // Handle the response from appointment_process.php
-                    // Redirect, update the UI, or show a success message as needed
-                    toastr.success('Appointment processed successfully!');
-                });
-            },
-            error: function(xhr, status, error) {
-                // Handle any errors
-                toastr.error('Error adding prescription: ' + error);
-                console.error(xhr.responseText); // For debugging purposes
-            }
+                    // After successful AJAX request, submit the form to appointment_process.php
+                    $.post('appointment_process.php', formData, function(data) {
+                        // Handle the response from appointment_process.php
+                        // Redirect, update the UI, or show a success message as needed
+                        toastr.success('Appointment processed successfully!');
+                    });
+                },
+                error: function(xhr, status, error) {
+                    // Handle any errors
+                    toastr.error('Error adding prescription: ' + error);
+                    console.error(xhr.responseText); // For debugging purposes
+                }
+            });
         });
     });
-});
 </script>
 
 <div class="container">
     <!-- Appointment Form Section -->
     <section class="form-section">
         <form id="appointmentForm">
+            <div class="card-header" style="margin-top: -19px;margin-bottom: 28px;margin-left: -18px;">Add Supplier</div>
             <div class="form-row">
                 <label for="doctorid">Doctor Name:
-                    <select name="doctorid" id="doctorid" required>
+                    <select name="doctorid" class="form-control" id="doctorid" required>
                         <option value="">Select Doctor</option>
                         <?php
                         if ($doctorResult->num_rows > 0) {
@@ -115,7 +115,7 @@ $(document).ready(function() {
                 </label>
 
                 <label for="patientNameSelect">Patient Name:
-                    <select name="patientName" id="patientNameSelect" required>
+                    <select name="patientName" class="form-control" id="patientNameSelect" required>
                         <option value="">Select Patient</option>
                         <?php
                         if ($patientResult->num_rows > 0) {
@@ -130,13 +130,13 @@ $(document).ready(function() {
                 </label>
 
                 <label for="PatientMobile">Patient Mobile:
-                    <input type="text" name="PatientMobile" id="PatientMobile" required placeholder="Mobile" style="height: 29px;" readonly>
+                    <input type="text" class="form-control" name="PatientMobile" id="PatientMobile" required placeholder="Mobile" readonly>
                 </label>
             </div>
 
             <div style="margin-top: 2%;">
                 <label for="gender" style="width: 30%;margin-right: 10px;">Gender:
-                    <select name="gender" id="gender" required>
+                    <select name="gender" class="form-control" id="gender" required>
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -145,14 +145,14 @@ $(document).ready(function() {
                 </label>
 
                 <label for="AppointmentTime" style="margin-right: 10px;width: 30%;">Appointment Time:
-                    <input type="time" name="AppointmentTime" required>
+                    <input type="time" class="form-control" name="AppointmentTime" required>
                 </label>
 
                 <label for="AppointmentDate" style="margin-right: 10px;width: 27%;">Appointment Date:
-                    <input type="date" name="AppointmentDate" required>
+                    <input type="date" class="form-control" name="AppointmentDate" required>
                 </label>
 
-                <input type="submit" value="Book" class="submit-button">
+                <input type="submit" value="Book" class="btn btn-secondary submit-button">
             </div>
 
             <!-- Hidden inputs for prescription -->
@@ -364,20 +364,7 @@ $(document).ready(function() {
         font-size: 14px;
     }
 
-    .submit-button {
-        width: 80px;
-        /* Make the button smaller in width */
-        background-color: #28a745;
-        color: white;
-        padding: 8px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        text-align: center;
-        height: fit-content;
-        margin-top: 5px;
-    }
+    
 
     .submit-button:hover {
         background-color: #218838;

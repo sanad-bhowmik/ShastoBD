@@ -67,58 +67,90 @@ $result = $conn->query($sql);
             filterTable();
         }
     </script>
+    <style>
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            /* Space between inputs */
+            margin-bottom: 25px;
+            /* Space below the inputs */
+        }
+
+        .filter-container input {
+            flex: 1 1 200px;
+            /* Allow inputs to grow and shrink with a minimum width */
+        }
+
+        .filter-container button {
+            flex: 0 0 auto;
+            /* Make button fixed size */
+        }
+    </style>
 </head>
 
 <body>
 
-    <section class="container">
-        <!-- Filter Form -->
-        <form style="margin-bottom: 20px;">
-            <input type="text" id="appointment_number" placeholder="Appointment Number" onkeyup="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
-            <input type="text" id="patient_name" placeholder="Patient Name" onkeyup="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
-            <input type="text" id="patient_mobile" placeholder="Patient Mobile" onkeyup="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
-            <input type="date" id="appointment_date" oninput="filterTable()" style="height: 36px;width: 152px;text-align: center; margin-right: 10px;border-radius: 10px;" />
-            <button type="button" class="btn-danger" onclick="clearFilters()" style="padding: 4px;border-radius: 10px;width: 53px;height: 31px;">Clear</button> <!-- Clear Button -->
-        </form>
+    <div class="app-main__inner">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        Inactive Appointments
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div class="filter-container">
+                                <input type="text" id="appointment_number" class="form-control" placeholder="Appointment Number" onkeyup="filterTable()" />
+                                <input type="text" id="patient_name" placeholder="Patient Name" onkeyup="filterTable()" class="form-control" />
+                                <input type="text" id="patient_mobile" placeholder="Patient Mobile" onkeyup="filterTable()" class="form-control" />
+                                <input type="date" id="appointment_date" oninput="filterTable()" class="form-control" />
+                                <button type="button" class="btn btn-danger" onclick="clearFilters()">Clear</button><!-- Clear Button -->
+                            </div>
+                            <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Sl</th>
+                                        <th class="text-center">Appointment Number</th>
+                                        <th class="text-center">Patient Name</th>
+                                        <th class="text-center">Patient Mobile</th>
+                                        <th class="text-center">Appointment Time</th>
+                                        <th class="text-center">Appointment Date</th>
+                                        <th class="text-center">Doctor Name</th>
+                                        <th class="text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockTableBody">
+                                    <?php
+                                    if ($result->num_rows > 0) {
+                                        $serialNumber = 1; // Initialize serial number
+                                        // Output data of each row
+                                        while ($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $serialNumber . "</td>"; // Display serial number
+                                            echo "<td>" . $row["appointment_number"] . "</td>";
+                                            echo "<td>" . $row["PatientName"] . "</td>";
+                                            echo "<td>" . $row["PatientMobile"] . "</td>";
+                                            echo "<td>" . $row["Appointment_Time"] . "</td>";
+                                            echo "<td>" . $row["AppointmentDate"] . "</td>";
+                                            echo "<td>" . $row["DocName"] . "</td>";
+                                            echo "<td><span class='badge badge-danger'>" . htmlspecialchars($row["Status"]) . "</span></td>";
 
-        <table id="dataTable">
-            <thead>
-                <tr>
-                    <th>S/N</th>
-                    <th>Appointment Number</th>
-                    <th>Patient Name</th>
-                    <th>Patient Mobile</th>
-                    <th>Appointment Time</th>
-                    <th>Appointment Date</th>
-                    <th>Doctor Name</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    $serialNumber = 1; // Initialize serial number
-                    // Output data of each row
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $serialNumber . "</td>"; // Display serial number
-                        echo "<td>" . $row["appointment_number"] . "</td>";
-                        echo "<td>" . $row["PatientName"] . "</td>";
-                        echo "<td>" . $row["PatientMobile"] . "</td>";
-                        echo "<td>" . $row["Appointment_Time"] . "</td>";
-                        echo "<td>" . $row["AppointmentDate"] . "</td>";
-                        echo "<td>" . $row["DocName"] . "</td>";
-                        echo "<td>" . $row["Status"] . "</td>";
-                        echo "</tr>";
-                        $serialNumber++; // Increment serial number
-                    }
-                } else {
-                    echo "<tr><td colspan='8'>No records found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </section>
+                                            echo "</tr>";
+                                            $serialNumber++; // Increment serial number
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='8'>No records found</td></tr>";
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 
@@ -128,65 +160,3 @@ $result = $conn->query($sql);
 // Close the database connection
 $conn->close();
 ?>
-
-
-
-
-
-<style>
-    .container {
-        width: 96%;
-        margin: 50px auto;
-        background-color: #fff;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-    }
-
-    #dataTable {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-    }
-
-    #dataTable thead {
-        background-color: #f2f2f2;
-    }
-
-    #dataTable th,
-    #dataTable td {
-        padding: 10px;
-        text-align: left;
-        border: 1px solid #ccc;
-    }
-
-    #dataTable th {
-        background-color: #e0e0e0;
-        font-weight: bold;
-    }
-
-    #dataTable tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    #dataTable tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    @media (max-width: 600px) {
-        body {
-            padding: 10px;
-        }
-
-        #dataTable {
-            font-size: 14px;
-        }
-
-        #dataTable th,
-        #dataTable td {
-            padding: 8px;
-        }
-    }
-</style>

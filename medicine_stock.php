@@ -11,22 +11,23 @@ $conn = new mysqli($dbhost, $dbusername, $dbpassword, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: Please contact the administrator.");
 }
 
 $message = "";
 $alertType = "";
 
-// Handle form submission
+// Handle form submission for new stock entry
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supplier_name'])) {
     $supplier_id = $_POST['supplier_name'];
     $cat_id = $_POST['address'];
     $medicine_id = $_POST['phone'];
     $InQty = $_POST['status'];
+    $rate = $_POST['rate'];  // New Rate variable
 
-    // Insert data into stock_in table
-    $stmt = $conn->prepare("INSERT INTO stock_in (supplier_id, cat_id, medicine_id, InQty, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())");
-    $stmt->bind_param("iiii", $supplier_id, $cat_id, $medicine_id, $InQty);
+    // Insert data into stock_in table with the new rate column
+    $stmt = $conn->prepare("INSERT INTO stock_in (supplier_id, cat_id, medicine_id, InQty, rate, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
+    $stmt->bind_param("iiiii", $supplier_id, $cat_id, $medicine_id, $InQty, $rate);
 
     if ($stmt->execute()) {
         $message = "Stock added successfully!";
@@ -39,43 +40,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supplier_name'])) {
     $stmt->close();
 }
 
+// Handle update for existing stock entry
+if (isset($_POST['update_id'])) {
+    $update_id = $_POST['update_id'];
+    $InQty = $_POST['InQty'];
+    $rate = $_POST['rate'];
+    $OutQty = $_POST['OutQty'];
+
+    // Update the stock_in table with new values
+    $stmt = $conn->prepare("UPDATE stock_in SET InQty = ?, rate = ?, OutQty = ?, updated_at = NOW() WHERE id = ?");
+    $stmt->bind_param("iiii", $InQty, $rate, $OutQty, $update_id);
+
+    if ($stmt->execute()) {
+        $message = "Stock updated successfully!";
+        $alertType = "success";
+    } else {
+        $message = "Error updating stock: " . $stmt->error;
+        $alertType = "error";
+    }
+
+    $stmt->close();
+}
+
 // Fetch suppliers, categories, and medicines for dropdowns
 $supplierResult = $conn->query("SELECT id, name FROM suppliers");
 $addressResult = $conn->query("SELECT id, name FROM medicine_category");
 $phoneResult = $conn->query("SELECT id, name FROM medicine");
 
-$filterQuery = "SELECT s.name AS supplier_name, c.name AS category_name, m.name AS medicine_name, stock.InQty, stock.OutQty, stock.created_at 
+$filterQuery = "SELECT stock.id, s.name AS supplier_name, c.name AS category_name, m.name AS medicine_name, stock.InQty, stock.rate, stock.OutQty, stock.created_at 
                 FROM stock_in stock 
                 JOIN suppliers s ON stock.supplier_id = s.id 
                 JOIN medicine_category c ON stock.cat_id = c.id 
                 JOIN medicine m ON stock.medicine_id = m.id";
 
-
-// Apply filters if needed
 $conditions = [];
 if (!empty($_POST['filter_supplier'])) {
-    $supplier_id = intval($_POST['filter_supplier']);  // Sanitize input
+    $supplier_id = intval($_POST['filter_supplier']);
     $conditions[] = "stock.supplier_id = $supplier_id";
 }
 if (!empty($_POST['filter_category'])) {
-    $cat_id = intval($_POST['filter_category']);  // Sanitize input
+    $cat_id = intval($_POST['filter_category']);
     $conditions[] = "stock.cat_id = $cat_id";
 }
 if (!empty($_POST['filter_medicine'])) {
-    $medicine_id = intval($_POST['filter_medicine']);  // Sanitize input
+    $medicine_id = intval($_POST['filter_medicine']);
     $conditions[] = "stock.medicine_id = $medicine_id";
 }
 if (!empty($_POST['filter_date'])) {
-    $filter_date = $_POST['filter_date'];  // Sanitize input
-    $conditions[] = "DATE(stock.created_at) = '$filter_date'";
+    $filter_date = $_POST['filter_date'];
+    if (preg_match("/^\d{4}-\d{2}-\d{2}$/", $filter_date)) {
+        $conditions[] = "DATE(stock.created_at) = '$filter_date'";
+    } else {
+        echo "Invalid date format";
+    }
 }
 
-// Add conditions to the filter query if there are any
 if (count($conditions) > 0) {
     $filterQuery .= " WHERE " . implode(" AND ", $conditions);
 }
 
 $stockResult = $conn->query($filterQuery);
+if (!$stockResult) {
+    die("Query failed: " . $conn->error);
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -93,304 +122,196 @@ $stockResult = $conn->query($filterQuery);
 </head>
 
 <body>
-    <div class="container">
+    <div class="app-main__inner">
         <form method="POST" action="">
-            <div class="flex-container">
-                <div class="form-group">
-                    <label for="supplier_name">Supplier:</label>
-                    <select id="supplier_name" name="supplier_name" required>
-                        <option value="">Select Supplier</option>
-                        <?php while ($row = $supplierResult->fetch_assoc()): ?>
-                            <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="address">Category:</label>
-                    <select id="address" name="address" required>
-                        <option value="">Select Category</option>
-                        <?php while ($row = $addressResult->fetch_assoc()): ?>
-                            <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Medicine:</label>
-                    <select id="phone" name="phone" required>
-                        <option value="">Select Medicine</option>
-                        <?php while ($row = $phoneResult->fetch_assoc()): ?>
-                            <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="status">QTY:</label>
-                    <input type="text" id="status" name="status" placeholder="" required>
-                </div>
-                <div class="form-group" style="margin-top: 19px;">
-                    <button type="submit" class="btn-primary">Save</button>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="main-card mb-3 card">
+                        <div class="card-header">Add Medicine Stock</div>
+                        <div class="card-body">
+                            <div class="position-relative row form-group">
+
+                                <!-- Invoice Number -->
+                                <div class="col-sm-3">
+                                    <label for="supplier_name">Supplier:</label>
+                                    <select id="supplier_name" name="supplier_name" class="form-control" required>
+                                        <option value="">Select Supplier</option>
+                                        <?php while ($row = $supplierResult->fetch_assoc()): ?>
+                                            <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+
+                                <!-- Customer Name -->
+                                <div class="col-sm-3">
+                                    <label for="address">Category:</label>
+                                    <select id="address" name="address" class="form-control" required>
+                                        <option value="">Select Category</option>
+                                        <?php while ($row = $addressResult->fetch_assoc()): ?>
+                                            <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+
+                                <!-- Customer Phone -->
+                                <div class="col-sm-3">
+                                    <label for="phone">Medicine:</label>
+                                    <select id="phone" name="phone" class="form-control" required>
+                                        <option value="">Select Medicine</option>
+                                        <?php while ($row = $phoneResult->fetch_assoc()): ?>
+                                            <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+
+                                <!-- Created Date -->
+                                <div class="col-sm-3">
+                                    <label for="status">QTY:</label>
+                                    <input type="text" id="status" name="status" class="form-control" placeholder="Enter Quantity" required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label for="rate">Rate:</label>
+                                    <input type="text" id="rate" name="rate" class="form-control" placeholder="Enter Rate" required>
+                                </div>
+                                <div class="col-sm-3">
+                                    <button type="submit" class="btn btn-success" style="margin-top: 12%;">Save</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
 
-        <?php if (!empty($message)): ?>
-            <script>
-                toastr.<?php echo $alertType; ?>('<?php echo $message; ?>');
-            </script>
-        <?php endif; ?>
-    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-header">
+                        Medicine Stock
 
-    <div class="container" style="margin: -28px auto;">
-        <h2>Stock List</h2>
-        <form method="POST" action="">
-            <div style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 12px;">
-                <div class="form-group" style="">
-                    <select id="filter_supplier" name="filter_supplier" class="select2" style="width: 100%;">
-                        <option value="">Select Supplier</option>
-                        <?php
-                        $result_suppliers = $conn->query("SELECT DISTINCT s.id, s.name FROM stock_in stock JOIN suppliers s ON stock.supplier_id = s.id");
-                        while ($row = $result_suppliers->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group" style="">
-                    <select id="filter_category" name="filter_category" class="select2" style="width: 100%;">
-                        <option value="">Select Category</option>
-                        <?php
-                        $result_categories = $conn->query("SELECT DISTINCT c.id, c.name FROM stock_in stock JOIN medicine_category c ON stock.cat_id = c.id");
-                        while ($row = $result_categories->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group" style="">
-                    <select id="filter_medicine" name="filter_medicine" class="select2" style="width: 100%;">
-                        <option value="">Select Medicine</option>
-                        <?php
-                        $result_medicines = $conn->query("SELECT DISTINCT m.id, m.name FROM stock_in stock JOIN medicine m ON stock.medicine_id = m.id");
-                        while ($row = $result_medicines->fetch_assoc()) {
-                            echo "<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group" style="">
-                    <input type="date" id="filter_date" name="filter_date" class="form-control" style="" />
-                </div>
-                <div class="form-group" style="">
-                    <button type="submit" class="btn-primary">Filter</button>
-                    <button id="clearBtn" class="btn-primary" style="background-image: radial-gradient(circle 986.6px at 10% 20%, rgba(251, 6, 6, 0.94) 0%, rgba(194, 4, 4, 0.94) 60%);">Clear</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <div style="margin-top: 10px;margin-bottom: 25px;">
+                                <input type="text" id="filter_supplier" placeholder="Filter Supplier" class="form-control" style="display:inline-block; width:auto; margin-right: 10px;">
+                                <input type="text" id="filter_category" placeholder="Filter Category" class="form-control" style="display:inline-block; width:auto; margin-right: 10px;">
+                                <input type="text" id="filter_medicine" placeholder="Filter Medicine" class="form-control" style="display:inline-block; width:auto;">
+                                <button id="clearBtn" class="btn btn-danger" style="display:inline-block;">Clear</button> <!-- Clear Button -->
+                            </div>
+                            <table class="align-middle mb-0 table table-borderless table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Sl</th>
+                                        <th class="text-center">Supplier Name</th>
+                                        <th class="text-center">Category Name</th>
+                                        <th class="text-center">Medicine Name</th>
+                                        <th class="text-center">InQty</th>
+                                        <th class="text-center">Rate</th>
+                                        <th class="text-center">OutQty</th>
+                                        <th class="text-center">Date</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockTableBody">
+                                    <?php
+                                    // Initialize index counter for stock entries
+                                    $stockIndex = 1;
+
+                                    // Fetching stock entries first and adding them to the table
+                                    while ($row = $stockResult->fetch_assoc()): ?>
+                                        <tr style="border-bottom: 1px solid;" id="row-<?php echo $row['id']; ?>">
+                                            <td class="text-center"><?php echo $stockIndex++; ?></td> <!-- Index for stock entries -->
+                                            <td><?php echo $row['supplier_name']; ?></td>
+                                            <td><?php echo $row['category_name']; ?></td>
+                                            <td><?php echo $row['medicine_name']; ?></td>
+                                            <td class="editable" data-field="InQty" data-id="<?php echo $row['id']; ?>">
+                                                <span class="value"><?php echo $row['InQty']; ?></span>
+                                                <input type="text" class="input-field" value="<?php echo $row['InQty']; ?>" style="display:none;">
+                                            </td>
+                                            <td class="editable" data-field="rate" data-id="<?php echo $row['id']; ?>">
+                                                <span class="value"><?php echo $row['rate']; ?></span>
+                                                <input type="text" class="input-field" value="<?php echo $row['rate']; ?>" style="display:none;">
+                                            </td>
+                                            <td class="editable" data-field="OutQty" data-id="<?php echo $row['id']; ?>">
+                                                <span class="value"><?php echo $row['OutQty']; ?></span>
+                                                <input type="text" class="input-field" value="<?php echo $row['OutQty']; ?>" style="display:none;">
+                                            </td>
+                                            <td><?php echo $row['created_at']; ?></td>
+                                            <td>
+                                                <button class="edit-btn btn btn-secondary" data-id="<?php echo $row['id']; ?>">Edit</button>
+                                                <button class="save-btn btn btn-success" data-id="<?php echo $row['id']; ?>" style="display:none;">Save</button>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
 
-        <table class="table" style="width: 100%; border-collapse: collapse; border-spacing: 0;">
-            <thead style="background-color: #9ad8d6; text-align: center;">
-                <tr>
-                    <th>Supplier Name</th>
-                    <th>Category Name</th>
-                    <th>Medicine Name</th>
-                    <th>InQty</th>
-                    <th>OutQty</th>
-                    <th>Created_at</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($row = $stockResult->fetch_assoc()): ?>
-                    <tr style="border-bottom: 1px solid;">
-                        <td><?php echo $row['supplier_name']; ?></td>
-                        <td><?php echo $row['category_name']; ?></td>
-                        <td><?php echo $row['medicine_name']; ?></td>
-                        <td><?php echo $row['InQty']; ?></td>
-                        <td><?php echo $row['OutQty']; ?></td>
-                        <td><?php echo $row['created_at']; ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+
+            $("#clearBtn").click(function(e) {
+                e.preventDefault();
+                $("select, #filter_date").val("");
+                $("form")[0].submit();
+            });
+
+            $(".edit-btn").click(function() {
+                var rowId = $(this).data("id");
+                $("#row-" + rowId + " .value").hide();
+                $("#row-" + rowId + " .input-field").show();
+                $(this).hide();
+                $("#row-" + rowId + " .save-btn").show();
+            });
+
+            $(".save-btn").click(function() {
+                var rowId = $(this).data("id");
+                var InQty = $("#row-" + rowId + " .editable[data-field='InQty'] .input-field").val();
+                var rate = $("#row-" + rowId + " .editable[data-field='rate'] .input-field").val();
+                var OutQty = $("#row-" + rowId + " .editable[data-field='OutQty'] .input-field").val();
+
+                // Create a form to send the update request
+                $.post("", {
+                    update_id: rowId,
+                    InQty: InQty,
+                    rate: rate,
+                    OutQty: OutQty
+                }, function(response) {
+                    toastr.success('Stock updated successfully!');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                });
+            });
+        });
+        $(document).ready(function() {
+            // Filter functionality for the table
+            $("#filter_supplier, #filter_category, #filter_medicine").on("input", function() {
+                var supplierFilter = $("#filter_supplier").val().toLowerCase();
+                var categoryFilter = $("#filter_category").val().toLowerCase();
+                var medicineFilter = $("#filter_medicine").val().toLowerCase();
+
+                $("#stockTableBody tr").filter(function() {
+                    $(this).toggle(
+                        ($(this).find("td:eq(1)").text().toLowerCase().indexOf(supplierFilter) > -1 || supplierFilter === "") &&
+                        ($(this).find("td:eq(2)").text().toLowerCase().indexOf(categoryFilter) > -1 || categoryFilter === "") &&
+                        ($(this).find("td:eq(3)").text().toLowerCase().indexOf(medicineFilter) > -1 || medicineFilter === "")
+                    );
+                });
+            });
+            $("#clearBtn").click(function() {
+                // Reload the page
+                location.reload();
+            });
+        });
+    </script>
 </body>
 
 </html>
-
-<script>
-    $(document).ready(function() {
-        $('.select2').select2();
-
-        $('#clearBtn').click(function() {
-            $('#filter_supplier').val('').trigger('change');
-            $('#filter_category').val('').trigger('change');
-            $('#filter_medicine').val('').trigger('change');
-            $('#filter_date').val('');
-        });
-    });
-</script>
-
-<style>
-    @media (max-width: 600px) {
-        .form-group {
-            flex: 1 1 48%;
-
-        }
-
-        .form-group:nth-child(odd) {
-            margin-right: 4%;
-            /* Add some spacing between odd and even elements */
-        }
-
-        .form-group:last-child {
-            flex: 1 1 100%;
-            /* Make the buttons take the full width */
-        }
-
-        #filter_date {
-            width: 96%;
-            border: 1px solid #b0a8a8;
-            height: 29px;
-            border-radius: 5px;
-            background-color: white;
-            color: black;
-        }
-    }
-
-    @media (min-width: 1024px) {
-        #filter_date {
-            width: 100%;
-            border: 1px solid #b0a8a8;
-            height: 29px;
-            border-radius: 5px;
-            background-color: white;
-            color: black;
-        }
-    }
-
-    .container {
-        max-width: 97%;
-        margin: 50px auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-    }
-
-    h2 {
-        text-align: center;
-        color: #333;
-        font-size: 18px;
-        margin-bottom: 20px;
-    }
-
-    .flex-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .form-group {
-        width: 19%;
-    }
-
-    label {
-        font-size: 12px;
-        color: #555;
-        margin-bottom: 6px;
-        display: block;
-        font-weight: 600;
-    }
-
-    input[type="text"],
-    input[type="tel"],
-    select {
-        width: 100%;
-        padding: 6px 8px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        color: #333;
-        background-color: #f9f9f9;
-        transition: all 0.3s ease;
-    }
-
-    input[type="text"]:focus,
-    input[type="tel"]:focus,
-    select:focus {
-        border-color: #80bdff;
-        background-color: #fff;
-        outline: none;
-    }
-
-    button.btn-primary {
-        display: inline-block;
-        width: 28%;
-        padding: 6px 8px;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        background-image: radial-gradient(circle farthest-corner at 10% 20%, rgba(14, 174, 87, 1) 0%, rgba(12, 116, 117, 1) 90%);
-        transition: background-color 0.3s ease;
-    }
-
-    button.btn-primary:hover {
-        background-color: #218838;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 30px;
-    }
-
-    table th,
-    table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-
-    table th {
-        background-color: #f2f2f2;
-        font-size: 14px;
-    }
-
-    table td {
-        font-size: 12px;
-    }
-
-    table tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-
-    table tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    @media (max-width: 768px) {
-        .form-group {
-            width: 45%;
-        }
-
-        button.btn-primary {
-            width: 45%;
-            margin-bottom: 10px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .form-group {
-            width: 100%;
-        }
-
-        button.btn-primary {
-            width: 100%;
-        }
-    }
-</style>
