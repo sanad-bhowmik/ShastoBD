@@ -61,16 +61,15 @@ $result = $conn->query($sql);
                     <div class="main-card mb-3 card">
                         <div class="card-header">Add Group</div>
                         <div class="card-body">
-                            <div class="position-relative row form-group">
-
-                                <!-- Invoice Number -->
-                                <div class="col-sm-3">
+                            <div class="position-relative row form-group responsive-form">
+                                <!-- Group Name -->
+                                <div class="col-sm-3 form-item">
                                     <label for="group_name">Group Name:</label>
                                     <input type="text" id="group_name" name="group_name" class="form-control" placeholder="Enter group name" required>
                                 </div>
 
-                                <!-- Customer Name -->
-                                <div class="col-sm-3">
+                                <!-- Status -->
+                                <div class="col-sm-3 form-item">
                                     <label for="status">Status:</label>
                                     <select id="status" name="status" class="form-control" required>
                                         <option value="1">Active</option>
@@ -78,12 +77,26 @@ $result = $conn->query($sql);
                                     </select>
                                 </div>
 
-
-                                <div class="col-sm-3">
-                                    <button type="submit" class="btn btn-primary" style="margin-left: -5%;margin-top: 28px;">Save</button>
+                                <!-- Save Button -->
+                                <div class="col-sm-3 form-item">
+                                    <button type="submit" class="btn btn-primary save-button" style="margin-top: 27px;">Save</button>
                                 </div>
-
                             </div>
+
+                            <style>
+                                @media (max-width: 600px) {
+                                    .responsive-form {
+                                        flex-direction: column;
+                                        align-items: stretch;
+                                    }
+
+                                    .save-button {
+                                        margin-top: 10px;
+                                        width: 100%;
+                                    }
+                                }
+                            </style>
+
                         </div>
                     </div>
                 </div>

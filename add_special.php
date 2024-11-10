@@ -119,7 +119,41 @@ include_once("include/header.php");
               </div>
             </section>
             <div id="targetLayer"></div>
+            <style>
+              
+              @media (max-width: 600px) {
+                section {
+                  max-width: 100%;
+                  padding: 1rem;
+                }
 
+                .form-group {
+                  text-align: center;
+                }
+
+                .btn {
+                  width: 100%;
+                }
+              }
+
+              /* Larger screens adjustments */
+              @media (min-width: 768px) {
+                section {
+                  flex-direction: row;
+                  align-items: center;
+                }
+
+                .form-group {
+                  flex: 1;
+                }
+
+                .form-group:last-child {
+                  max-width: 150px;
+                  margin-left: 8px;
+                  text-align: left;
+                }
+              }
+            </style>
 
           </form>
         </div>

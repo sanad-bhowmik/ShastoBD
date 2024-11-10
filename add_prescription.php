@@ -44,14 +44,14 @@ $appointmentResult = $conn->query($appointmentQuery);
                 <div class="main-card mb-3 card">
                     <div class="card-header">Add Medicine Stock</div>
                     <div class="card-body">
-                        <div class="position-relative  form-group" style="margin-left: 1%;">
+                        <div class="position-relative form-group" style="margin: 1%;">
 
-                            <div class="form-row" style="margin-bottom: .9375rem; display: flex; flex-wrap: wrap;">
+                            <div class="form-row responsive-row">
                                 <!-- Appointment Number Select2 Searchable Dropdown -->
-                                <div style="flex: 1; padding-left: .625rem; margin-top: 5px;">
-                                    <label for="appointmentNumber" style="display: block; margin-bottom: 10%; margin-right: 10px; margin-top: -2px;">
+                                <div class="responsive-column">
+                                    <label for="appointmentNumber">
                                         <span>Appointment Number:</span>
-                                        <select name="appointmentNumber" id="appointmentNumber" style="width: 100%; padding: .5rem; border: .0625rem solid #ccc; border-radius: .25rem; height: 33px; font-size: 11px; padding: 1px; text-align: center;">
+                                        <select name="appointmentNumber" id="appointmentNumber">
                                             <option value="" disabled selected>Select</option>
                                             <?php
                                             if ($appointmentResult->num_rows > 0) {
@@ -67,22 +67,23 @@ $appointmentResult = $conn->query($appointmentQuery);
                                 </div>
 
                                 <!-- Doctor Name (Auto-filled based on Appointment) -->
-                                <div style="flex: 1; padding-right: .625rem;">
-                                    <label for="doctorName" style="display: block; margin-bottom: .3125rem;">Doctor:
-                                        <input type="text" name="doctorName" id="doctorName" readonly style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
+                                <div class="responsive-column">
+                                    <label for="doctorName">Doctor:
+                                        <input type="text" name="doctorName" id="doctorName" readonly>
                                     </label>
                                 </div>
 
                                 <!-- Patient Name (Auto-filled based on Appointment) -->
-                                <div style="flex: 1; padding-right: .625rem; padding-left: .625rem;">
-                                    <label for="patientName" style="display: block; margin-bottom: .3125rem;">Patient:
-                                        <input type="text" name="patientName" id="patientName" readonly style="width: 100%;border: .0625rem solid #ada8a8;border-radius: .25rem;height: 33px;padding: 1px;text-align: center;">
+                                <div class="responsive-column">
+                                    <label for="patientName">Patient:
+                                        <input type="text" name="patientName" id="patientName" readonly>
                                     </label>
                                 </div>
+
                                 <!-- Medicine Name Select2 Dropdown -->
-                                <div style="flex: 1; padding-left: .625rem;">
-                                    <label for="medicine" style="display: block; margin-bottom: .3125rem;">Medicine Name:
-                                        <select name="medicine" id="medicine" style="width: 100%; padding: .5rem; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
+                                <div class="responsive-column">
+                                    <label for="medicine">Medicine Name:
+                                        <select name="medicine" id="medicine">
                                             <option value="" disabled selected>Select Medicine</option>
                                             <?php
                                             if ($medicineResult->num_rows > 0) {
@@ -98,32 +99,31 @@ $appointmentResult = $conn->query($appointmentQuery);
                                 </div>
                             </div>
 
-                            <div class="form-row" style="display: flex;flex-wrap: wrap;gap: 1rem;margin-left: 1%;margin-right: -1%;width: 99%;">
-
+                            <div class="form-row responsive-row">
                                 <!-- Medicine Group (Readonly) -->
-                                <div style="flex: 1; padding-right: .625rem;">
-                                    <label for="medicineGroup" style="display: block; margin-bottom: .3125rem;">Medicine Group:
-                                        <input type="text" name="medicineGroup" id="medicineGroup" readonly style="width: 100%; border: .0625rem solid #ada8a8; border-radius: .25rem; height: 33px; text-align: center;">
+                                <div class="responsive-column">
+                                    <label for="medicineGroup">Medicine Group:
+                                        <input type="text" name="medicineGroup" id="medicineGroup" readonly>
                                     </label>
                                 </div>
 
-                                <div style="flex: 1;margin-top: -2px;">
-                                    <label for="duration" style="margin-bottom: 1px;">Duration:</label>
-                                    <input type="text" name="duration" id="duration" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
+                                <div class="responsive-column">
+                                    <label for="duration">Duration:</label>
+                                    <input type="text" name="duration" id="duration" required>
                                 </div>
 
-                                <div style="flex: 1;margin-top: -2px;">
-                                    <label for="dosage" style="margin-bottom: 1px;">Dosage:</label>
-                                    <input type="text" name="dosage" id="dosage" required style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;">
+                                <div class="responsive-column">
+                                    <label for="dosage">Dosage:</label>
+                                    <input type="text" name="dosage" id="dosage" required>
                                 </div>
 
-                                <div style="flex: 1;margin-top: -2px;">
-                                    <label for="notes" style="margin-bottom: 1px;">Additional Notes:</label>
-                                    <textarea name="notes" id="notes" rows="2" style="width: 100%;padding: .5rem;border: .0625rem solid #b2adad;border-radius: .25rem;height: 34px;" required></textarea>
+                                <div class="responsive-column">
+                                    <label for="notes">Additional Notes:</label>
+                                    <textarea name="notes" id="notes" rows="2" required></textarea>
                                 </div>
 
-                                <div>
-                                    <button type="button" class="btn btn-secondary" id="saveButton" style="width: 101%;padding: 6px;color: white;border: none;border-radius: .25rem;cursor: pointer;margin-bottom: 10px;margin-top: 17px;">Add To List</button>
+                                <div class="responsive-button">
+                                    <button type="button" class="btn btn-secondary kik" id="saveButton">Add To List</button>
                                 </div>
                             </div>
                         </div>
@@ -135,18 +135,17 @@ $appointmentResult = $conn->query($appointmentQuery);
 </div>
 
 
-<div class="row" style="margin-left: 10px;margin-right: 10px;">
+<div class="row" style="margin-left: 10px; margin-right: 10px;">
     <div class="col-md-12">
         <div class="main-card mb-3 card">
             <div class="card-header">
                 Medicine Stock
-
             </div>
-            <div class="form-container" style="padding: 12px;">
+            <div class="form-container">
                 <!-- Table to display submitted data -->
-                <table id="dataTable" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                <table id="dataTable">
                     <thead>
-                        <tr style="background-color: #f2f2f2;">
+                        <tr>
                             <th>Appointment Number</th>
                             <th>Patient</th>
                             <th>Medicine</th>
@@ -193,6 +192,7 @@ $appointmentResult = $conn->query($appointmentQuery);
         </div>
     </div>
 </div>
+
 <!-- Your existing HTML code remains here -->
 
 <script>
@@ -524,6 +524,148 @@ $appointmentResult = $conn->query($appointmentQuery);
 </script>
 
 <style>
+    .responsive-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .responsive-column {
+        flex: 1;
+        padding: 0.5rem;
+    }
+
+    .responsive-column label {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    #kik {
+        margin-left: 1%;
+        width: 10%;
+        margin-top: -4%;
+    }
+
+    .responsive-column input,
+    .responsive-column select,
+    .responsive-column textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #b2adad;
+        border-radius: 0.25rem;
+        height: 34px;
+        text-align: center;
+    }
+
+    .responsive-button {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .responsive-button button {
+        padding: 0.5rem;
+        color: white;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        background-color: #6c757d;
+        margin-left: 1%;
+        margin-top: -4%;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+        .responsive-row {
+            flex-direction: column;
+        }
+
+        .responsive-button {
+            width: 100%;
+        }
+    }
+
+    .form-container {
+        padding: 12px;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .print-btn {
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-top: 20px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .print-btn .printer-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .print-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+        table {
+            width: 100%;
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .print-btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .print-btn .printer-wrapper {
+            justify-content: center;
+        }
+
+        .main-card {
+            padding: 0;
+        }
+
+        .card-header {
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 10px;
+        }
+
+        .form-container {
+            padding: 10px;
+        }
+
+        th,
+        td {
+            padding: 5px;
+            font-size: 12px;
+        }
+    }
+
     .print-btn {
         width: 100px;
         height: 45px;
@@ -541,7 +683,7 @@ $appointmentResult = $conn->query($appointmentQuery);
         box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.065);
         transition: all 0.3s;
         margin-top: 13px;
-        margin-left: 90%;
+        color: black;
     }
 
     .printer-wrapper {

@@ -193,12 +193,39 @@ $conn->close();
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <div style="margin-top: 10px;margin-bottom: 25px;">
-                                <input type="text" id="filter_supplier" placeholder="Filter Supplier" class="form-control" style="display:inline-block; width:auto; margin-right: 10px;">
-                                <input type="text" id="filter_category" placeholder="Filter Category" class="form-control" style="display:inline-block; width:auto; margin-right: 10px;">
-                                <input type="text" id="filter_medicine" placeholder="Filter Medicine" class="form-control" style="display:inline-block; width:auto;">
-                                <button id="clearBtn" class="btn btn-danger" style="display:inline-block;">Clear</button> <!-- Clear Button -->
+                            <div class="filter-container">
+                                <input type="text" id="filter_supplier" placeholder="Filter Supplier" class="form-control filter-input">
+                                <input type="text" id="filter_category" placeholder="Filter Category" class="form-control filter-input">
+                                <input type="text" id="filter_medicine" placeholder="Filter Medicine" class="form-control filter-input">
+                                <button id="clearBtn" class="btn btn-danger">Clear</button>
                             </div>
+
+                            <style>
+                                .filter-container {
+                                    display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 10px;
+                                    margin-top: 10px;
+                                    margin-bottom: 25px;
+                                }
+
+                                .filter-input {
+                                    flex: 1;
+                                    min-width: 150px;
+                                }
+
+                                @media (max-width: 600px) {
+                                    .filter-container {
+                                        flex-direction: column;
+                                    }
+
+                                    .filter-input,
+                                    #clearBtn {
+                                        width: 100%;
+                                    }
+                                }
+                            </style>
+
                             <table class="align-middle mb-0 table table-borderless table-striped table-hover">
                                 <thead>
                                     <tr>

@@ -97,7 +97,8 @@ $patientResult = $conn->query($patientQuery);
     <!-- Appointment Form Section -->
     <section class="form-section">
         <form id="appointmentForm">
-            <div class="card-header" style="margin-top: -19px;margin-bottom: 28px;margin-left: -18px;">Add Supplier</div>
+            <div class="card-header" style="margin-top: -19px;margin-bottom: 24px;">Add Supplier</div>
+
             <div class="form-row">
                 <label for="doctorid">Doctor Name:
                     <select name="doctorid" class="form-control" id="doctorid" required>
@@ -134,8 +135,8 @@ $patientResult = $conn->query($patientQuery);
                 </label>
             </div>
 
-            <div style="margin-top: 2%;">
-                <label for="gender" style="width: 30%;margin-right: 10px;">Gender:
+            <div class="form-row">
+                <label for="gender">Gender:
                     <select name="gender" class="form-control" id="gender" required>
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
@@ -144,14 +145,16 @@ $patientResult = $conn->query($patientQuery);
                     </select>
                 </label>
 
-                <label for="AppointmentTime" style="margin-right: 10px;width: 30%;">Appointment Time:
+                <label for="AppointmentTime">Appointment Time:
                     <input type="time" class="form-control" name="AppointmentTime" required>
                 </label>
 
-                <label for="AppointmentDate" style="margin-right: 10px;width: 27%;">Appointment Date:
+                <label for="AppointmentDate">Appointment Date:
                     <input type="date" class="form-control" name="AppointmentDate" required>
                 </label>
+            </div>
 
+            <div class="submit-section">
                 <input type="submit" value="Book" class="btn btn-secondary submit-button">
             </div>
 
@@ -161,6 +164,35 @@ $patientResult = $conn->query($patientQuery);
         </form>
     </section>
 </div>
+
+<style>
+    @media (max-width: 600px) {
+        .form-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        label {
+            width: 100%;
+        }
+
+        .submit-button {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 600px) {
+        .form-row {
+            flex-direction: row;
+            gap: 1rem;
+        }
+
+        label {
+            flex: 1;
+        }
+    }
+</style>
+
 
 <div class="container" style="margin-top: -2%;">
     <!-- Appointment Data Table Section -->
@@ -364,7 +396,7 @@ $patientResult = $conn->query($patientQuery);
         font-size: 14px;
     }
 
-    
+
 
     .submit-button:hover {
         background-color: #218838;

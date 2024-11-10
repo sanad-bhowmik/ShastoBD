@@ -57,7 +57,7 @@ if ($result_medicines->num_rows > 0) {
 </head>
 
 <body>
-    <div class="container" style="display: flex; justify-content: space-between; margin: 20px; height: 76%;">
+    <div class="container" style="display: flex; justify-content: space-between; height: 76%;">
         <div class="form-container" style="flex: 1; padding: 20px; margin-right: 10px; border-radius: 8px; ">
             <h2>Add Sale Info</h2>
             <form id="saleForm" method="POST" action="" style="margin-bottom: 49px;display: flex;align-items: center;gap: 10px;width: 112%;">
@@ -125,7 +125,33 @@ if ($result_medicines->num_rows > 0) {
             </div>
         </div>
     </div>
+    <style>
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 20px;
+            }
 
+            .form-container form {
+                flex-direction: column;
+            }
+
+            .price-section {
+                flex-direction: column;
+            }
+
+            .save-button,
+            .add-button {
+                align-self: stretch;
+                margin-top: 10px;
+            }
+
+            table th,
+            table td {
+                font-size: 14px;
+            }
+        }
+    </style>
     <script>
         $(document).ready(function() {
             $('.select2').select2(); // Initialize select2 for dropdowns
