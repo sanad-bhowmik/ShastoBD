@@ -24,7 +24,7 @@ if(isset($_POST['oid'])){
     //echo $_FILES["gm1"]["name"];
     //die;
 
-    $server="https://app.shasthobd.com/";
+    $server="http://localhost/shasthobdAdmin/";
     $gm2="";
     $gallery='applications/appImg/';
    $app_gm1_name = $_FILES["gm1"]["name"];

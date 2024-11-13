@@ -164,36 +164,6 @@ $patientResult = $conn->query($patientQuery);
         </form>
     </section>
 </div>
-
-<style>
-    @media (max-width: 600px) {
-        .form-row {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        label {
-            width: 100%;
-        }
-
-        .submit-button {
-            width: 100%;
-        }
-    }
-
-    @media (min-width: 600px) {
-        .form-row {
-            flex-direction: row;
-            gap: 1rem;
-        }
-
-        label {
-            flex: 1;
-        }
-    }
-</style>
-
-
 <div class="container" style="margin-top: -2%;">
     <!-- Appointment Data Table Section -->
     <section class="table-section">
@@ -245,24 +215,26 @@ $patientResult = $conn->query($patientQuery);
             <tbody>
                 <?php
                 if ($appointmentResult->num_rows > 0) {
+                    $si = 1; // Initialize serial index
                     while ($row = $appointmentResult->fetch_assoc()) {
                         echo "<tr>
-                            <td>" . $row['id'] . "</td>
-                            <td class='appointment-number'>" . $row['appointment_number'] . "</td>
-                            <td class='patient-name'>" . $row['PatientName'] . "</td>
-                            <td class='patient-mobile'>" . $row['PatientjMobile'] . "</td>
-                            <td>" . $row['gender'] . "</td>
-                            <td class='appointment-date'>" . $row['AppointmentDate'] . "</td>
-                            <td>" . $row['AppointmentTime'] . "</td>
-                            <td class='doctor-name'>" . $row['DoctorName'] . "</td>
-                            <td>" . $row['Status'] . "</td>
-                        </tr>";
+                              <td>" . $si++ . "</td>
+                              <td class='appointment-number'>" . $row['appointment_number'] . "</td>
+                              <td class='patient-name'>" . $row['PatientName'] . "</td>
+                              <td class='patient-mobile'>" . $row['PatientMobile'] . "</td>
+                              <td>" . $row['ParientGender'] . "</td>
+                              <td class='appointment-date'>" . $row['AppointmentDate'] . "</td>
+                              <td>" . $row['Appointment_Time'] . "</td>
+                              <td class='doctor-name'>" . $row['DocName'] . "</td>
+                              <td>" . $row['Status'] . "</td>
+                          </tr>";
                     }
                 } else {
                     echo "<tr><td colspan='9'>No appointments found.</td></tr>";
                 }
                 ?>
             </tbody>
+
         </table>
     </section>
 </div>
@@ -325,6 +297,32 @@ $patientResult = $conn->query($patientQuery);
 
 
 <style>
+    @media (max-width: 600px) {
+        .form-row {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        label {
+            width: 100%;
+        }
+
+        .submit-button {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 600px) {
+        .form-row {
+            flex-direction: row;
+            gap: 1rem;
+        }
+
+        label {
+            flex: 1;
+        }
+    }
+
     .filter-section {
         display: flex;
         gap: 10px;
