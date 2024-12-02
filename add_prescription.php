@@ -123,7 +123,8 @@ $appointmentResult = $conn->query($appointmentQuery);
                                 </div>
 
                                 <div class="responsive-button">
-                                    <button type="button" class="btn btn-secondary kik" id="saveButton">Add To List</button>
+                                    <button type="button" class="btn btn-secondary kik" id="saveButton">Add To
+                                        List</button>
                                 </div>
                             </div>
                         </div>
@@ -165,18 +166,16 @@ $appointmentResult = $conn->query($appointmentQuery);
                     <span class="printer-wrapper">
                         <span class="printer-container">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 92 75">
-                                <path
-                                    stroke-width="5"
-                                    stroke="black"
-                                    d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z"></path>
+                                <path stroke-width="5" stroke="black"
+                                    d="M12 37.5H80C85.2467 37.5 89.5 41.7533 89.5 47V69C89.5 70.933 87.933 72.5 86 72.5H6C4.067 72.5 2.5 70.933 2.5 69V47C2.5 41.7533 6.75329 37.5 12 37.5Z">
+                                </path>
                                 <mask fill="white" id="path-2-inside-1_30_7">
-                                    <path
-                                        d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z"></path>
+                                    <path d="M12 12C12 5.37258 17.3726 0 24 0H57C70.2548 0 81 10.7452 81 24V29H12V12Z">
+                                    </path>
                                 </mask>
-                                <path
-                                    mask="url(#path-2-inside-1_30_7)"
-                                    fill="black"
-                                    d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z"></path>
+                                <path mask="url(#path-2-inside-1_30_7)" fill="black"
+                                    d="M7 12C7 2.61116 14.6112 -5 24 -5H57C73.0163 -5 86 7.98374 86 24H76C76 13.5066 67.4934 5 57 5H24C20.134 5 17 8.13401 17 12H7ZM81 29H12H81ZM7 29V12C7 2.61116 14.6112 -5 24 -5V5C20.134 5 17 8.13401 17 12V29H7ZM57 -5C73.0163 -5 86 7.98374 86 24V29H76V24C76 13.5066 67.4934 5 57 5V-5Z">
+                                </path>
                                 <circle fill="black" r="3" cy="49" cx="78"></circle>
                             </svg>
                         </span>
@@ -195,107 +194,9 @@ $appointmentResult = $conn->query($appointmentQuery);
 
 <!-- Your existing HTML code remains here -->
 
-<script>
-    $('#medicine').on('change', function() {
-        var selectedMedicine = $(this).val();
-
-        if (selectedMedicine) {
-            $.ajax({
-                type: "POST",
-                url: "getMedicineGroup.php",
-                data: {
-                    medicineName: selectedMedicine
-                },
-                success: function(response) {
-                    console.log("Received group name: ", response);
-                    $('#medicineGroup').val(response);
-                },
-                error: function() {
-                    $('#medicineGroup').val("Error retrieving group");
-                }
-            });
-        } else {
-            $('#medicineGroup').val("");
-        }
-    });
-
-    $(document).ready(function() {
-        // Event listener for Appointment Number selection
-        $('#appointmentNumber').on('change', function() {
-            var appointmentNumber = $(this).val();
-
-            if (appointmentNumber) {
-                // Fetch Doctor and Patient data based on Appointment Number
-                $.ajax({
-                    url: 'fetch_appointment_data.php', // PHP file to fetch details
-                    type: 'POST',
-                    data: {
-                        appointment_number: appointmentNumber
-                    },
-                    success: function(data) {
-                        var result = JSON.parse(data);
-                        if (result.success) {
-                            $('#doctorName').val(result.doctor_name);
-                            $('#patientName').val(result.patient_name);
-                        } else {
-                            toastr.error(result.error);
-                        }
-                    },
-                    error: function() {
-                        toastr.error('Error fetching appointment details.');
-                    }
-                });
-            } else {
-                $('#doctorName').val('');
-                $('#patientName').val('');
-            }
-        });
-        $(document).ready(function() {
-            $('#medicine').select2({
-                placeholder: "Select Medicine",
-                allowClear: true
-            });
-        });
-
-        // Event listener for the Save button
-        $('#saveButton').on('click', function() {
-            // Get form field values
-            var appointmentNumber = $('#appointmentNumber').val();
-            var doctorName = $('#doctorName').val();
-            var patientName = $('#patientName').val();
-            var medicine = $('#medicine').val();
-            var group = $('#medicineGroup').val();
-            var duration = $('#duration').val();
-            var dosage = $('#dosage').val();
-            var notes = $('#notes').val();
-
-            // Append the data to the table
-            var newRow = `
-            <tr>
-                <td>${appointmentNumber}</td>
-                <td>${patientName}</td>
-                <td>${medicine}</td>
-                <td>${group}</td>
-                <td>${duration}</td>
-                <td>${dosage}</td>
-                <td>${notes}</td>
-                <td>${doctorName}</td>
-            </tr>
-        `;
-            $('#dataTable tbody').append(newRow);
-
-            // Clear the medicine, duration, dosage, and notes fields only
-            $('#medicine').val('');
-            $('#duration').val('');
-            $('#dosage').val('');
-            $('#notes').val('');
-        });
-    });
-</script>
-
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Initialize Select2 on Appointment Number dropdown
         $('#appointmentNumber').select2({
             placeholder: "Select Appointment",
@@ -306,7 +207,7 @@ $appointmentResult = $conn->query($appointmentQuery);
         // Other existing jQuery code...
     });
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Initialize Select2
         $('#doctorid').select2({
             placeholder: "Select Doctor",
@@ -318,7 +219,7 @@ $appointmentResult = $conn->query($appointmentQuery);
         });
 
         // Handle form submission
-        $('#prescriptionForm').on('submit', function(e) {
+        $('#prescriptionForm').on('submit', function (e) {
             e.preventDefault();
 
             var refNo = Math.floor(100000 + Math.random() * 900000);
@@ -329,7 +230,7 @@ $appointmentResult = $conn->query($appointmentQuery);
                 url: 'prescription_process.php',
                 type: 'POST',
                 data: formData,
-                success: function(response) {
+                success: function (response) {
                     toastr.success('Prescription added successfully!');
 
                     // Create PDF after successful insertion
@@ -337,7 +238,7 @@ $appointmentResult = $conn->query($appointmentQuery);
 
                     $('#prescriptionForm')[0].reset();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     toastr.error('Error adding prescription: ' + error);
                 }
             });
@@ -354,14 +255,14 @@ $appointmentResult = $conn->query($appointmentQuery);
             data: {
                 appointment_number: appointmentNumber
             },
-            success: function(response) {
+            success: function (response) {
                 if (response === 'success') {
                     toastr.success('Appointment status updated successfully!');
                 } else {
                     toastr.error('Failed to update appointment status.');
                 }
             },
-            error: function() {
+            error: function () {
                 toastr.error('Error updating appointment status.');
             }
         });
@@ -392,12 +293,12 @@ $appointmentResult = $conn->query($appointmentQuery);
         const logoImg = new Image();
         logoImg.src = 'https://i.ibb.co.com/TqfJdhm/logo-inverse.png'; // Replace with actual logo URL
 
-        logoImg.onload = function() {
+        logoImg.onload = function () {
             pdf.addImage(logoImg, 'PNG', pdf.internal.pageSize.getWidth() - 45, 5, 40, 25);
             createPrescriptionContent(pdf, doctorName, patientName);
         };
 
-        logoImg.onerror = function() {
+        logoImg.onerror = function () {
             console.error('Failed to load logo image.');
             createPrescriptionContent(pdf, doctorName, patientName);
         }
@@ -407,10 +308,10 @@ $appointmentResult = $conn->query($appointmentQuery);
         const margin = 20;
         const headerHeight = 35;
 
-        // Positioning at the bottom of the blue header section
+        // Positioning patient information
         const patientInfoY = headerHeight + 10;
 
-        // Display patient information below the header section with flexible positioning
+        // Patient Information
         pdf.setTextColor(0, 0, 0);
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(10);
@@ -462,7 +363,7 @@ $appointmentResult = $conn->query($appointmentQuery);
 
         pdf.setFont("helvetica", "normal");
 
-        $('#dataTable tbody tr').each(function() {
+        $('#dataTable tbody tr').each(function () {
             const medicineName = $(this).find('td').eq(3).text();
             const groupName = $(this).find('td').eq(2).text();
             const duration = $(this).find('td').eq(4).text();
@@ -518,9 +419,140 @@ $appointmentResult = $conn->query($appointmentQuery);
         pdf.setFont("helvetica", "italic");
         pdf.text("Thank you for choosing Emon Dental. We wish you a speedy recovery!", margin, pdf.internal.pageSize.getHeight() - 5);
 
-        pdf.autoPrint();
-        window.open(pdf.output('bloburl'), '_blank');
+        // Save to server and trigger download
+        savePDFToServer(pdf);
     }
+
+    function savePDFToServer(pdf) {
+        const pdfBlob = pdf.output('blob');
+        const formData = new FormData();
+        const appointmentNumber = $('#appointmentNumber').val();
+        const fileName = `appointment_${appointmentNumber}.pdf`;
+
+        formData.append('pdf', pdfBlob, fileName);
+
+        // Save to server
+        $.ajax({
+            url: 'save_pdf.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.startsWith('success')) {
+                    const filePath = response.split('|')[1]; // Extract file path from response
+                    toastr.success('PDF saved successfully on the server.');
+
+                    // Open the saved PDF in a new browser tab
+                    window.open(filePath, '_blank');
+                } else {
+                    toastr.error('Error saving PDF to the server.');
+                }
+            },
+            error: function () {
+                toastr.error('Error during PDF upload.');
+            }
+        });
+    }
+
+</script>
+
+<script>
+    $('#medicine').on('change', function () {
+        var selectedMedicine = $(this).val();
+
+        if (selectedMedicine) {
+            $.ajax({
+                type: "POST",
+                url: "getMedicineGroup.php",
+                data: {
+                    medicineName: selectedMedicine
+                },
+                success: function (response) {
+                    console.log("Received group name: ", response);
+                    $('#medicineGroup').val(response);
+                },
+                error: function () {
+                    $('#medicineGroup').val("Error retrieving group");
+                }
+            });
+        } else {
+            $('#medicineGroup').val("");
+        }
+    });
+
+    $(document).ready(function () {
+        // Event listener for Appointment Number selection
+        $('#appointmentNumber').on('change', function () {
+            var appointmentNumber = $(this).val();
+
+            if (appointmentNumber) {
+                // Fetch Doctor and Patient data based on Appointment Number
+                $.ajax({
+                    url: 'fetch_appointment_data.php', // PHP file to fetch details
+                    type: 'POST',
+                    data: {
+                        appointment_number: appointmentNumber
+                    },
+                    success: function (data) {
+                        var result = JSON.parse(data);
+                        if (result.success) {
+                            $('#doctorName').val(result.doctor_name);
+                            $('#patientName').val(result.patient_name);
+                        } else {
+                            toastr.error(result.error);
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Error fetching appointment details.');
+                    }
+                });
+            } else {
+                $('#doctorName').val('');
+                $('#patientName').val('');
+            }
+        });
+        $(document).ready(function () {
+            $('#medicine').select2({
+                placeholder: "Select Medicine",
+                allowClear: true
+            });
+        });
+
+        // Event listener for the Save button
+        $('#saveButton').on('click', function () {
+            // Get form field values
+            var appointmentNumber = $('#appointmentNumber').val();
+            var doctorName = $('#doctorName').val();
+            var patientName = $('#patientName').val();
+            var medicine = $('#medicine').val();
+            var group = $('#medicineGroup').val();
+            var duration = $('#duration').val();
+            var dosage = $('#dosage').val();
+            var notes = $('#notes').val();
+
+            // Append the data to the table
+            var newRow = `
+            <tr>
+                <td>${appointmentNumber}</td>
+                <td>${patientName}</td>
+                <td>${medicine}</td>
+                <td>${group}</td>
+                <td>${duration}</td>
+                <td>${dosage}</td>
+                <td>${notes}</td>
+                <td>${doctorName}</td>
+            </tr>
+        `;
+            $('#dataTable tbody').append(newRow);
+
+            // Clear the medicine, duration, dosage, and notes fields only
+            $('#medicine').val('');
+            $('#duration').val('');
+            $('#dosage').val('');
+            $('#notes').val('');
+        });
+    });
 </script>
 
 <style>

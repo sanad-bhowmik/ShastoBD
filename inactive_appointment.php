@@ -14,8 +14,14 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Query to get data from appointmentview table
-$sql = "SELECT appointment_number, PatientName, PatientMobile, Appointment_Time, AppointmentDate, DocName, Status FROM appointmentview WHERE Status = 'Inactive'";
+// Query to get data from appointmentview table and related file_path from ot_prescription table
+$sql = "
+    SELECT a.appointment_number, a.PatientName, a.PatientMobile, a.Appointment_Time, a.AppointmentDate, a.DocName, a.Status, 
+           p.file_path
+    FROM appointmentview a
+    LEFT JOIN ot_prescription p ON a.appointment_number = p.appointment_number
+    WHERE a.Status = 'Inactive'
+";
 
 $result = $conn->query($sql);
 ?>
@@ -67,26 +73,6 @@ $result = $conn->query($sql);
             filterTable();
         }
     </script>
-    <style>
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            /* Space between inputs */
-            margin-bottom: 25px;
-            /* Space below the inputs */
-        }
-
-        .filter-container input {
-            flex: 1 1 200px;
-            /* Allow inputs to grow and shrink with a minimum width */
-        }
-
-        .filter-container button {
-            flex: 0 0 auto;
-            /* Make button fixed size */
-        }
-    </style>
 </head>
 
 <body>
@@ -101,13 +87,18 @@ $result = $conn->query($sql);
                     <div class="card-body">
                         <div class="table-responsive">
                             <div class="filter-container">
-                                <input type="text" id="appointment_number" class="form-control" placeholder="Appointment Number" onkeyup="filterTable()" />
-                                <input type="text" id="patient_name" placeholder="Patient Name" onkeyup="filterTable()" class="form-control" />
-                                <input type="text" id="patient_mobile" placeholder="Patient Mobile" onkeyup="filterTable()" class="form-control" />
+                                <input type="text" id="appointment_number" class="form-control"
+                                    placeholder="Appointment Number" onkeyup="filterTable()" />
+                                <input type="text" id="patient_name" placeholder="Patient Name" onkeyup="filterTable()"
+                                    class="form-control" />
+                                <input type="text" id="patient_mobile" placeholder="Patient Mobile"
+                                    onkeyup="filterTable()" class="form-control" />
                                 <input type="date" id="appointment_date" oninput="filterTable()" class="form-control" />
-                                <button type="button" class="btn btn-danger" onclick="clearFilters()">Clear</button><!-- Clear Button -->
+                                <button type="button" class="btn btn-danger"
+                                    onclick="clearFilters()">Clear</button><!-- Clear Button -->
                             </div>
-                            <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="dataTable">
+                            <table class="align-middle mb-0 table table-borderless table-striped table-hover"
+                                id="dataTable">
                                 <thead>
                                     <tr>
                                         <th class="text-center">Sl</th>
@@ -118,6 +109,7 @@ $result = $conn->query($sql);
                                         <th class="text-center">Appointment Date</th>
                                         <th class="text-center">Doctor Name</th>
                                         <th class="text-center">Status</th>
+                                        <th class="text-center">PDF</th>
                                     </tr>
                                 </thead>
                                 <tbody id="stockTableBody">
@@ -136,14 +128,24 @@ $result = $conn->query($sql);
                                             echo "<td>" . $row["DocName"] . "</td>";
                                             echo "<td><span class='badge badge-danger'>" . htmlspecialchars($row["Status"]) . "</span></td>";
 
+                                            // Check if the file_path exists
+                                            if ($row["file_path"]) {
+                                                // Generate the image for the PDF column with a link to the PDF
+                                                $pdfPath = $row["file_path"];
+                                                echo "<td><a href='$pdfPath' target='_blank'><img src='./themefiles/assets/images/pdf.png' alt='Image' style='width: 24px; height: 24px;cursor: pointer;'></a></td>";
+                                            } else {
+                                                echo "<td>No PDF</td>";
+                                            }
+
                                             echo "</tr>";
-                                            $serialNumber++; // Increment serial number
+                                            $serialNumber++;
                                         }
                                     } else {
-                                        echo "<tr><td colspan='8'>No records found</td></tr>";
+                                        echo "<tr><td colspan='9'>No records found</td></tr>";
                                     }
                                     ?>
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -160,3 +162,20 @@ $result = $conn->query($sql);
 // Close the database connection
 $conn->close();
 ?>
+
+<style>
+    .filter-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 25px;
+    }
+
+    .filter-container input {
+        flex: 1 1 200px;
+    }
+
+    .filter-container button {
+        flex: 0 0 auto;
+    }
+</style>
