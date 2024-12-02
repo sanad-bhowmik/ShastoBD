@@ -24,6 +24,12 @@ $sql = "
 ";
 
 $result = $conn->query($sql);
+
+// Check if query execution was successful
+if ($result === false) {
+    echo "Error: " . $conn->error; // Display SQL error message
+    exit; // Stop execution if the query fails
+}
 ?>
 
 <!DOCTYPE html>
@@ -115,8 +121,7 @@ $result = $conn->query($sql);
                                 <tbody id="stockTableBody">
                                     <?php
                                     if ($result->num_rows > 0) {
-                                        $serialNumber = 1; // Initialize serial number
-                                        // Output data of each row
+                                        $serialNumber = 1; 
                                         while ($row = $result->fetch_assoc()) {
                                             echo "<tr>";
                                             echo "<td>" . $serialNumber . "</td>"; // Display serial number

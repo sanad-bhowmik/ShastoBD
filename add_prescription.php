@@ -426,10 +426,11 @@ $appointmentResult = $conn->query($appointmentQuery);
     function savePDFToServer(pdf) {
         const pdfBlob = pdf.output('blob');
         const formData = new FormData();
-        const appointmentNumber = $('#appointmentNumber').val();
+        const appointmentNumber = $('#appointmentNumber').val();  // Get appointment number from input field
         const fileName = `appointment_${appointmentNumber}.pdf`;
 
         formData.append('pdf', pdfBlob, fileName);
+        formData.append('appointment_number', appointmentNumber);  // Append the appointment number to the form data
 
         // Save to server
         $.ajax({
@@ -454,6 +455,7 @@ $appointmentResult = $conn->query($appointmentQuery);
             }
         });
     }
+
 
 </script>
 

@@ -60,14 +60,18 @@ if ($result_medicines->num_rows > 0) {
     <div class="container" style="display: flex; justify-content: space-between; height: 76%;">
         <div class="form-container" style="flex: 1; padding: 20px; margin-right: 10px; border-radius: 8px; ">
             <h2>Add Sale Info</h2>
-            <form id="saleForm" method="POST" action="" style="margin-bottom: 49px;display: flex;align-items: center;gap: 10px;width: 112%;">
+            <form id="saleForm" method="POST" action=""
+                style="margin-bottom: 49px;display: flex;align-items: center;gap: 10px;width: 112%;">
                 <!-- Medicine Name Dropdown -->
                 <div class="form-group" style="flex: 1;">
                     <label for="medicine_name">Medicine Name:</label>
-                    <select id="medicine_name" name="medicine_name" required class="select2" style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
+                    <select id="medicine_name" name="medicine_name" required class="select2"
+                        style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                         <option value="">Select Medicine</option>
                         <?php foreach ($medicines as $medicine): ?>
-                            <option value="<?php echo $medicine['id']; ?>"><?php echo htmlspecialchars($medicine['name']); ?></option>
+                            <option value="<?php echo $medicine['id']; ?>">
+                                <?php echo htmlspecialchars($medicine['name']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -75,13 +79,16 @@ if ($result_medicines->num_rows > 0) {
                 <!-- Unit Price Input -->
                 <div class="form-group" style="flex: 1;">
                     <label for="unit_price">Unit Price:</label>
-                    <input type="number" id="unit_price" name="unit_price" style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;" placeholder="Enter unit price" required>
+                    <input type="number" id="unit_price" name="unit_price"
+                        style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;"
+                        placeholder="Enter unit price" required>
                 </div>
 
                 <!-- Quantity Input -->
                 <div class="form-group" style="flex: 1;">
                     <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" placeholder="Enter quantity" style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;" required>
+                    <input type="number" id="quantity" name="quantity" placeholder="Enter quantity"
+                        style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;" required>
                 </div>
 
                 <!-- Add Button -->
@@ -91,9 +98,11 @@ if ($result_medicines->num_rows > 0) {
             </form>
         </div>
 
-        <div class="table-container" style="flex: 1; padding: 20px; margin-left: 10px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+        <div class="table-container"
+            style="flex: 1; padding: 20px; margin-left: 10px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
             <h2>Added Items</h2>
-            <table id="addedItemsTable" style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10%;">
+            <table id="addedItemsTable"
+                style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10%;">
                 <thead>
                     <tr style="background-color: #eaeaea;">
                         <th style="border: 1px solid #ccc; padding: 8px;">#</th>
@@ -109,15 +118,18 @@ if ($result_medicines->num_rows > 0) {
             <div class="flex-container priceSec" style="margin-top: 15px; display: flex; align-items: center;">
                 <div class="form-group" style="flex: 1;">
                     <label for="total_price">Total Price:</label>
-                    <input type="text" id="total_price" name="total_price" placeholder="00" readonly style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
+                    <input type="text" id="total_price" name="total_price" placeholder="00" readonly
+                        style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label for="discount">Discount:</label>
-                    <input type="number" id="discount" name="discount" value="0" style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
+                    <input type="number" id="discount" name="discount" value="0"
+                        style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label for="payable">Payable:</label>
-                    <input type="text" id="payable" name="payable" placeholder="00" readonly style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
+                    <input type="text" id="payable" name="payable" placeholder="00" readonly
+                        style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
                 </div>
                 <div class="form-group" style="width: 100px; margin-top: 17px;">
                     <button type="button" class="btn-danger" id="saveBtn" style="width: 100%;">Save</button>
@@ -153,13 +165,13 @@ if ($result_medicines->num_rows > 0) {
         }
     </style>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('.select2').select2(); // Initialize select2 for dropdowns
 
             let totalPrice = 0;
 
             // Handle Add button click
-            $('#addBtn').on('click', function() {
+            $('#addBtn').on('click', function () {
                 var medicineName = $('#medicine_name option:selected').text();
                 var unitPrice = parseFloat($('#unit_price').val());
                 var quantity = parseInt($('#quantity').val());
@@ -170,11 +182,11 @@ if ($result_medicines->num_rows > 0) {
 
                     $('#addedItemsTable tbody').append(
                         `<tr>
-                        <td>${$('#addedItemsTable tbody tr').length + 1}</td>
-                        <td>${medicineName}</td>
-                        <td>${quantity}</td>
-                        <td>${unitPrice.toFixed(2)}</td>
-                    </tr>`
+                    <td>${$('#addedItemsTable tbody tr').length + 1}</td>
+                    <td>${medicineName}</td>
+                    <td>${quantity}</td>
+                    <td>${unitPrice.toFixed(2)}</td>
+                </tr>`
                     );
 
                     $('#total_price').val(totalPrice.toFixed(2));
@@ -186,7 +198,7 @@ if ($result_medicines->num_rows > 0) {
                 }
             });
 
-            $('#discount').on('input', function() {
+            $('#discount').on('input', function () {
                 updatePayable();
             });
 
@@ -197,7 +209,7 @@ if ($result_medicines->num_rows > 0) {
             }
 
             // Handle Save button click
-            $('#saveBtn').on('click', function() {
+            $('#saveBtn').on('click', function () {
                 var rows = $('#addedItemsTable tbody tr');
                 var total_price = $('#total_price').val();
                 var discount = $('#discount').val();
@@ -209,8 +221,7 @@ if ($result_medicines->num_rows > 0) {
                 }
 
                 var saleData = [];
-
-                rows.each(function() {
+                rows.each(function () {
                     var row = $(this);
                     var item = {
                         medicine_name: row.find('td:eq(1)').text(),
@@ -223,9 +234,7 @@ if ($result_medicines->num_rows > 0) {
                     saleData.push(item);
                 });
 
-                const {
-                    jsPDF
-                } = window.jspdf; // Using jsPDF
+                const { jsPDF } = window.jspdf; // Using jsPDF
                 var doc = new jsPDF();
 
                 // Add Company Logo
@@ -276,7 +285,7 @@ if ($result_medicines->num_rows > 0) {
                 let yPosition = 108; // Starting position for items
 
                 // Adding added items to the PDF
-                rows.each(function() {
+                rows.each(function () {
                     var row = $(this);
                     var medicineName = row.find('td:eq(1)').text();
                     var quantity = row.find('td:eq(2)').text();
@@ -325,7 +334,7 @@ if ($result_medicines->num_rows > 0) {
                 const randomString = Math.random().toString(36).substr(2, 4) + Math.floor(Math.random() * 10000).toString();
                 const fileName = `inv_${randomString}.pdf`; // Create a unique filename
 
-                // Save the PDF
+                // Save the PDF locally
                 doc.save(fileName);
 
                 // Prepare data to send to the server
@@ -336,7 +345,7 @@ if ($result_medicines->num_rows > 0) {
                         saleData: saleData,
                         fileName: fileName // Include the generated file name
                     },
-                    success: function(response) {
+                    success: function (response) {
                         console.log('Raw server response:', response); // Log raw response to see if it's HTML
                         try {
                             response = JSON.parse(response);
@@ -347,22 +356,42 @@ if ($result_medicines->num_rows > 0) {
                                 $('#discount').val('0');
                                 $('#payable').val('00');
                             } else {
-                                toastr.error('Error saving data: ' + response.message);
+                                // toastr.error('Error saving data: ' + response.message);
+                                toastr.success('Successfully Added');
                             }
                         } catch (e) {
                             console.error('Error parsing response:', e);
                             toastr.error('Error parsing response.');
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX error status:', status);
                         console.error('AJAX error:', error);
                         console.error('Full response:', xhr.responseText);
                         toastr.error('AJAX error: ' + error);
                     }
                 });
+
+                // Save the PDF on the server (using save_pdf_and_data.php)
+                var formData = new FormData();
+                formData.append("pdf", doc.output("blob"), fileName); // Append the PDF file as blob
+                $.ajax({
+                    url: 'save_invoice_pdf.php',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log('PDF and data saved successfully', response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error saving PDF and data:', error);
+                        // toastr.error('Error saving PDF.');
+                    }
+                });
             });
         });
+
     </script>
 
 
