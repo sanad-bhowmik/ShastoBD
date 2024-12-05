@@ -1,0 +1,538 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 4074
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F2 16 Tf
+18.3999999999999986 TL
+0 g
+250.6645669291338834 785.1970866141732586 Td
+(INVOICE) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 728.5041732283464171 Td
+(Invoice No:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+113.3858267716535551 728.5041732283464171 Td
+(INV-989741) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+226.7716535433071101 728.5041732283464171 Td
+(Invoice Date:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+311.8110236220472871 728.5041732283464171 Td
+(4/12/2024) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+425.1968503937008563 728.5041732283464171 Td
+(Status:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+481.8897637795275841 728.5041732283464171 Td
+(New) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 700.15771653543311 Td
+(Name:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 685.9844881889763428 Td
+(Address:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 671.8112598425196893 Td
+(Mobile:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+425.1968503937008563 700.15771653543311 Td
+(Payment:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+481.8897637795275841 700.15771653543311 Td
+(Cash) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+425.1968503937008563 685.9844881889763428 Td
+(Sold By:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+481.8897637795275841 685.9844881889763428 Td
+(Admin) Tj
+ET
+0.78 g
+28.3464566929133888 643.4648031496062686 538.5826771653544256 -22.677165354330711 re
+f
+BT
+/F2 10 Tf
+11.5 TL
+0 g
+34.0157480314960665 629.291574803149615 Td
+(Sl.) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0 g
+85.0393700787401627 629.291574803149615 Td
+(Item Name) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0 g
+255.1181102362205024 629.291574803149615 Td
+(Quantity) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0 g
+340.157480314960651 629.291574803149615 Td
+(Unit Price) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0 g
+425.1968503937008563 629.291574803149615 Td
+(Discount) Tj
+ET
+BT
+/F2 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 629.291574803149615 Td
+(Amount) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+34.0157480314960665 606.614409448818833 Td
+(1) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+0. 617.952992125984224 Td
+() Tj
+T* (                                Maxpro                            ) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+263.5645669291338891 606.614409448818833 Td
+(NaN) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+363.3771653543307707 606.614409448818833 Td
+(2.00) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+448.0433070866142771 606.614409448818833 Td
+(0) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+527.1866141732283495 606.614409448818833 Td
+(NaN) Tj
+ET
+0.2834645669291339 w
+28.3464566929133888 578.2679527559054122 m
+566.9291338582677326 578.2679527559054122 l
+S
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+396.8503937007874356 564.0947244094487587 Td
+(Gross Amount:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 564.0947244094487587 Td
+(280.00) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+396.8503937007874356 549.9214960629921052 Td
+(Discount \(ABS\):) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 549.9214960629921052 Td
+(0) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+396.8503937007874356 535.748267716535338 Td
+(Tax Amount:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 535.748267716535338 Td
+(0.00) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+396.8503937007874356 521.5750393700786844 Td
+(Net Amount:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 521.5750393700786844 Td
+(280.00) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+396.8503937007874356 507.4018110236219741 Td
+(Paid Amount:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 507.4018110236219741 Td
+(280.00) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+396.8503937007874356 493.2285826771653205 Td
+(Due Amount:) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+510.2362204724410049 493.2285826771653205 Td
+(0.00) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 90.7088976377951894 Td
+(Authorized Signature) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+425.1968503937008563 90.7088976377951894 Td
+(Customer Signature) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 76.5356692913385359 Td
+(EMON DENTAL.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0 g
+28.3464566929133888 62.3624409448817687 Td
+(979 Eastern Plaza, Dhaka-1205, Bangladesh.Contact: +8801XXXXXXXXX, Email: info@example.com) Tj
+ET
+0.53 0.81 0.92 rg
+0. 19.8427559055117015 595.2755905511811534 -56.6929133858267775 re
+f
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 2.5.1)
+/CreationDate (D:20241204164959+06'00')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000004278 00000 n 
+0000006095 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000004335 00000 n 
+0000004460 00000 n 
+0000004590 00000 n 
+0000004723 00000 n 
+0000004860 00000 n 
+0000004983 00000 n 
+0000005112 00000 n 
+0000005244 00000 n 
+0000005380 00000 n 
+0000005508 00000 n 
+0000005635 00000 n 
+0000005764 00000 n 
+0000005897 00000 n 
+0000005999 00000 n 
+0000006343 00000 n 
+0000006429 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <A640FCA4404205459B92D6421D326BF6> <A640FCA4404205459B92D6421D326BF6> ]
+>>
+startxref
+6533
+%%EOF

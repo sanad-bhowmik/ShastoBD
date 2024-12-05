@@ -336,7 +336,9 @@ $appointmentResult = $conn->query($appointmentQuery);
         pdf.setFontSize(24);
         pdf.setFont("helvetica", "bold");
         pdf.setTextColor(0, 102, 204);
-        pdf.text("Rx", leftPanelWidth + margin + 15, currentYStart + 25);
+
+        // Updated left margin to 10
+        pdf.text("Rx", leftPanelWidth + 14 + 15, currentYStart + 25);
 
         // Table Section
         const startY = currentYStart + 45;

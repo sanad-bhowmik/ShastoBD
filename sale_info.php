@@ -36,6 +36,18 @@ if ($result_medicines->num_rows > 0) {
         $medicines[] = $row;
     }
 }
+
+$customers = [];
+$sql = "
+    SELECT id, customer_name
+    FROM sale_customer
+";
+$result_customers = $conn->query($sql);
+if ($result_customers->num_rows > 0) {
+    while ($row = $result_customers->fetch_assoc()) {
+        $customers[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -61,13 +73,27 @@ if ($result_medicines->num_rows > 0) {
         <div class="form-container" style="flex: 1; padding: 20px; margin-right: 10px; border-radius: 8px; ">
             <h2>Add Sale Info</h2>
             <form id="saleForm" method="POST" action=""
-                style="margin-bottom: 49px;display: flex;align-items: center;gap: 10px;width: 112%;">
+                style="margin-left: -21px;margin-bottom: 49px;display: flex;align-items: center;gap: 10px;width: 119%;">
+
+                <!-- Medicine Name Dropdown -->
+                <div class="form-group" style="flex: 1;">
+                    <label for="customer_name">Customer Name:</label>
+                    <select id="customer_name" name="customer_name"  class="select2"
+                        style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
+                        <option value="">Select</option>
+                        <?php foreach ($customers as $customer): ?>
+                            <option value="<?php echo $customer['customer_name']; ?>">
+                                <?php echo htmlspecialchars($customer['customer_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
                 <!-- Medicine Name Dropdown -->
                 <div class="form-group" style="flex: 1;">
                     <label for="medicine_name">Medicine Name:</label>
                     <select id="medicine_name" name="medicine_name" required class="select2"
                         style="width: 100%; border: 1px solid #778899b5; border-radius: 5px;">
-                        <option value="">Select Medicine</option>
+                        <option value="">Select</option>
                         <?php foreach ($medicines as $medicine): ?>
                             <option value="<?php echo $medicine['id']; ?>">
                                 <?php echo htmlspecialchars($medicine['name']); ?>
@@ -81,13 +107,13 @@ if ($result_medicines->num_rows > 0) {
                     <label for="unit_price">Unit Price:</label>
                     <input type="number" id="unit_price" name="unit_price"
                         style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;"
-                        placeholder="Enter unit price" required>
+                        placeholder="Unit price" required>
                 </div>
 
                 <!-- Quantity Input -->
                 <div class="form-group" style="flex: 1;">
                     <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" placeholder="Enter quantity"
+                    <input type="number" id="quantity" name="quantity" placeholder=""
                         style="border: 1px solid #778899b5; height: 31px; width: 100%; border-radius: 5px;" required>
                 </div>
 
@@ -99,7 +125,7 @@ if ($result_medicines->num_rows > 0) {
         </div>
 
         <div class="table-container"
-            style="flex: 1; padding: 20px; margin-left: 10px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+            style="flex: 1; padding: 20px; margin-left: 10px; border-radius: 8px; background-color: #f9f9f9;box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
             <h2>Added Items</h2>
             <table id="addedItemsTable"
                 style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10%;">
@@ -107,6 +133,7 @@ if ($result_medicines->num_rows > 0) {
                     <tr style="background-color: #eaeaea;">
                         <th style="border: 1px solid #ccc; padding: 8px;">#</th>
                         <th style="border: 1px solid #ccc; padding: 8px;">Medicine Name</th>
+                        <th style="border: 1px solid #ccc; padding: 8px;">Customer</th>
                         <th style="border: 1px solid #ccc; padding: 8px;">Quantity</th>
                         <th style="border: 1px solid #ccc; padding: 8px;">Unit Price</th>
                     </tr>
@@ -167,14 +194,21 @@ if ($result_medicines->num_rows > 0) {
     <script>
         $(document).ready(function () {
             $('.select2').select2(); // Initialize select2 for dropdowns
-
+            $('#customer_name').select2();
             let totalPrice = 0;
 
             // Handle Add button click
             $('#addBtn').on('click', function () {
                 var medicineName = $('#medicine_name option:selected').text();
+                var customerName = $('#customer_name option:selected').text();
+                var customerId = $('#customer_name').val(); // Get the customer ID
                 var unitPrice = parseFloat($('#unit_price').val());
                 var quantity = parseInt($('#quantity').val());
+
+                if (!customerId) {  // Ensure a customer is selected
+                    toastr.error('Please select a customer.');
+                    return;
+                }
 
                 if (medicineName && unitPrice && quantity) {
                     var itemTotal = unitPrice * quantity;
@@ -184,6 +218,7 @@ if ($result_medicines->num_rows > 0) {
                         `<tr>
                     <td>${$('#addedItemsTable tbody tr').length + 1}</td>
                     <td>${medicineName}</td>
+                    <td>${customerName}</td>
                     <td>${quantity}</td>
                     <td>${unitPrice.toFixed(2)}</td>
                 </tr>`
@@ -215,127 +250,153 @@ if ($result_medicines->num_rows > 0) {
                 var discount = $('#discount').val();
                 var payable = $('#payable').val();
 
+
+                console.log("Customer ID:", customerId); // Debugging line
+                console.log("Customer Name:", customerName);
+
+                
                 if (rows.length === 0) {
                     toastr.error('No items added.');
                     return;
                 }
 
                 var saleData = [];
+                var customerId = $('#customer_name').val(); // Get customer ID for the sale
+                var customerName = $('#customer_name option:selected').text();
                 rows.each(function () {
                     var row = $(this);
                     var item = {
+                        customer_id: customerId,  // Include customer ID in the item
+                        customer_name: row.find('td:eq(2)').text(),  // Customer name from the row
                         medicine_name: row.find('td:eq(1)').text(),
+                        quantity: row.find('td:eq(3)').text(),
+                        unit_price: row.find('td:eq(4)').text(),
                         quantity: row.find('td:eq(2)').text(),
-                        unit_price: row.find('td:eq(3)').text(),
-                        total_price: total_price,
-                        discount: discount,
-                        payable: payable
+                        total_price: row.find('td:eq(4)').text(),  // Assuming total price is in the 4th column
+                        discount: row.find('td:eq(5)').text(),     // Assuming discount is in the 5th column
+                        payable: row.find('td:eq(6)').text()
                     };
                     saleData.push(item);
                 });
 
-                const { jsPDF } = window.jspdf; // Using jsPDF
+                const { jsPDF } = window.jspdf;
                 var doc = new jsPDF();
 
-                // Add Company Logo
-                const logo = 'themefiles/assets/images/logo-inverse.png'; // Logo path
-                const imgWidth = 50; // Set the desired width for the logo
-                const imgHeight = 20; // Set the desired height for the logo
-                doc.addImage(logo, 'PNG', 10, 10, imgWidth, imgHeight); // Adjust logo position and size
+                // Generate a random Invoice No.
+                const randomInvoiceNo = `INV-${Math.floor(100000 + Math.random() * 900000)}`;
 
-                // Set the background color to white
-                doc.setFillColor(255, 255, 255); // White background
-                doc.rect(0, 0, doc.internal.pageSize.width, doc.internal.pageSize.height, 'F'); // Fill background
-
-                // Title
-                doc.setFontSize(26);
+                // Get the current date
+                const currentDate = new Date();
+                const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+                // Add Invoice Title with Bottom Margin
+                doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0); // Black text color
-                doc.text('Sale Invoice', 70, 30); // Centered title
+                doc.text('INVOICE', 100, 20, { align: 'center' });
+                let marginBottom = 20;
+                let currentY = 20 + marginBottom;
 
-                // Invoice Information
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'normal');
-                const date = new Date().toLocaleDateString();
-                doc.text(`Invoice Date: ${date}`, 10, 45);
-                doc.text(`Total Price: Tk ${total_price}`, 10, 55);
-                doc.text(`Discount: Tk ${discount}`, 10, 65);
-                doc.text(`Payable: Tk ${payable}`, 10, 75);
-
-                // Draw a line for separation
-                doc.setTextColor(0, 0, 0); // Reset to black for line
-                doc.line(10, 80, 200, 80); // Draw line from (x1, y1) to (x2, y2)
-
-                // Adding Added Items Header
-                doc.setFontSize(14);
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0); // Black text color
-                doc.text('Added Items:', 10, 90);
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold'); // Set bold font for the header
-                doc.text('Medicine Name', 10, 100);
-                doc.text('Quantity', 100, 100);
-                doc.text('Unit Price', 150, 100);
-
-                // Draw a line for item header
-                doc.line(10, 103, 200, 103); // Draw line under the header
-
-                // Reset font for items
-                doc.setFont('helvetica', 'normal');
-                let yPosition = 108; // Starting position for items
-
-                // Adding added items to the PDF
-                rows.each(function () {
-                    var row = $(this);
-                    var medicineName = row.find('td:eq(1)').text();
-                    var quantity = row.find('td:eq(2)').text();
-                    var unitPrice = parseFloat(row.find('td:eq(3)').text()).toFixed(2);
-
-                    doc.text(medicineName, 10, yPosition);
-                    doc.text(quantity, 100, yPosition);
-                    doc.text(`Tk ${unitPrice}`, 150, yPosition);
-
-                    yPosition += 10; // Increment y position for the next item
-                });
-
-                // Draw line after items
-                doc.line(10, yPosition, 200, yPosition);
-
-                // Add totals and discounts with better layout
-                doc.setFont('helvetica', 'bold');
-                yPosition += 10; // Move down for totals
-                doc.text("Total Price:", 140, yPosition);
-                doc.text(`Tk ${total_price}`, 180, yPosition);
-
-                yPosition += 10; // Move down for discount
-                doc.text("Discount:", 140, yPosition);
-                doc.text(`Tk ${discount}`, 180, yPosition);
-
-                yPosition += 10; // Move down for payable
-                doc.text("Payable:", 140, yPosition);
-                doc.text(`Tk ${payable}`, 180, yPosition);
-
-                // Draw line before thank you message
-                doc.line(10, yPosition + 10, 200, yPosition + 10);
-
-                // Add thank you message at the bottom
-                doc.setFontSize(12); // Set smaller font size for the thank you message
-                doc.setFont('helvetica', 'italic');
-                doc.text('Thank you for your business!', 10, yPosition + 20);
-
-                // Footer with contact information
+                // Order Details Section
                 doc.setFontSize(10);
                 doc.setFont('helvetica', 'normal');
-                doc.text('Contact: +8801XXXXXXXXX', 10, yPosition + 30);
-                doc.text('Email: info@example.com', 10, yPosition + 35);
-                doc.text('Website: www.example.com', 10, yPosition + 40);
+                doc.text('Invoice No:', 10, currentY);
+                doc.text(randomInvoiceNo, 40, currentY);
+                doc.text('Invoice Date:', 80, currentY);
+                doc.text(formattedDate, 110, currentY);
+                doc.text('Status:', 150, currentY);
+                doc.text('New', 170, currentY);
 
-                // Generate a unique random string (4 characters + 4 digits)
-                const randomString = Math.random().toString(36).substr(2, 4) + Math.floor(Math.random() * 10000).toString();
-                const fileName = `inv_${randomString}.pdf`; // Create a unique filename
+                currentY += 10;
 
-                // Save the PDF locally
-                doc.save(fileName);
+                doc.setFontSize(10);
+                doc.text('Customer Name:', 10, currentY);
+                doc.text(customerName, 40, currentY);
+                doc.text('Address:', 10, currentY + 5);
+                doc.text('', 40, currentY + 5);
+                doc.text('Mobile:', 10, currentY + 10);
+                doc.text('', 40, currentY + 10);
+                doc.text('Payment:', 150, currentY);
+                doc.text('Cash', 170, currentY);
+                doc.text('Sold By:', 150, currentY + 5);
+                doc.text('Admin', 170, currentY + 5);
+
+                doc.setFillColor(200, 200, 200);
+                doc.rect(10, currentY + 20, 190, 8, 'F');
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+
+                doc.text('Sl.', 12, currentY + 25);
+                doc.text('Item Name', 30, currentY + 25);
+                doc.text('Quantity', 90, currentY + 25);
+                doc.text('Unit Price', 120, currentY + 25);
+                doc.text('Amount', 150, currentY + 25);
+
+                // Table Content
+                doc.setFont('helvetica', 'normal');
+                let yPosition = currentY + 33;
+                let sl = 1;
+
+                rows.each(function () {
+                    var row = $(this);
+                    var itemName = row.find('td:eq(1)').text();
+                    var quantity = parseFloat(row.find('td:eq(3)').text());
+                    var unitPrice = parseFloat(row.find('td:eq(4)').text());
+
+                    var amount = (quantity * unitPrice).toFixed(2);
+
+                    doc.text(sl.toString(), 12, yPosition);
+                    doc.text(itemName, 0, yPosition + -4, { align: 'left' });
+                    doc.text(quantity.toString(), 100, yPosition, { align: 'right' });
+                    doc.text(unitPrice.toFixed(2), 135, yPosition, { align: 'right' });
+                    doc.text(amount, 193, yPosition, { align: 'right' });
+
+                    sl++;
+                    yPosition += 8;
+                });
+
+                doc.setLineWidth(0.1);
+                yPosition += 2;
+                doc.line(10, yPosition, 200, yPosition);
+
+                yPosition += 5;
+                doc.setFont('helvetica', 'normal');
+                doc.text('Gross Amount:', 140, yPosition);
+                doc.text(total_price, 180, yPosition);
+
+                yPosition += 5;
+                doc.text('Discount (ABS):', 140, yPosition);
+                doc.text(discount, 180, yPosition);
+
+                yPosition += 5;
+                doc.text('Tax Amount:', 140, yPosition);
+                doc.text('0.00', 180, yPosition);
+
+                yPosition += 5;
+                doc.text('Net Amount:', 140, yPosition);
+                doc.text(payable, 180, yPosition);
+
+                yPosition += 5;
+                doc.text('Paid Amount:', 140, yPosition);
+                doc.text(payable, 180, yPosition);
+
+                yPosition += 5;
+                doc.text('Due Amount:', 140, yPosition);
+                doc.text('0.00', 180, yPosition);
+
+                let footerYPosition = 265;
+                doc.text('Authorized Signature', 10, footerYPosition);
+                doc.text('Customer Signature', 150, footerYPosition);
+
+                // Company Info positioned below the signatures
+                doc.text('EMON DENTAL.', 10, footerYPosition + 5);
+                doc.text('979 Eastern Plaza, Dhaka-1205, Bangladesh.Contact: +8801XXXXXXXXX, Email: info@example.com', 10, footerYPosition + 10);
+
+                doc.setFillColor(135, 206, 235);
+                doc.rect(0, 290, 210, 20, 'F');
+
+                const fileName = `Invoice_${randomInvoiceNo}.pdf`;
+                var pdfBlob = doc.output('blob');
+                var pdfUrl = URL.createObjectURL(pdfBlob);
+                window.open(pdfUrl, '_blank');
 
                 // Prepare data to send to the server
                 $.ajax({
@@ -353,40 +414,17 @@ if ($result_medicines->num_rows > 0) {
                                 toastr.success('Successfully Added');
                                 $('#addedItemsTable tbody').empty();
                                 $('#total_price').val('00');
-                                $('#discount').val('0');
-                                $('#payable').val('00');
+                                $('#discount').val('');
+                                $('#payable').val('');
                             } else {
-                                // toastr.error('Error saving data: ' + response.message);
-                                toastr.success('Successfully Added');
+                                toastr.success('Invoice Created Successfully');
                             }
                         } catch (e) {
-                            console.error('Error parsing response:', e);
-                            toastr.error('Error parsing response.');
+                            toastr.error('Unexpected response format from server');
                         }
                     },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX error status:', status);
-                        console.error('AJAX error:', error);
-                        console.error('Full response:', xhr.responseText);
-                        toastr.error('AJAX error: ' + error);
-                    }
-                });
-
-                // Save the PDF on the server (using save_pdf_and_data.php)
-                var formData = new FormData();
-                formData.append("pdf", doc.output("blob"), fileName); // Append the PDF file as blob
-                $.ajax({
-                    url: 'save_invoice_pdf.php',
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        console.log('PDF and data saved successfully', response);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error saving PDF and data:', error);
-                        // toastr.error('Error saving PDF.');
+                    error: function () {
+                        toastr.error('Failed to save data');
                     }
                 });
             });

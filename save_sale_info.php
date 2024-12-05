@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     foreach ($saleData as $sale) {
         $medicine_name = $sale['medicine_name'];
+        $customer_name = $sale['customer_name'];
         $quantity = $sale['quantity'];
         $unit_price = $sale['unit_price'];
         $total_price = $sale['total_price'];
@@ -28,12 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $payable = $sale['payable'];
 
         $customerId = 1; // Assuming a default customer ID
-        $customer_name = 'SasthoBD'; // Default customer name
+        // $customer_name = 'SasthoBD'; // Default customer name
         $customer_address = '123 Main St'; // Default address
         $customer_phone = '555-1234'; // Default phone number
 
         // Prepare statement for sale_info
-        $stmt = $conn->prepare("INSERT INTO sale_info (inv_num, totalPrice, discount, payable_price, customerId, customer_name, customer_address, customer_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO sale_info (inv_num, totalPrice, discount, payable_price, customerId, customer_name, customer_address, customer_phone, file_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         // Fetch the last invoice number
         $sql = "SELECT inv_num FROM sale_info ORDER BY id DESC LIMIT 1";
@@ -49,8 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $inv_num = "INV-01";
         }
 
-        // Bind and execute statement for sale_info
-        $stmt->bind_param("sddddsss", $inv_num, $total_price, $discount, $payable, $customerId, $customer_name, $customer_address, $customer_phone);
+        // Define the file path (assuming you're saving it on the server)
+        $file_path = 'C:/xampp/htdocs/shasthobdAdmin/themefiles/assets/pdf/invoice/' . $fileName; // Modify this path according to your system
+
+        // Bind and execute statement for sale_info (now including file_path)
+        $stmt->bind_param("sddddssss", $inv_num, $total_price, $discount, $payable, $customerId, $customer_name, $customer_address, $customer_phone, $file_path);
 
         if (!$stmt->execute()) {
             echo json_encode(['success' => false, 'message' => $stmt->error]);
@@ -62,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $insertedIds[] = $insertedId; // Store the inserted ID
 
         // Insert into sale_invoice with the unique file name
-        $file_path = 'C:/xampp/htdocs/shasthobdAdmin/themefiles/assets/pdf/' . $fileName; // Use the received file name
         $stmtInvoice = $conn->prepare("INSERT INTO sale_invoice (inv_num, file_path, file_name, sale_info_id) VALUES (?, ?, ?, ?)");
         $stmtInvoice->bind_param("sssi", $inv_num, $file_path, $fileName, $insertedId); // Bind the file name and sale_info ID
 

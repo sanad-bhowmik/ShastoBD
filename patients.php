@@ -13,7 +13,7 @@ include_once("include/header.php");
   }
 
   // Call the function when the document is ready
-  $(document).ready(function() {
+  $(document).ready(function () {
     showAlert();
   });
 </script>
@@ -23,7 +23,7 @@ include_once("include/header.php");
     if (input.files && input.files[0]) {
       var reader = new FileReader();
 
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         if (id == "gm1") {
           $('#g1').show();
           $('#g1').attr('src', e.target.result);
@@ -59,23 +59,27 @@ include_once("include/header.php");
             <div class="row align-items-end">
               <div class="col-md-2">
                 <label for="patientName">Patient Name</label>
-                <input type="text" class="form-control" id="patientName" name="patientName" required>
+                <input type="text" class="form-control" id="patientName" name="patientName" style="font-size: 12px;"
+                  required>
               </div>
               <div class="col-md-2">
                 <label for="patientMobile">Mobile</label>
-                <input type="text" class="form-control" id="patientMobile" name="patientMobile" required>
+                <input type="text" class="form-control" id="patientMobile" name="patientMobile" style="font-size: 12px;"
+                  required>
               </div>
               <div class="col-md-2">
                 <label for="patientEmail">Email</label>
-                <input type="email" class="form-control" id="patientEmail" name="patientEmail" required>
+                <input type="email" class="form-control" id="patientEmail" name="patientEmail" style="font-size: 12px;"
+                  >
               </div>
               <div class="col-md-2">
                 <label for="patientAddress">Address</label>
-                <input type="text" class="form-control" id="patientAddress" name="patientAddress" required>
+                <input type="text" class="form-control" id="patientAddress" name="patientAddress"
+                  style="font-size: 12px;" >
               </div>
               <div class="col-md-2">
                 <label for="patientGender">Gender</label>
-                <select class="form-control" id="patientGender" name="patientGender" required>
+                <select class="form-control" id="patientGender" name="patientGender" style="font-size: 12px;" required>
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -136,10 +140,11 @@ include_once("include/header.php");
                     <td class="text-center"><?php echo $rs['Address']; ?></td>
                     <td class="text-center"><?php echo $rs['Gender']; ?></td>
                     <td class="text-center">
-                      <button id="<?php echo $rs['OID']; ?>" type="button" class="btn-sm mr-2 mb-2 btn-primary patientDetails">Details</button>
+                      <button id="<?php echo $rs['OID']; ?>" type="button"
+                        class="btn-sm mr-2 mb-2 btn-primary patientDetails">Details</button>
                     </td>
                   </tr>
-                <?php $i++;
+                  <?php $i++;
                 } ?>
               </tbody>
             </table>
@@ -155,7 +160,8 @@ include_once("include/footer.php");
 ?>
 
 <!-- Large modal -->
-<div id="pModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div id="pModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
@@ -177,14 +183,14 @@ include_once("include/footer.php");
 </div>
 
 <script type="text/javascript">
-  $(document).ready(function() {
-    $('.bd-example-modal-lg').on('hidden.bs.modal', function() {
+  $(document).ready(function () {
+    $('.bd-example-modal-lg').on('hidden.bs.modal', function () {
       //location.reload();
     });
   });
 
   //===============================details
-  $(document).on('click', '.patientDetails', function() {
+  $(document).on('click', '.patientDetails', function () {
     var p_id = $(this).attr("id");
     $.ajax({
       url: "get/get_patient_details_admin.php",
@@ -192,7 +198,7 @@ include_once("include/footer.php");
       data: {
         p_id: p_id
       },
-      success: function(data) {
+      success: function (data) {
         $("#patient-details").html(data);
         $(".bd-example-modal-lg").modal('show');
       }
@@ -202,35 +208,35 @@ include_once("include/footer.php");
   //=======================end
 
   //===========start remove
-  $('.docDelete').on('click', function() {
+  $('.docDelete').on('click', function () {
     var promotionID = $(this).attr("id");
     $.confirm({
       title: 'Confirm!',
       content: 'Are you sure to Remove this? Data cannot be recovered!',
       buttons: {
-        confirm: function() {
+        confirm: function () {
           $.ajax({
             url: "delete/delete_doctor.php",
             method: "POST",
             data: {
               pid: promotionID
             },
-            success: function(response) {
+            success: function (response) {
               console.log(response);
               $.confirm({
                 title: 'Notice',
                 content: response + " Reload Page?",
                 buttons: {
-                  Yes: function() {
+                  Yes: function () {
                     location.reload();
                   },
-                  No: function() {}
+                  No: function () { }
                 }
               });
             }
           });
         },
-        cancel: function() {
+        cancel: function () {
           $.alert('Canceled!');
         }
       }
@@ -238,12 +244,12 @@ include_once("include/footer.php");
   });
   //==============end remove
 
-  $('#UpdateDoctor').on('submit', function(event) {
+  $('#UpdateDoctor').on('submit', function (event) {
     event.preventDefault();
     var chkbox = $("input[type=checkbox]");
     var count = 0;
 
-    chkbox.each(function(index) {
+    chkbox.each(function (index) {
       if (this.checked) {
         count++;
       }
@@ -263,7 +269,7 @@ include_once("include/footer.php");
         data: new FormData(this),
         contentType: false,
         processData: false,
-        success: function(data) {
+        success: function (data) {
           if (data === 'failed') {
             console.log(data);
             toastr.error('Something went wrong/Missing').fadeOut(6000);
@@ -286,7 +292,7 @@ include_once("include/footer.php");
     }
   });
 
-  $(document).ready(function() {
+  $(document).ready(function () {
     $('#DocTable').DataTable({
       lengthMenu: [15, 25, 50],
       "columnDefs": [{

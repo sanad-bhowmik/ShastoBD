@@ -123,23 +123,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                                 <!-- Invoice Number -->
                                 <div class="col-sm-3">
                                     <label for="customer_name">Customer Name:</label>
-                                    <input type="text" id="customer_name" class="form-control" name="customer_name" placeholder="Enter customer name" required>
+                                    <input type="text" id="customer_name" class="form-control" name="customer_name"
+                                        placeholder="Enter customer name" required>
                                 </div>
 
                                 <!-- Customer Name -->
                                 <div class="col-sm-3">
                                     <label for="address">Address:</label>
-                                    <input type="text" id="address" name="address" class="form-control" placeholder="Enter address">
+                                    <input type="text" id="address" name="address" class="form-control"
+                                        placeholder="Enter address">
                                 </div>
                                 <!-- Customer Name -->
                                 <div class="col-sm-3">
                                     <label for="phone">Phone:</label>
-                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="Enter phone number">
+                                    <input type="text" id="phone" name="phone" class="form-control"
+                                        placeholder="Enter phone number">
                                 </div>
 
 
                                 <div class="col-sm-3">
-                                    <button type="submit" class="btn btn-secondary savebtn" style="margin-top: 27px;" name="action" value="add">Save</button>
+                                    <button type="submit" class="btn btn-secondary savebtn" style="margin-top: 27px;"
+                                        name="action" value="add">Save</button>
                                 </div>
 
                             </div>
@@ -162,7 +166,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="groupTable">
+                            <table class="align-middle mb-0 table table-borderless table-striped table-hover"
+                                id="groupTable">
                                 <thead>
                                     <tr>
                                         <th class="">#</th>
@@ -210,9 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Edit button functionality
-            $('.edit-btn').on('click', function() {
+            $('.edit-btn').on('click', function () {
                 var row = $(this).closest('tr');
                 row.find('.customer-name').hide();
                 row.find('.customer-input').show();
@@ -225,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             });
 
             // Save button functionality
-            $('.save-btn').on('click', function() {
+            $('.save-btn').on('click', function () {
                 var row = $(this).closest('tr');
                 var customerId = $(this).data('id');
                 var customerName = row.find('.customer-input').val();
@@ -244,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                         phone: phone,
                         status: status // Send status value
                     },
-                    success: function(response) {
+                    success: function (response) {
                         response = JSON.parse(response);
                         if (response.status === 'success') {
                             toastr.success(response.message);
@@ -265,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                             toastr.error(response.message);
                         }
                     },
-                    error: function() {
+                    error: function () {
                         toastr.error('Error occurred while updating the customer.');
                     }
                 });

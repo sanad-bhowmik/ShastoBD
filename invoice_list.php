@@ -66,31 +66,33 @@ if (isset($_POST['submit'])) {
             <div class="card-header">Search Sales</div>
             <div class="card-body">
               <div class="position-relative row form-group">
-
                 <!-- Invoice Number -->
                 <div class="col-sm-3">
                   <p class="text">Invoice Number:</p>
-                  <input autocomplete="off" type="text" name="inv_num" value="<?php if (isset($_POST['inv_num'])) echo $_POST['inv_num']; ?>" class="form-control" placeholder="Enter Invoice Number">
+                  <input autocomplete="off" type="text" name="inv_num" value="<?php if (isset($_POST['inv_num']))
+                    echo $_POST['inv_num']; ?>" class="form-control" placeholder="Enter Invoice Number">
                 </div>
 
                 <!-- Customer Name -->
                 <div class="col-sm-3">
                   <p class="text">Customer Name:</p>
-                  <input autocomplete="off" type="text" name="customer_name" value="<?php if (isset($_POST['customer_name'])) echo $_POST['customer_name']; ?>" class="form-control" placeholder="Enter Customer Name">
+                  <input autocomplete="off" type="text" name="customer_name" value="<?php if (isset($_POST['customer_name']))
+                    echo $_POST['customer_name']; ?>" class="form-control" placeholder="Enter Customer Name">
                 </div>
 
                 <!-- Customer Phone -->
                 <div class="col-sm-3">
                   <p class="text">Customer Phone:</p>
-                  <input autocomplete="off" type="text" name="customer_phone" value="<?php if (isset($_POST['customer_phone'])) echo $_POST['customer_phone']; ?>" class="form-control" placeholder="Enter Customer Phone">
+                  <input autocomplete="off" type="text" name="customer_phone" value="<?php if (isset($_POST['customer_phone']))
+                    echo $_POST['customer_phone']; ?>" class="form-control" placeholder="Enter Customer Phone">
                 </div>
 
                 <!-- Created Date (single date field) -->
                 <div class="col-sm-3">
                   <p class="text">Date:</p>
-                  <input class="form-control" type="date" name="created_date" value="<?php if (isset($_POST['created_date'])) echo $_POST['created_date']; ?>">
+                  <input class="form-control" type="date" name="created_date" value="<?php if (isset($_POST['created_date']))
+                    echo $_POST['created_date']; ?>">
                 </div>
-
               </div>
               <div class="position-relative row form-group p-t-10">
                 <div class="col-sm-4">
@@ -122,7 +124,8 @@ if (isset($_POST['submit'])) {
                     <th class="text-center">Discount</th>
                     <th class="text-center">Payable Price</th>
                     <th class="text-center">Date</th>
-                    <th class="text-center">Action</th> <!-- New Action column -->
+                    <th class="text-center">Action</th>
+                    <th class="text-center">PDF</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -146,15 +149,23 @@ if (isset($_POST['submit'])) {
                         ?>
                       </td>
                       <td class="text-center">
-                        <button class="btn btn-danger" onclick="confirmDrop('<?php echo $rs['inv_num']; ?>')">Drop</button>
+                        <button class="btn btn-danger"
+                          onclick="confirmDrop('<?php echo $rs['inv_num']; ?>')">Drop</button>
                       </td>
+                      <td class="text-center">
+                        <a href="http://localhost/shasthobdAdmin/themefiles/assets/pdf/invoice/<?php echo basename($rs['file_path']); ?>"
+                          target="_blank">
+                          <img src="./themefiles/assets/images/pdf.png" alt="PDF" width="24" height="24"
+                            style="cursor:pointer;">
+                        </a>
+                      </td>
+
                     </tr>
-                  <?php
+                    <?php
                     $i++;
                   } ?>
                 </tbody>
               </table>
-
             </div>
           </div>
         </div>
@@ -171,12 +182,12 @@ if (isset($_POST['submit'])) {
           data: {
             inv_num: invNum
           },
-          success: function(response) {
+          success: function (response) {
             // Use Toastr for success notifications
             toastr.success(response, 'Success');
             location.reload(); // Reload the page to see updated data
           },
-          error: function() {
+          error: function () {
             // Use Toastr for error notifications
             toastr.error("An error occurred while dropping the invoice.", 'Error');
           }
@@ -184,8 +195,17 @@ if (isset($_POST['submit'])) {
       }
     }
 
-    $(document).ready(function() {
-      $('#clearBtn').click(function() {
+    // Function to open the PDF in a new tab
+    function openPDF(filePath) {
+      if (filePath) {
+        window.open(filePath, '_blank');
+      } else {
+        toastr.error("PDF file path not found.", 'Error');
+      }
+    }
+
+    $(document).ready(function () {
+      $('#clearBtn').click(function () {
         window.location.href = 'invoice_list.php'; // Clear the form by refreshing
       });
     });
